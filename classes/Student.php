@@ -10,6 +10,16 @@ class Student
         $this->studentID = $id;
     }
 
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    public function setID($id)
+    {
+        $this->studentID = $id;
+    }
+
     public function getName() 
     {
         return $this->name;
