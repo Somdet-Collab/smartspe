@@ -14,27 +14,45 @@ class TeamHandling
 
     public function addTeam(Team $team)
     {
-        array_push($this->teams, $team);
+        $this->teams[$team->getTeamID()] = $team;
     }
 
-    public function getTeams(Student $student)
+    public function findStudent(string $studentID)
     {
         $found_team = null;
 
         foreach ($this->teams as $team)
         {
-            if (in_array($student, $team->getMembers()))
+            foreach ($team->getMembers() as $member)
             {
-                $found_team = $team;
+                if ($member->getId() == $studentID)
+                {
+                    $found_team = $team;
+                }
             }
         }
 
-        if(empty($found_team))
+        if($found_team === null)
             {
-                echo "{$student->getName()}({$student->getId()} is not found in any group. <br>";
+                echo "{$studentID} is not found in any group. <br>";
             }
 
         return $found_team;
+    }
+
+    public function getTeams()
+    {
+        return $this->teams;
+    }
+
+    public function exists($teamid)
+    {
+        return isset($this->teams[$teamid]);
+    }
+
+    public function getTeam($teamid)
+    {
+        return $this->teams[$teamid];
     }
 }
 ?>
