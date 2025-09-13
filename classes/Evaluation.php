@@ -8,6 +8,26 @@ class Evaluation
     public function __construct()
     {
         $this->scores = [];
-        $this->comment = [];
-    } 
+        $this->comment = "";
+    }
+
+    public function addScore(int $score)
+    {
+        array_push($this->scores, $score);
+    }
+
+    public function addComment(string $comment)
+    {
+        $this->comment = $comment;
+    }
+
+    public function getScores()
+    {
+        return $this->scores;
+    }
+
+    public function getComment()
+    {
+        return $this->comment;
+    }
 }
