@@ -32,7 +32,7 @@ class Team
             {
                 unset($this->members[$key]);   // remove by index
                 $this->members = array_values($this->members); // reindex
-                echo "This {$id} member is already removed <br><br>";
+                echo "{$member->getName()}({$id}) is removed from the group <br><br>";
                 $found = true;
                 break;
             }
