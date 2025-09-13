@@ -1,3 +1,11 @@
+<?php
+    require_once 'Student.php';
+    require_once 'Team.php';
+    require_once 'TeamHandling.php';
+
+    session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,72 +21,109 @@
         <input type="text" name="name"><br>
         <label>Group ID:</label>
         <input type="text" name="group"><br>
-        <input type="submit" name="submit">
+        <input type="submit" name="submit"><br><br>
+        <label>TeamID: </label>
+        <input type="text" name="teamid"><br>
+        <input type="submit" value="Display members" name="team"><br><br>
+        <label>Delete student id:</label>
+        <input type="number" name="deleteid"><br>
+        <input type="submit" value="Delete" name="delete"><br><br>
     </form>
 </body>
 </html>
 
 <?php
 
-require_once 'Student.php';
-require_once 'Team.php';
-require_once 'TeamHandling.php';
+$id = $_POST["stdID"] ?? null;
+$name = $_POST["name"] ?? null;
+$group = $_POST["group"] ?? null;
 
-$id = $_POST["stdID"];
-$name = $_POST["name"];
-$group = $_POST["group"];
+//Is used to find team
+$teamID = $_POST["teamid"] ?? null;
 
-$student = new Student($name, $id);
+if (!isset($_SESSION['teams'])) 
+{
+    $_SESSION['teams'] = new TeamHandling();
+}
 
-// //Team 1
-// $student1 = new Student("James", 3547777);
-// $student2 = new Student("Jack", 356666);
-// $student3 = new Student("Lim Beng", 354898);
-// $student4 = new Student("Lack Knowledge", 334420);
+//Team array
+$teams = $_SESSION['teams'];
 
-// //Team 2
-// $student5 = new Student("KiKi Wang", 3548987);
-// $student6 = new Student("Menga", 3547720);
+$student = null;
 
-// //Team 3
-// $student7 = new Student("Luca set", 350047);
-// $student8 = new Student("Lackin", 354889);
-// $student9 = new Student("Mistery James", 300922);
+if (isset($_POST["submit"])) 
+{
 
-// $teams = new TeamHandling();
+    if ($id != null && $name != null && $group != null)
+    {
+        if(!$teams->exists($group))
+        {
+            $teams->addTeam(new Team($group));
+        }
 
-// $team1 = new Team("FT01");
-// $team2 = new Team("FT02");
-// $team3 = new Team("FT03");
+        // Create new student object 
+        $student = new Student($name, $id);
 
-// $team1->assignMember($student1);
-// $team1->assignMember($student2);
-// $team1->assignMember($student3);
-// $team1->assignMember($student4);
+        $team = $teams->getTeam($group);
+        $team->assignMember($student);
+        $teams->addTeam($team);
+    }
+    else
+    {
+        echo "Please enter all details!! <br><br>";
+    }
+}
 
-// $team2->assignMember($student5);
-// $team2->assignMember($student6);
+if (isset($_POST["team"]))
+{
+    if ($teams->exists($teamID) && $teamID)
+    {
+        $temp_team = $teams->getTeam($teamID);
 
-// $team3->assignMember($student7);
-// $team3->assignMember($student8);
-// $team3->assignMember($student9);
+        foreach($temp_team->getMembers() as $std)
+        {
+            echo "Member id is {$std->getID()} <br>";
+            echo "Member Name is {$std->getName()} <br><br>";
+        }
+    }
+    elseif (!$teams->exists($teamID) && $teamID)
+    {
+        echo "Team {$teamID} does not exist <br>";
+    }
+    else
+    {
+        echo "You haven't entered any team id <br>";
+    }
 
-$teams = new TeamHandling();
+}
 
+if (isset($_POST["delete"]))
+{
+    $delId = $_POST["deleteid"] ?? null;
 
+    if ($delId)
+    {
+        $temp_team = $teams->findStudent($delId);
 
-$counter = 0;
-
-// foreach ($team1->getMembers() as $member)
-// {
-//     $counter++;
-//     echo "Student {$counter}'s name is {$member->getName()}. <br>";
-// }
+        if (!empty($temp_team))
+        {
+            $temp_team->removeMember($delId);
+            $teams->addTeam($temp_team); // save bac
+        }
+    }
+    else
+    {
+        echo "You didn't enter id to be deleted <br><br>";
+    }
+}
 
 if (isset($_POST['submit'])) 
 {
-    echo "Student id is {$student->getID()} <br>";
-    echo "Student Name is {$student->getName()} <br>";
+    if($student)
+    {
+        echo "Student id is {$student->getID()} <br>";
+        echo "Student Name is {$student->getName()} <br>";
+    }
 }
 
 ?>
