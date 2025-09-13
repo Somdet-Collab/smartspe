@@ -22,12 +22,17 @@
         <label>Group ID:</label>
         <input type="text" name="group"><br>
         <input type="submit" name="submit"><br><br>
+        <label>Display all Teams: </label>
+        <input type="submit" value="Display Teams" name="allteam"><br><br>
         <label>TeamID: </label>
         <input type="text" name="teamid"><br>
         <input type="submit" value="Display members" name="team"><br><br>
         <label>Delete student id:</label>
         <input type="number" name="deleteid"><br>
         <input type="submit" value="Delete" name="delete"><br><br>
+        <label>Delete Team id:</label>
+        <input type="text" name="deleteteam"><br>
+        <input type="submit" value="Delete" name="delteam"><br><br>
     </form>
 </body>
 </html>
@@ -109,6 +114,42 @@ if (isset($_POST["delete"]))
         {
             $temp_team->removeMember($delId);
             $teams->addTeam($temp_team); // save bac
+        }
+    }
+    else
+    {
+        echo "You didn't enter id to be deleted <br><br>";
+    }
+}
+
+if (isset($_POST["allteam"]))
+{
+    $allteams = $teams->getTeams();
+    $count = 0;
+
+    if (!empty($allteams))
+    {
+        foreach($allteams as $team)
+        {
+            $count++;
+            echo "{$count}. TeamID: {$team->getTeamID()} <br><br>";
+        }
+    }
+    else
+    {
+        echo "There is no team entered yet!! <br>";
+    }
+}
+
+if (isset($_POST["delteam"]))
+{
+    $delId = $_POST["deleteteam"] ?? null;
+
+    if ($delId)
+    {
+        if ($teams->removeTeam($delId))
+        {
+            echo "Team {$delId} is deleted from the system <br><br>";
         }
     }
     else

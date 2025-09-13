@@ -28,6 +28,7 @@ class TeamHandling
                 if ($member->getId() == $studentID)
                 {
                     $found_team = $team;
+                    break;
                 }
             }
         }
@@ -35,6 +36,30 @@ class TeamHandling
         if($found_team === null)
             {
                 echo "{$studentID} is not found in any group. <br>";
+            }
+
+        return $found_team;
+    }
+
+    public function removeTeam($teamID)
+    {
+        $found_team = false;
+
+        foreach ($this->teams as $key => $team)
+        {
+            if ($team->getTeamID() == $teamID)
+            {
+                unset($this->teams[$key]);   // remove by index
+                $this->teams = array_values($this->teams); // reindex
+                echo "This {$teamID} member is already removed <br><br>";
+                $found_team = true;
+                break;
+            }
+        }
+
+        if(!$found_team)
+            {
+                echo "{$teamID} is not found in the system. <br>";
             }
 
         return $found_team;
