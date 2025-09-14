@@ -10,7 +10,13 @@ class Evaluation
         $this->scores = [];
         $this->comment = "";
     }
-
+ 
+    //Prompt student id to identify student
+    //And pass the the team that student belong to
+    public function evaluate($studentid, $team)
+    {
+        
+    }
     public function addScore(int $score)
     {
         array_push($this->scores, $score);
