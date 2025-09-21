@@ -1,5 +1,6 @@
 <?php
 require('../../config.php');
+$context = context_system::instance();
 require_login();
 
 $PAGE->set_url(new moodle_url('/mod/sentiment_analysis/view.php'));
@@ -46,6 +47,7 @@ echo $OUTPUT->header();
 <h3>Existing Teams</h3>
 <?php
 $teams = $DB->get_records('team');
+
 if ($teams) {
     echo "<ul>";
     foreach ($teams as $team) {
