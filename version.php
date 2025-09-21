@@ -27,4 +27,4 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2025041400;       // The current module version (Date: YYYYMMDDXX).
 $plugin->requires  = 2025040800;       // Requires this Moodle version.
-$plugin->component = 'sentiment_analysis';      // Full name of the plugin (used for diagnostics)
+$plugin->component = 'mod_sentiment_analysis';      // Full name of the plugin (used for diagnostics)
