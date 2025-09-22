@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $record->name = $teamname;
     $record->course = $courseid;
 
-    $DB->insert_record('team', $record);
+    $DB->insert_record('sentiment_analysis_team', $record);
 
     echo $OUTPUT->notification("Team <strong>{$teamname}</strong> added!", 'notifysuccess');
 }
@@ -46,7 +46,7 @@ echo $OUTPUT->header();
 <hr>
 <h3>Existing Teams</h3>
 <?php
-$teams = $DB->get_records('team');
+$teams = $DB->get_records('sentiment_analysis_team');
 
 if ($teams) {
     echo "<ul>";

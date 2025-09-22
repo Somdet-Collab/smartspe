@@ -13,7 +13,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="teampk" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="coursepk" TYPE="foreign" FIELDS="course" REFTABLE="mdl_course" REFFIELDS="id"/>
+        <KEY NAME="coursepk" TYPE="foreign" FIELDS="course" REFTABLE="course" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="teamcode_uq" UNIQUE="true" FIELDS="teamcode"/>
@@ -48,7 +48,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="evaluatorfk" TYPE="foreign" FIELDS="evaluator" REFTABLE="sentiment_analysis_team_member" REFFIELDS="id"/>
         <KEY NAME="evaluateefk" TYPE="foreign" FIELDS="evaluatee" REFTABLE="sentiment_analysis_team_member" REFFIELDS="id"/>
-        <KEY NAME="coursepk" TYPE="foreign" FIELDS="course" REFTABLE="mdl_course" REFFIELDS="id"/>
+        <KEY NAME="coursepk" TYPE="foreign" FIELDS="course" REFTABLE="course" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
