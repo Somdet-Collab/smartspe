@@ -28,7 +28,7 @@
       <KEYS>
         <KEY NAME="team_mempk" TYPE="primary" FIELDS="id"/>
         <KEY NAME="studentfk" TYPE="foreign" FIELDS="studentID" REFTABLE="user" REFFIELDS="id"/>
-        <KEY NAME="teamfk" TYPE="foreign" FIELDS="teamid" REFTABLE="team" REFFIELDS="id"/>
+        <KEY NAME="teamfk" TYPE="foreign" FIELDS="teamid" REFTABLE="sentiment_analysis_team" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="sentiment_analysis_evaluation" COMMENT="evaluation results are stored">
@@ -46,8 +46,8 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="evaluatorfk" TYPE="foreign" FIELDS="evaluator" REFTABLE="team_member" REFFIELDS="id"/>
-        <KEY NAME="evaluateefk" TYPE="foreign" FIELDS="evaluatee" REFTABLE="team_member" REFFIELDS="id"/>
+        <KEY NAME="evaluatorfk" TYPE="foreign" FIELDS="evaluator" REFTABLE="sentiment_analysis_team_member" REFFIELDS="id"/>
+        <KEY NAME="evaluateefk" TYPE="foreign" FIELDS="evaluatee" REFTABLE="sentiment_analysis_team_member" REFFIELDS="id"/>
         <KEY NAME="coursepk" TYPE="foreign" FIELDS="course" REFTABLE="mdl_course" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
@@ -63,7 +63,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="sa_pk" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="evaluatpk" TYPE="foreign" FIELDS="evaluationid" REFTABLE="evaluation" REFFIELDS="id"/>
+        <KEY NAME="evaluatpk" TYPE="foreign" FIELDS="evaluationid" REFTABLE="sentiment_analysis_evaluation" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
   </TABLES>
