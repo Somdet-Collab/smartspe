@@ -4,7 +4,7 @@
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="team" COMMENT="team details are stored here">
+    <TABLE NAME="sentiment_analysis_team" COMMENT="team details are stored here">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="teamcode" TYPE="char" LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
@@ -19,7 +19,7 @@
         <INDEX NAME="teamcode_uq" UNIQUE="true" FIELDS="teamcode"/>
       </INDEXES>  
     </TABLE>
-    <TABLE NAME="team_member" COMMENT="member of each team is stored here">
+    <TABLE NAME="sentiment_analysis_team_member" COMMENT="member of each team is stored here">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="teamid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -31,7 +31,7 @@
         <KEY Name="teamfk" TYPE="foreign" FIELDS="teamid" REFTABLE="team" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="evaluation" COMMENT="evaluation results are stored">
+    <TABLE NAME="sentiment_analysis_evaluation" COMMENT="evaluation results are stored">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -54,7 +54,7 @@
         <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="sentiment_analysis" COMMENT="The result after sentiment analysis">
+    <TABLE NAME="sentiment_analysis_report" COMMENT="The result after sentiment analysis">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="evaluationid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
