@@ -3,7 +3,7 @@ require('../../config.php');
 $context = context_system::instance();
 require_login();
 
-$PAGE->set_url(new moodle_url('/mod/sentiment_analysis/view.php'));
+$PAGE->set_url(new moodle_url('/mod/smartspe/view.php'));
 $PAGE->set_title('Sentiment Analysis Test');
 $PAGE->set_heading('Sentiment Analysis Test');
 
@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $record->name = $teamname;
     $record->course = $courseid;
 
-    $DB->insert_record('sentiment_analysis_team', $record);
+    $DB->insert_record('smartspe_team', $record);
 
     echo $OUTPUT->notification("Team <strong>{$teamname}</strong> added!", 'notifysuccess');
 }
@@ -46,7 +46,7 @@ echo $OUTPUT->header();
 <hr>
 <h3>Existing Teams</h3>
 <?php
-$teams = $DB->get_records('sentiment_analysis_team');
+$teams = $DB->get_records('smartspe_team');
 
 if ($teams) {
     echo "<ul>";

@@ -1,8 +1,8 @@
 <?php
 
-require_once 'Student.php';
 class Team
 {
+
     private $teamID;
     private array $members;
 
@@ -12,14 +12,14 @@ class Team
         $this->members = [];
     }
 
-    public function setName(string $id)
+    public function set_teamid(string $id)
     {
         $this->teamID = $id;
     }
 
-    public function assignMember(Student $student) 
+    public function assignMember($userid) 
     {
-        array_push($this->members, $student);
+        array_push($this->members, $userid);
     }
 
     public function removeMember($id)
