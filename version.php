@@ -17,7 +17,7 @@
 /**
  * Version information
  *
- * @package   mod_sentiment_analysis
+ * @package   mod_smartspe
  * @author Somdet Pidtanung
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @var stdClass $plugin
@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_sentiment_analysis';      // Full name of the plugin (used for diagnostics)
+$plugin->component = 'mod_smartspe';      // Full name of the plugin (used for diagnostics)
 $plugin->version   = 2025092200;       // The current module version (Date: YYYYMMDDXX).
 $plugin->requires  = 2022041900;       // Requires this Moodle version.
 $plugin->maturity  = MATURITY_ALPHA;            // Plugin stability

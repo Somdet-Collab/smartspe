@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/sentiment_analysis/db" VERSION="20200213" COMMENT="XMLDB file for Folder module"
+<XMLDB PATH="mod/smartspe/db" VERSION="20200213" COMMENT="XMLDB file for Folder module"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="sentiment_analysis_team" COMMENT="team details are stored here">
+    <TABLE NAME="smartspe_team" COMMENT="team details are stored here">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="teamcode" TYPE="char" LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="teamcode" TYPE="char" LENGTH="4" UNIQUE="true" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="project" TYPE="char" LENGTH="255" UNIQUE="true" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
@@ -19,11 +19,11 @@
         <INDEX NAME="teamcode_uq" UNIQUE="true" FIELDS="teamcode"/>
       </INDEXES>  
     </TABLE>
-    <TABLE NAME="sentiment_analysis_team_member" COMMENT="member of each team is stored here">
+    <TABLE NAME="smartspe_team_member" COMMENT="member of each team is stored here">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="teamid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="studentID" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="studentID" TYPE="int" LENGTH="10" UNIQUE="true" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="team_mempk" TYPE="primary" FIELDS="id"/>
@@ -31,7 +31,7 @@
         <KEY NAME="teamfk" TYPE="foreign" FIELDS="teamid" REFTABLE="sentiment_analysis_team" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="sentiment_analysis_evaluation" COMMENT="evaluation results are stored">
+    <TABLE NAME="smartspe_evaluation" COMMENT="evaluation results are stored">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -54,7 +54,7 @@
         <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="sentiment_analysis_report" COMMENT="The result after sentiment analysis">
+    <TABLE NAME="smartspe_report" COMMENT="The result after sentiment analysis">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="evaluationid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
