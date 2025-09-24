@@ -1,5 +1,5 @@
 <?php
-namespace mod\smartspe;
+namespace mod\smartspe\classes;
 
 require(__DIR__ . '/config.php');
 

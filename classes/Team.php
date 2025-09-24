@@ -1,4 +1,5 @@
 <?php
+namespace mod\smartspe\classes;
 
 class Team
 {

@@ -1,7 +1,6 @@
 <?php
-    require_once 'Student.php';
-    require_once 'Team.php';
-    require_once 'TeamHandling.php';
+
+use mod\smartspe\classes\Team as Team;
 
     session_start();
 ?>
