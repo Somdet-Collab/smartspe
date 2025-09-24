@@ -2,7 +2,7 @@
 
 namespace mod\smartspe\classes;
 
-use mod\smartspe\classes\db_manager;
+use mod\smartspe\classes\db_manager as team_manager;
 
 class processor
 {
@@ -24,4 +24,11 @@ class processor
 
         return $index;
     }
+
+    public function save_answers($answers, $userid, $evaluateeid)
+    {
+
+    }
+
+    
 }

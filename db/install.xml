@@ -34,7 +34,6 @@
     <TABLE NAME="smartspe_evaluation" COMMENT="evaluation results are stored">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="evaluator" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="evaluatee" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="q1" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
@@ -48,7 +47,6 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="evaluatorfk" TYPE="foreign" FIELDS="evaluator" REFTABLE="sentiment_analysis_team_member" REFFIELDS="id"/>
         <KEY NAME="evaluateefk" TYPE="foreign" FIELDS="evaluatee" REFTABLE="sentiment_analysis_team_member" REFFIELDS="id"/>
-        <KEY NAME="coursepk" TYPE="foreign" FIELDS="course" REFTABLE="course" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>

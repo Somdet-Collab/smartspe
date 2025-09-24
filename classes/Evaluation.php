@@ -1,6 +1,6 @@
 <?php
 
-class Evaluation
+class evaluation
 {
     private $scores;
     private $comment;
