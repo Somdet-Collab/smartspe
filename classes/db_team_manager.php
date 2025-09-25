@@ -9,6 +9,7 @@ class db_manager
     {
         #Declare variable
         global $DB;
+        $success = false;
 
         if (!$this->record_exist('smartspe_team', ['teamcode' => $teamid]))
         {
@@ -17,16 +18,21 @@ class db_manager
             $record->teamcode = $teamid;
             $record->project = $project_name;
             $record->course = $courseid;
+
+            $success = true;
         }
         else
         {
             echo "This teamid ($teamid) has already existed in the database <br>";
+            return $success;
         }
 
         #Insert data into databas
         if ($DB->insert_record('smartspe_team', $record))
             echo "Team {$teamid} has been created. <br>";
 
+        
+        return $success;
     }
 
     public function update_team($teamid, $project)
@@ -38,7 +44,7 @@ class db_manager
         {
             #Record to be updated
             $record = $DB->get_record('smartspe_team', ['teamcode' => $teamid]);
-            $record->$project = $project; //Update row with new value
+            $record->project = $project; //Update row with new value
             $DB->update_record('smartspe_team', $record); //Update row in db
             $success = true;
         }
@@ -61,7 +67,7 @@ class db_manager
             $DB->delete_records('smartspe_team_member', ['teamid' => $teamid]);
             
             //Delete this team
-            $DB->delete_record('smartspe_team', ['teamid' => $teamid]);
+            $DB->delete_record('smartspe_team', ['teamcode' => $teamid]);
             $success = true;
         }
         else
@@ -78,7 +84,7 @@ class db_manager
         global $DB;
         $success = false;
 
-        if ($this->record_exist('smartspe_team_member', ['teamcode' => $teamid]))
+        if ($this->record_exist('smartspe_team_member', ['teamid' => $teamid]))
         {
             //Create class object to store data
             $record = new \stdClass();
@@ -124,7 +130,7 @@ class db_manager
         if ($this->record_exist('smartspe_team_member', ['studentID' => $userid]))
         {
             #Get record of $userid
-            $record = $DB->get_record_select('smartspe_team_member', 'userid = ?', [$userid]);
+            $record = $DB->get_record_select('smartspe_team_member', 'studentID = ?', [$userid]);
             $teamid = $record->teamid;#get team id of this user
 
             #Get all members in the same team
