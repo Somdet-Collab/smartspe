@@ -45,11 +45,28 @@ class db_evaluation
     public function get_answers_db($userid)
     {
         global $DB;
+        $answers = [];
+        
+        for($i = 0; $i < 5; $i++)
+        {   
+            //Access questions column
+            $question = 'q'.($i+1);
+            $record = $DB->get_records('smartspe_evaluation', ['evaluator' => $userid]);
+            $answers[$i] = $record->$question;
+        }
+
+        return $answers; //Array
+
     }
 
     public function get_comment_db($userid)
     {
         global $DB;
+
+        $record = $DB->get_records('smartspe_evaluation', ['evaluator' => $userid]);
+        $comment = $record->comment;
+
+        return $comment;
     }
 
     

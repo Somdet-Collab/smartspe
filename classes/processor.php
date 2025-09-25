@@ -3,6 +3,7 @@
 namespace mod\smartspe\classes;
 
 use mod\smartspe\classes\db_manager as team_manager;
+use mod\smartspe\classes\db_evaluation as evaluation;
 
 class processor
 {
