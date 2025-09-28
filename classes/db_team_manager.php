@@ -1,9 +1,9 @@
 <?php
-namespace mod\smartspe\classes;
+namespace mod_smartspe;
 
 require(__DIR__ . '/config.php');
 
-class db_manager
+class db_team_manager
 {
     public function create_team($teamid, $project_name, $courseid)
     {

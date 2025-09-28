@@ -1,7 +1,7 @@
 
 <?php
-
-use mod\smartspe\classes\processor;
+require_once(__DIR__ . '/classes/processor.php');
+use mod_smartspe\processor;
 
 ?>
 

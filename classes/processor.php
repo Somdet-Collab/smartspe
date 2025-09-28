@@ -1,13 +1,13 @@
 <?php
 
-namespace mod\smartspe\classes;
+namespace mod_smartspe;
 
 require 'vendor/autoload.php';
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-use mod\smartspe\classes\db_manager as team_manager;
-use mod\smartspe\classes\db_evaluation as evaluation;
+use mod_smartspe\db_evaluation as team_manager;
+use mod_smartspe\db_evaluation as evaluation;
 
 
 class processor

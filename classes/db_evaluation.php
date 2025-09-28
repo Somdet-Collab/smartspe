@@ -1,7 +1,7 @@
 <?php
-namespace mod\smartspe\classes;
+namespace mod_smartspe;
 
-use mod\smartspe\classes\db_manager as team_manager;
+use mod_smartspe\db_team_manager as team_manager;
 
 class db_evaluation
 {
