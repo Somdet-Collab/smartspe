@@ -58,8 +58,8 @@ use mod_smartspe\processor;
   <div class="upload-box">
     <h2>Upload Excel File (.xlsx)</h2>
     <form action="index.php" method="post" enctype="multipart/form-data">
-      <input type="file" name="myfile" accept=".xlsx" required>
-      <button type="submit" class="btn">Upload</button>
+      <input type="file" name="input_file" accept=".xlsx" required>
+      <button type="submit" name="submit" class="btn">Upload</button>
     </form>
     <?php if (!empty($message)): ?>
       <div class="message"><?php echo $message; ?></div>
@@ -72,9 +72,9 @@ use mod_smartspe\processor;
 
 $processor = new processor();
 
-if (isset($_POST['submit']))
+if (isset($_POST["submit"]))
 {
-    if($_FILES['input_file'][''] == "")
+    if($_FILES['input_file']['name'] == "")
     {
         $message = "⚠️ Error uploading file. Error code: " . $file["error"];
     }
