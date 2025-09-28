@@ -8,7 +8,7 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="teamcode" TYPE="char" LENGTH="4" UNIQUE="true" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="project" TYPE="char" LENGTH="255" UNIQUE="true" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="project" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
