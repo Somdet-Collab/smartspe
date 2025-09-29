@@ -4,8 +4,10 @@ namespace mod_smartspe;
 
 require 'vendor/autoload.php';
 
-use mod_smartspe\db_evaluation as team_manager;
+use mod_smartspe\db_team_manager as team_manager;
 use mod_smartspe\db_evaluation as evaluation;
+
+use \PhpOffice\PhpSpreadsheet\IOFactory;
 
 
 class processor
@@ -31,10 +33,6 @@ class processor
 
             try
             {
-                //Upload file
-                move_uploaded_file($tmp_name, $upload_dir.$newfile);
-                echo "<br> The file {$newfile} has been uploaded <br>";
-
                 //Read data to file
                 $this->read_file($upload_dir.$newfile);
             }
@@ -51,36 +49,66 @@ class processor
 
     public function read_file($file_name)
     {
-        $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xls();
-        $spreadsheet = $reader->load($file_name);
+        //Create file loader
+        $spreadsheet = IOFactory::load($file_name);
         $worksheets = $spreadsheet->getActiveSheet();
         $data = $worksheets->toArray();
 
         //Get index of each specify columns
-        $col_given_name = $this->find_column($data[0], "Given Name");
+        $col_student_id = $this->find_column($data[0], "Student ID");
         $col_project_title = $this->find_column($data[0], "PROJECT");
         $col_teamid = $this->find_column($data[0], "TEAM");
 
         //Save data to database
         $manager = new team_manager();
-        foreach ($data as $row)
+
+        foreach ($data as $index => $row)
         {
-            $name = $row[$col_given_name];
+            //Skip the header
+            if ($index === 0) continue;
+
+            $studentid = $row[$col_student_id];
             $project = $row[$col_project_title];
             $teamid = $row[$col_teamid];
+            $courseid = "ICT302";
 
-            
+            //Create team if doesn't exist
+            $manager->create_team($teamid, $project, $courseid);
+
+            //Assign student to exist team
+            $manager->assign_team_member($studentid, $teamid);
         }
 
     }
 
-    public function write_file($filename, $content, $extension="csv")
+    public function write_file_output($filename, $content, $extension="csv")
     {
         
     }
 
-    public function save_answers($answers, $userid, $evaluateeid)
+    public function write_file_data($filename, $content, $extension= "csv")
     {
+
+    }
+
+    public function save_answers($answers, $comment, $userid, $evaluateeid)
+    {
+        $manager = new team_manager(); //Team management 
+        $evaluation = new evaluation(); //evaluation database
+
+        //Ensure both students exists
+        if ($manager->record_exist('smartspe_team_member', ['studentid' => $userid])
+            && $manager->record_exist('smartspe_team_member', ['studentid' => $evaluateeid]))
+        {
+            $evaluation->save_answers_db($answers, $comment, $userid, $evaluateeid);
+        }
+        else
+        {
+            if(!$manager->record_exist('smartspe_team_member', ['studentid' => $userid]))
+                $err_msg = "The student id ($userid) doesn't exist. <br>";
+            else
+                $err_msg = "The evaluee id ($evaluateeid) doesn't exist. <br>";
+        }
 
     }
 
@@ -95,13 +123,9 @@ class processor
             if ($column_name == $column)
             {
                 $index = $key;
-                break;
-            }
-            else
-            {
-                return $index = -1;
+                return $index;
             }
         }
-        return $index;
+        return -1;
     }
 }

@@ -5,7 +5,7 @@ use mod_smartspe\db_team_manager as team_manager;
 
 class db_evaluation
 {
-    public function save_answers_db($answers, $comment, $userid, $evaluateeid, $courseid)
+    public function save_answers_db($answers, $comment, $userid, $evaluateeid)
     {
         global $DB;
         $success = false;
@@ -17,6 +17,7 @@ class db_evaluation
         if ($manager->record_exist('smartspe_team_member', ['studentid' => $userid]))
         {
             $record = new \stdClass();
+            $courseid = "ICT302";
 
             $record->evaluator = $userid;
             $record->evaluatee = $evaluateeid;
@@ -37,7 +38,7 @@ class db_evaluation
         }
         else
         {
-            echo "This student {$userid} has not been assigned to any team <br>";
+            $err_msg = "This student {$userid} has not been assigned to any team <br>";
         }
 
         return $success;

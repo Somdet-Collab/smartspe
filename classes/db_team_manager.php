@@ -5,7 +5,7 @@ require(__DIR__ . '/config.php');
 
 class db_team_manager
 {
-    public function create_team($teamid, $project_name, $courseid)
+    public function create_team($teamid, $project_name=null, $courseid)
     {
         #Declare variable
         global $DB;
@@ -23,13 +23,13 @@ class db_team_manager
         }
         else
         {
-            echo "This teamid ($teamid) has already existed in the database <br>";
+            $err_msg = "This teamid ($teamid) has already existed in the database <br>";
             return $success;
         }
 
         #Insert data into databas
         if ($DB->insert_record('smartspe_team', $record))
-            echo "Team {$teamid} has been created. <br>";
+            $msg = "Team {$teamid} has been created. <br>";
 
         
         return $success;
@@ -50,7 +50,7 @@ class db_team_manager
         }
         else
         {
-            echo "This teamid ($teamid) is not in the database <br>";
+            $err_msg = "This teamid ($teamid) is not in the database <br>";
         }
 
         return $success;
@@ -72,7 +72,7 @@ class db_team_manager
         }
         else
         {
-            echo "This teamid ($teamid) is not in the database <br>";
+            $err_msg = "This teamid ($teamid) is not in the database <br>";
         }
 
         return $success;
@@ -97,8 +97,8 @@ class db_team_manager
         }
         else
         {
-            echo "Team ($teamid) hasn't been created <br>";
-            echo "Please create team first <br>";
+            $err_msg = "Team ($teamid) hasn't been created <br>";
+            $err_msg = "Please create team first <br>";
         }
 
         return $success;
@@ -117,7 +117,7 @@ class db_team_manager
         }
         else
         {
-            echo "This student ($userid) is not in the database <br>";
+            $err_msg = "This student ($userid) is not in the database <br>";
         }
         return $success;
     }
@@ -138,7 +138,7 @@ class db_team_manager
         }
         else
         {
-            echo "This userid ($userid) is not in the database <br>";
+            $err_msg = "This userid ($userid) is not in the database <br>";
         }
 
         return $members;
