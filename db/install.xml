@@ -4,33 +4,6 @@
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="smartspe_team" COMMENT="team details are stored here">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="teamcode" TYPE="char" LENGTH="4" UNIQUE="true" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="project" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="teampk" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="coursepk" TYPE="foreign" FIELDS="course" REFTABLE="course" REFFIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="teamcode_uq" UNIQUE="true" FIELDS="teamcode"/>
-      </INDEXES>  
-    </TABLE>
-    <TABLE NAME="smartspe_team_member" COMMENT="member of each team is stored here">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="teamid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="studentid" TYPE="int" LENGTH="10" UNIQUE="true" NOTNULL="true" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="team_mempk" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="studentfk" TYPE="foreign" FIELDS="studentid" REFTABLE="user" REFFIELDS="id"/>
-        <KEY NAME="teamfk" TYPE="foreign" FIELDS="teamid" REFTABLE="smartspe_team" REFFIELDS="id"/>
-      </KEYS>
-    </TABLE>
     <TABLE NAME="smartspe_evaluation" COMMENT="evaluation results are stored">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
@@ -46,8 +19,8 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="evaluatorfk" TYPE="foreign" FIELDS="evaluator" REFTABLE="smartspe_team_member" REFFIELDS="id"/>
-        <KEY NAME="evaluateefk" TYPE="foreign" FIELDS="evaluatee" REFTABLE="smartspe_team_member" REFFIELDS="id"/>
+        <KEY NAME="evaluatorfk" TYPE="foreign" FIELDS="evaluator" REFTABLE="groups_members" REFFIELDS="userid"/>
+        <KEY NAME="evaluateefk" TYPE="foreign" FIELDS="evaluatee" REFTABLE="groups_members" REFFIELDS="userid"/>
         <KEY NAME="coursepk" TYPE="foreign" FIELDS="course" REFTABLE="course" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
