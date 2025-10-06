@@ -29,14 +29,14 @@ class processor
         $evaluation = new evaluation(); //evaluation database
 
         //Ensure both students exists
-        if ($manager->record_exist('smartspe_team_member', ['studentid' => $userid])
-            && $manager->record_exist('smartspe_team_member', ['studentid' => $evaluateeid]))
+        if ($manager->record_exist('mdl_groups_members', ['userid' => $userid])
+            && $manager->record_exist('mdl_groups_members', ['userid' => $evaluateeid]))
         {
             $evaluation->save_answers_db($answers, $comment, $userid, $evaluateeid);
         }
         else
         {
-            if(!$manager->record_exist('smartspe_team_member', ['studentid' => $userid]))
+            if(!$manager->record_exist('mdl_groups_members', ['userid' => $userid]))
                 $err_msg = "The student id ($userid) doesn't exist. <br>";
             else
                 $err_msg = "The evaluee id ($evaluateeid) doesn't exist. <br>";
