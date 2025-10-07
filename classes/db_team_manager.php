@@ -10,14 +10,14 @@ class db_team_manager
         global $DB;
         $members = [];
 
-        if ($this->record_exist('mdl_groups_members', ['userid' => $userid]))
+        if ($this->record_exist('groups_members', ['userid' => $userid]))
         {
             #Get record of $userid
-            $record = $DB->get_record_select('mdl_groups_members', 'userid = ?', [$userid]);
+            $record = $DB->get_record_select('groups_members', 'userid = ?', [$userid]);
             $teamid = $record->groupid;#get team id of this user
 
             #Get all members in the same team
-            $members = $DB->get_records('mdl_groups_members', ['teamid' => $teamid]);
+            $members = $DB->get_records('groups_members', ['teamid' => $teamid]);
         }
         else
         {

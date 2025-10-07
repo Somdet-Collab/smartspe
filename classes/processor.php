@@ -7,8 +7,6 @@ require 'vendor/autoload.php';
 use mod_smartspe\db_team_manager as team_manager;
 use mod_smartspe\db_evaluation as evaluation;
 
-use \PhpOffice\PhpSpreadsheet\IOFactory;
-
 
 class processor
 {
@@ -29,14 +27,14 @@ class processor
         $evaluation = new evaluation(); //evaluation database
 
         //Ensure both students exists
-        if ($manager->record_exist('mdl_groups_members', ['userid' => $userid])
-            && $manager->record_exist('mdl_groups_members', ['userid' => $evaluateeid]))
+        if ($manager->record_exist('groups_members', ['userid' => $userid])
+            && $manager->record_exist('groups_members', ['userid' => $evaluateeid]))
         {
             $evaluation->save_answers_db($answers, $comment, $userid, $evaluateeid);
         }
         else
         {
-            if(!$manager->record_exist('mdl_groups_members', ['userid' => $userid]))
+            if(!$manager->record_exist('groups_members', ['userid' => $userid]))
                 $err_msg = "The student id ($userid) doesn't exist. <br>";
             else
                 $err_msg = "The evaluee id ($evaluateeid) doesn't exist. <br>";
