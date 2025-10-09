@@ -10,7 +10,7 @@ class db_team_manager
         global $DB;
         $members = [];
 
-        if ($this->record_exist('smartspe_team_member', ['studentID' => $userid]))
+        if ($this->record_exist('groups_members', ['userid' => $userid]))
         {
             //Get teams regarding to courseid
             $teams = $DB->get_records('groups', 'courseid ?', [$courseid]);
@@ -26,7 +26,7 @@ class db_team_manager
                 return false;
 
             #Get all members in the same team
-            $members = $DB->get_records('smartspe_team_member', ['teamid' => $teamid]);
+            $members = $DB->get_records('groups_members', ['teamid' => $teamid]);
         }
         else
         {

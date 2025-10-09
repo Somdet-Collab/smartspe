@@ -14,7 +14,7 @@ class db_evaluation
 
         //Call check function from team_manager
         //To confirm that userid is assigned to the team
-        if ($manager->record_exist('smartspe_team_member', ['studentid' => $userid]))
+        if ($manager->record_exist('groups_members', ['userid' => $userid]))
         {
             $record = new \stdClass();
             $courseid = "ICT302";
