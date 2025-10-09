@@ -5,6 +5,7 @@ require(__DIR__ . '/config.php');
 
 class db_team_manager
 {
+<<<<<<< Updated upstream
     public function create_team($teamid, $project_name=null, $courseid)
     {
         #Declare variable
@@ -123,15 +124,32 @@ class db_team_manager
     }
 
     public function get_members($userid)
+=======
+    public function get_members($userid, $courseid)
+>>>>>>> Stashed changes
     {
         global $DB;
         $members = [];
 
         if ($this->record_exist('smartspe_team_member', ['studentID' => $userid]))
         {
+            //Get teams regarding to courseid
+            $teams = $DB->get_records('groups', 'courseid ?', [$courseid]);
+
             #Get record of $userid
+<<<<<<< Updated upstream
             $record = $DB->get_record_select('smartspe_team_member', 'studentID = ?', [$userid]);
             $teamid = $record->teamid;#get team id of this user
+=======
+            $record = $DB->get_record('groups_members', 'userid = ?', [$userid]);
+
+            //Check if user team id is in any of the team
+            if (in_array($record->teamid, $teams))
+                $teamid = $record->groupid;#get team id of this user
+
+            else
+                return false;
+>>>>>>> Stashed changes
 
             #Get all members in the same team
             $members = $DB->get_records('smartspe_team_member', ['teamid' => $teamid]);

@@ -2,8 +2,6 @@
 
 namespace mod_smartspe;
 
-require 'vendor/autoload.php';
-
 use mod_smartspe\db_team_manager as team_manager;
 use mod_smartspe\db_evaluation as evaluation;
 

@@ -29,6 +29,7 @@ class db_evaluation
                 $field = 'q'.($index+1); //q1, q2, etc. (database column for questions)
                 $record->$field = $answer;
             }
+            
             $record->comment = $comment;
 
             //Insert record into database
