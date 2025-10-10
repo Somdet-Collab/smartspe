@@ -1,12 +1,14 @@
 <?php
 
+//This class carries core logic
+//Mainly interact with UI
 namespace mod_smartspe;
 
 use mod_smartspe\db_team_manager as team_manager;
 use mod_smartspe\db_evaluation as evaluation;
 
 
-class processor
+class quiz_manager
 {
 
     public function write_file_output($filename, $content, $extension="csv")
@@ -38,22 +40,5 @@ class processor
                 $err_msg = "The evaluee id ($evaluateeid) doesn't exist. <br>";
         }
 
-    }
-
-    public function find_column($row, $column_name)
-    {
-        $index = 0;
-
-        //Loop the header
-        //Key is index
-        foreach($row as $key => $column)
-        {
-            if ($column_name == $column)
-            {
-                $index = $key;
-                return $index;
-            }
-        }
-        return -1;
     }
 }
