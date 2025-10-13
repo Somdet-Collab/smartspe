@@ -3,17 +3,20 @@
 namespace mod_smartspe\classes\event;
 
 use question_engine;
+use core\exception\moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
 class data_persistence
 {
+    protected $attemptid;
     protected $attempt;
 
     public function __contruct($attemptid)
     {
         global $DB;
 
+        $this->attemptid = $attemptid;
         $this->attempt = $DB->get_record('quiz_attempts', ['id' => $attemptid], '*', MUST_EXIST);
     }
     public function load_attempt_questions() 
@@ -34,7 +37,7 @@ class data_persistence
                 'name' => $question->name,
                 'text' => $question->questiontext,
                 'state' => $qa->get_state(),
-                'current_answer' => $qa->get_last_step() ? $qa->get_last_step()->get_data() : null
+                'current_answer' => $qa->get_submitted_data()
             ];
         }
 
@@ -47,22 +50,23 @@ class data_persistence
 
         $qa = $quba->get_question_attempt($slot);
 
-        if (!$qa) 
-        {
-            throw new \Exception("Question slot {$slot} not found in this attempt.");
+        if (!$qa) {
+            throw new moodle_exception("Question slot {$slot} not found in this attempt.");
         }
 
-        // Start a new step for this attempt
-        $qa->start_new_step();
+        //
+        $updated = $qa->process_autosave($newdata);
 
-        // Set the new answer
-        $qa->set_response($newdata);
-
-        // Finish the step (not graded yet)
-        $qa->finish_step();
-
-        // Save the question usage (persist changes)
-        $quba->save_all_steps();
+        if (!empty($updated['error'])) 
+        {
+            // Handle validation errors
+            throw new moodle_exception("Updated data is invalid.");
+        } 
+        else 
+        {
+            // Save the updated quba
+            question_engine::save_questions_usage_by_activity($quba);
+        }
 
         return true;
     }

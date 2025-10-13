@@ -2,6 +2,8 @@
 
 namespace mod_smartspe\classes\event;
 
+use core\exception\moodle_exception;
+
 defined('MOODLE_INTERNAL') || die();
 
 /*
@@ -18,7 +20,7 @@ class duration_controller
     public function __construct($startdate, $enddate)
     {
         if ($startdate >= $enddate) 
-            throw new \moodle_exception('Start date must be before end date.');
+            throw new moodle_exception('Start date must be before end date.');
 
         $this->startdate = $startdate;
         $this->enddate = $enddate;
