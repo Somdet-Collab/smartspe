@@ -66,7 +66,7 @@ class questions_handler
 
     }
 
-    public function load_all_questions()
+    public function get_all_questions()
     {
         global $DB;
 
