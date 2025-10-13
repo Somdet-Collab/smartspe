@@ -3,11 +3,9 @@
 namespace mod_smartspe\classes\event;
 
 use question_bank;
-use question_category;
-use context_course;
+use core_question\category as question_category;
 
 defined('MOODLE_INTERNAL') || die();
-
 class questions_handler
 {
     protected $category;
@@ -17,7 +15,7 @@ class questions_handler
     public function __construct($courseid, $questionbankname)
     {
         // Get or create the question bank
-        $this->context = context_course::instance($courseid);
+        $this->context = \context_course::instance($courseid);
         $category = question_category::get_category_by_name($this->context, $questionbankname);
 
         //Create category if no category
@@ -31,19 +29,19 @@ class questions_handler
     public function questions_create($name, $qtype='multichoice', $text)
     {
         //Create question
-        $question = new \stdClass();
+        $question = new \stdclass();
         $question->category = $this->category->id;       // From mdl_question_categories
         $question->qtype = $qtype;        // e.g. shortanswer, multichoice
         $question->name = $name;
         $qtext = '<p>'.$text.'</p>';
         $question->questiontext = $qtext;
-        $question->questiontextformat = 'FORMAT_HTML';
+        $question->questiontextformat = FORMAT_HTML;
         $question->defaultmark = 0;
         $question->timecreated = time();
         $question->timemodified = time();
 
         //Moodle API to save questions
-        $questionid = question_bank::save_question($question, true);
+        $questionid = question_bank::save_answer($question);
 
         return $questionid;
     }
