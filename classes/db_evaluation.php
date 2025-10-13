@@ -5,7 +5,7 @@ use mod_smartspe\db_team_manager as team_manager;
 
 class db_evaluation
 {
-    public function save_answers_db($answers, $comment, $userid, $evaluateeid)
+    public function save_answers_db($answers, $comment, $self_comment=null, $userid, $evaluateeid, $courseid)
     {
         global $DB;
         $success = false;
@@ -17,7 +17,6 @@ class db_evaluation
         if ($manager->record_exist('groups_members', ['userid' => $userid]))
         {
             $record = new \stdClass();
-            $courseid = "ICT302";
 
             $record->evaluator = $userid;
             $record->evaluatee = $evaluateeid;
@@ -30,6 +29,10 @@ class db_evaluation
                 $record->$field = $answer;
             }
             
+            //If have self comment 
+            if ($self_comment)
+                $record->self_comment = $self_comment;
+
             $record->comment = $comment;
 
             //Insert record into database
@@ -75,6 +78,18 @@ class db_evaluation
         $record = $DB->get_record('smartspe_evaluation', ['evaluator' => $userid]);
         if ($record)
             $comment = $record->comment;
+
+        return $comment;
+    }
+
+    public function get_self_comment_db($userid)
+    {
+        global $DB;
+        $comment = null;
+
+        $record = $DB->get_record('smartspe_evaluation', ['evaluator' => $userid]);
+        if ($record)
+            $comment = $record->self_comment;
 
         return $comment;
     }

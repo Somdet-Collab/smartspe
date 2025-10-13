@@ -23,22 +23,7 @@ class quiz_manager
 
     public function save_answers($answers, $comment, $userid, $evaluateeid)
     {
-        $manager = new team_manager(); //Team management 
-        $evaluation = new evaluation(); //evaluation database
 
-        //Ensure both students exists
-        if ($manager->record_exist('groups_members', ['userid' => $userid])
-            && $manager->record_exist('groups_members', ['userid' => $evaluateeid]))
-        {
-            $evaluation->save_answers_db($answers, $comment, $userid, $evaluateeid);
-        }
-        else
-        {
-            if(!$manager->record_exist('groups_members', ['userid' => $userid]))
-                $err_msg = "The student id ($userid) doesn't exist. <br>";
-            else
-                $err_msg = "The evaluee id ($evaluateeid) doesn't exist. <br>";
-        }
 
     }
 }

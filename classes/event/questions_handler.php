@@ -27,7 +27,7 @@ class questions_handler
         $question->name = $name;
         $qtext = '<p>'.$text.'</p>';
         $question->questiontext = $qtext;
-        $question->questiontextformat = FORMAT_HTML;
+        $question->questiontextformat = 'FORMAT_HTML';
         $question->defaultmark = 0;
         $question->timecreated = time();
         $question->timemodified = time();
