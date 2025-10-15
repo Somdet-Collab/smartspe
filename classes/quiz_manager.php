@@ -29,7 +29,7 @@ class quiz_manager
 
     }
 
-    public function download_file_output($filename, $content, $extension="csv")
+    public function download_file_output($filename, $extension="csv")
     {
         
     }

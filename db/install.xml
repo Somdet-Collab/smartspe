@@ -14,6 +14,7 @@
         <FIELD NAME="q3" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="q4" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="q5" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="average" TYPE="float" DECIMALS='2' LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="self_comment" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="comment" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true"/>
@@ -28,7 +29,7 @@
         <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="smartspe_report" COMMENT="The result after sentiment analysis">
+    <TABLE NAME="smartspe_sentiment_analysis" COMMENT="The result after sentiment analysis">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="evaluationid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
