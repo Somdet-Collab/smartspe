@@ -12,7 +12,7 @@ class data_persistence
     protected $attemptid;
     protected $attempt;
 
-    public function __contruct($attemptid)
+    public function __construct($attemptid)
     {
         global $DB;
 

@@ -4,6 +4,8 @@ namespace mod_smartspe\classes\event;
 
 use core\exception\moodle_exception;
 
+require_once(__DIR__ . '/../../../config.php');
+
 defined('MOODLE_INTERNAL') || die();
 
 /*
@@ -17,13 +19,18 @@ class duration_controller
     //End date of submission
     private $enddate;
 
-    public function __construct($startdate, $enddate)
+    private $timezone;
+
+    public function __construct($startdate, $enddate, $timezone=null)
     {
+        global $USER;
+        
         if ($startdate >= $enddate) 
             throw new moodle_exception('Start date must be before end date.');
 
         $this->startdate = $startdate;
         $this->enddate = $enddate;
+        $this->timezone = $timezone ?? $USER->timezone;
     }
 
     /*
