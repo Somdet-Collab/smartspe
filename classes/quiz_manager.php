@@ -8,7 +8,7 @@ use mod_smartspe\db_team_manager as team_manager;
 use mod_smartspe\db_evaluation as evaluation;
 
 
-class quiz_manager
+class smartspe_quiz_manager
 {
     protected $autosave_handler; //To handle auto save
     protected $data_persistence; //To handle loading saved data
