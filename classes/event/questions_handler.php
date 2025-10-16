@@ -1,7 +1,6 @@
 <?php
 
 namespace mod_smartspe\classes\event;
-use core\exception\moodle_exception;
 
 global $CFG;
 require_once($CFG->libdir . '/question/questionlib.php');
@@ -14,14 +13,15 @@ class questions_handler
     protected $context;
     protected $questionbankname;
 
-    public function __construct($context, $questionbankname, $category)
+    public function __construct($courseid, $questionbankname)
     {
         // Get or create the question bank
-        $this->context = $context;
+        $this->context = \context_course::instance($courseid);
+        $category = \question_category::get_category_by_name($this->context, $questionbankname);
 
         //Create category if no category
         if (!$category) 
-            throw new moodle_exception("Category: {$category}, is not yet created");
+            $category = \question_category::create_category($this->context, $questionbankname);
 
         $this->category = $category;
         $this->questionbankname = $questionbankname;
