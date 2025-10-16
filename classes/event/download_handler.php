@@ -57,9 +57,9 @@ class download_handler
         global $DB;
 
         $stdid = $record->evaluator; //Get evalutor id
-        $name = $DB->get_record('user', ['userid' => $stdid], 'name'); //Get member name
+        $name = $DB->get_record('user', ['id' => $stdid], 'name'); //Get member name
         $memberid = $record->evaluatee; //Get evalutee id
-        $member_name = $DB->get_record('user', ['userid' => $memberid], 'name'); //Get member name
+        $member_name = $DB->get_record('user', ['id' => $memberid], 'name'); //Get member name
         $group = $DB->get_record('groups_members', ['userid' => $stdid], 'groupid'); //get teamid
         $polarity = $DB->get_record('smartspe_sentiment_analysis', ['evalutionid' => $record->id], 'polarity');
         $sentiment_score = $DB->get_record('smartspe_sentiment_analysis', ['evalutionid' => $record->id], 'sentimentscore');

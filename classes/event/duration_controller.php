@@ -64,12 +64,12 @@ class duration_controller
 
     public function get_start_date()
     {
-        return userdate($this->startdate);
+        return userdate($this->startdate, $this->timezone);
     }
     
     public function get_end_date()
     {
-        return userdate($this->enddate);
+        return userdate($this->enddate, $this->timezone);
     }
 
 }

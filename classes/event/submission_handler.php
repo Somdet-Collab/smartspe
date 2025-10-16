@@ -4,6 +4,7 @@ namespace mod_smartspe\classes\event;
 
 use mod_smartspe\db_team_manager as team_manager;
 use mod_smartspe\db_evaluation as evaluation;
+use core\exception\moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -42,13 +43,10 @@ class submission_handler
         else
         {
             if(!$manager->record_exist('groups_members', ['userid' => $userid]))
-                $err_msg = "The student id ($userid) doesn't exist. <br>";
+                throw new moodle_exception("The student id ($userid) doesn't exist. <br>");
             else
-                $err_msg = "The evaluee id ($evaluateeid) doesn't exist. <br>";
+                throw new moodle_exception("The evaluee id ($evaluateeid) doesn't exist. <br>");
         }
-
-        //If submission is failed
-        return false;
     }
 
     //If the submission is not done by time
