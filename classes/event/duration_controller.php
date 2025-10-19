@@ -1,6 +1,6 @@
 <?php
 
-namespace mod_smartspe\classes\event;
+namespace mod_smartspe\event;
 
 use core\exception\moodle_exception;
 
@@ -32,7 +32,7 @@ class duration_controller
         $this->enddate = $enddate;
         $this->timezone = $timezone ?? $USER->timezone;
     }
-
+    
     /*
     **
     **Check if submission currently open

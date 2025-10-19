@@ -1,6 +1,6 @@
 <?php
 
-namespace mod_smartspe\classes\event;
+namespace mod_smartspe\event;
 
 global $CFG;
 require_once($CFG->libdir . '/question/questionlib.php');

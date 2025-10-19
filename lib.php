@@ -15,7 +15,7 @@ defined('MOODLE_INTERNAL') || die();
  * Called when a new instance of the module is created.
  *
  * @param stdClass $data An object from the form in mod_form.php
- * @param smartspe_mod_form $mform
+ * @param mod_smartspe_mod_form $mform
  * @return int new smartspe instance id
  */
 function smartspe_add_instance($data, $mform = null) 
@@ -38,7 +38,7 @@ function smartspe_add_instance($data, $mform = null)
  * Called when an existing instance is updated.
  *
  * @param stdClass $data An object from the form in mod_form.php
- * @param smartspe_mod_form $mform
+ * @param mod_smartspe_mod_form $mform
  * @return bool true on success, false otherwise
  */
 function smartspe_update_instance($data, $mform = null) 

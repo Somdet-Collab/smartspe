@@ -1,6 +1,6 @@
 <?php
 
-use mod_smartspe\classes\event\duration_controller;
+use mod_smartspe\event\duration_controller;
 use core\exception\moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
@@ -69,6 +69,7 @@ class mod_smartspe_mod_form extends moodleform_mod
                 $data['startdate'],
                 $data['enddate']
             );
+
         } 
         catch (moodle_exception $e) 
         {

@@ -4,13 +4,13 @@
 //Mainly interact with UI
 namespace mod_smartspe;
 
-use mod_smartspe\classes\event\notification_handler;
-use mod_smartspe\classes\event\questions_handler;
-use mod_smartspe\classes\event\data_persistence;
-use mod_smartspe\classes\event\download_handler;
-use mod_smartspe\classes\event\duration_controller;
-use mod_smartspe\classes\event\submission_handler;
-use mod_smartspe\classes\event\data_handler;
+use mod_smartspe\event\notification_handler;
+use mod_smartspe\event\questions_handler;
+use mod_smartspe\event\data_persistence;
+use mod_smartspe\event\download_handler;
+use mod_smartspe\event\duration_controller;
+use mod_smartspe\event\submission_handler;
+use mod_smartspe\event\data_handler;
 use mod_smartspe\db_evaluation;
 use mod_smartspe\db_team_manager;
 
