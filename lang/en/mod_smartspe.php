@@ -1,6 +1,8 @@
 <?php
 // Standard Moodle language file for SmartSpe module.
 
+defined('MOODLE_INTERNAL') || die();
+
 $string['pluginname'] = 'Self Peer Evaluation';
 $string['modulename'] = 'Self Peer Evaluation';
 $string['modulenameplural'] = 'Self Peer Evaluations';

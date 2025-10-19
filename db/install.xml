@@ -68,7 +68,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="as_pk" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="userfk" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="userfk" TYPE="foreign" FIELDS="evaluateeid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
   </TABLES>
