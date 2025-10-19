@@ -13,7 +13,7 @@ require_once($CFG->dirroot . '/course/moodleform_mod.php');
  * @package    mod_smartspe
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class smartspe_mod_form extends moodleform_mod
+class mod_smartspe_mod_form extends moodleform_mod
 {
 
     public function definition() 
