@@ -15,7 +15,7 @@ defined('MOODLE_INTERNAL') || die();
  * Called when a new instance of the module is created.
  *
  * @param stdClass $data An object from the form in mod_form.php
- * @param mod_smartspe_mod_form $mform
+ * @param smartspe_mod_form $mform
  * @return int new smartspe instance id
  */
 function smartspe_add_instance($data, $mform = null) 

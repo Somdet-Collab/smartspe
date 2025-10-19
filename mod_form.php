@@ -31,6 +31,11 @@ class smartspe_mod_form extends moodleform_mod
         // Intro / description.
         $this->standard_intro_elements(get_string('smartspe_intro', 'mod_smartspe'));
 
+        // Teacher choose questionbank name
+        $mform->addElement('text', 'questionbankname', get_string('questionbankname', 'mod_smartspe'));
+        $mform->setType('questionbankname', PARAM_TEXT);
+        $mform->addRule('questionbankname', null, 'required', null, 'client');
+
         // --- Submission period section ---
         $mform->addElement('header', 'timinghdr', get_string('submissionperiod', 'mod_smartspe'));
 

@@ -13,10 +13,10 @@ class questions_handler
     protected $context;
     protected $questionbankname;
 
-    public function __construct($courseid, $questionbankname)
+    public function __construct($context, $questionbankname)
     {
         // Get or create the question bank
-        $this->context = \context_course::instance($courseid);
+        $this->context = $context;
         $category = \question_category::get_category_by_name($this->context, $questionbankname);
 
         //Create category if no category
