@@ -83,26 +83,22 @@ class mod_smartspe_mod_form extends moodleform_mod
 
     private function get_question_options()
     {
-        global $DB, $COURSE;
+        global $COURSE;
 
         $options = [0 => get_string('choose', 'mod_smartspe')];
 
-        // Get question categories for this course
-        $categories = $DB->get_records('question_categories', ['contextid' => \context_course::instance($COURSE->id)->id]);
+        $context = \context_course::instance($COURSE->id);
+        $questionlist = [];
 
-        if (empty($categories))
-            return $options;
+        // Use the new question bank API
+        $questionloader = \core_question\local\bank\question_bank_view::create($context);
+        $records = $questionloader->load_questions();
 
-        // Collect all category IDs
-        $catids = array_keys($categories);
-        list($insql, $params) = $DB->get_in_or_equal($catids, SQL_PARAMS_NAMED);
-
-        // Get all questions in those categories
-        $sql = "SELECT id, name FROM {question} WHERE category $insql ORDER BY name ASC";
-        $questions = $DB->get_records_sql($sql, $params);
-
-        foreach ($questions as $q)
-            $options[$q->id] = $q->name ?: 'No name (' . $q->id . ')';
+        foreach ($records as $record) 
+            {
+            $question = $record->question;
+            $options[$question->id] = $question->name ?: 'No name (' . $question->id . ')';
+        }
 
         return $options;
     }
