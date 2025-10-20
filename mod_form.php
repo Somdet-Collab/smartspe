@@ -32,7 +32,7 @@ class mod_smartspe_mod_form extends moodleform_mod
         $this->standard_intro_elements(get_string('smartspe_intro', 'mod_smartspe'));
 
         // Teacher choose question name
-        $mform->addElement('select', 'questionid', get_string('selectquestion', 'mod_yourplugin'), $this->get_question_options());
+        $mform->addElement('select', 'questionids', get_string('selectquestion', 'mod_smartspe'), $this->get_question_options());
         $mform->getElement('questionids')->setMultiple(true);
         $mform->setType('questionid', PARAM_SEQUENCE);
 
@@ -85,7 +85,7 @@ class mod_smartspe_mod_form extends moodleform_mod
     {
         global $DB, $COURSE;
 
-        $options = [0 => get_string('choose', 'mod_yourplugin')];
+        $options = [0 => get_string('choose', 'mod_smartspe')];
 
         // Get question categories for this course
         $categories = $DB->get_records('question_categories', ['contextid' => \context_course::instance($COURSE->id)->id]);

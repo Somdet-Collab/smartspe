@@ -10,7 +10,8 @@ $string['modulenameplural'] = 'Self Peer Evaluations';
 $string['smartspe_name'] = 'Evaluation Name';           // Form field for activity name
 $string['smartspe_name_help'] = 'Enter a descriptive name for this evaluation activity.';
 $string['smartspe_intro'] = 'Description';
-$string['questions'] = 'Questions selection';
+$string['selectquestion'] = 'Questions selection';
+$string['choose'] = 'Please select questions';
 
 $string['submissionperiod'] = 'Submission Period';      // Header in mod_form.php
 $string['submissionstart'] = 'Submission Start Date';   // Start date label
