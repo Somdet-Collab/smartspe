@@ -32,10 +32,9 @@ class mod_smartspe_mod_form extends moodleform_mod
         $this->standard_intro_elements(get_string('smartspe_intro', 'mod_smartspe'));
 
         // Teacher choose question name
-        $mform->addElement('select', 'questionids', get_string('selectquestion', 'mod_smartspe'), $this->get_question_options());
+        $mform->addElement('autocomplete', 'questionids', get_string('selectquestion', 'mod_smartspe'), $this->get_question_options());
+        $mform->setType('questionids', PARAM_SEQUENCE);
         $mform->getElement('questionids')->setMultiple(true);
-        $mform->setType('questionid', PARAM_SEQUENCE);
-
 
         // --- Submission period section ---
         $mform->addElement('header', 'timinghdr', get_string('submissionperiod', 'mod_smartspe'));
