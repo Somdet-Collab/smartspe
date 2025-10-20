@@ -1,11 +1,16 @@
 <?php
 require('../../config.php');
-$context = context_system::instance();
 require_login();
 
 $PAGE->set_url(new moodle_url('/mod/smartspe/view.php'));
 $PAGE->set_title('Sentiment Analysis Test');
 $PAGE->set_heading('Sentiment Analysis Test');
+
+$current = $DB->get_record('smartspe', ['id' => $instanceid]);
+$section = required_param('section', PARAM_INT);
+$context = \context_system::instance();
+$cm = get_coursemodule_from_instance('smartspe', $instanceid, $courseid);
+$course = $DB->get_record('course', ['id' => $courseid]);
 
 global $DB, $OUTPUT;
 

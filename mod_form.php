@@ -31,10 +31,11 @@ class mod_smartspe_mod_form extends moodleform_mod
         // Intro / description.
         $this->standard_intro_elements(get_string('smartspe_intro', 'mod_smartspe'));
 
-        // Teacher choose questionbank name
-        $mform->addElement('text', 'questionbankname', get_string('questionbankname', 'mod_smartspe'));
-        $mform->setType('questionbankname', PARAM_TEXT);
-        $mform->addRule('questionbankname', null, 'required', null, 'client');
+        // Teacher choose question name
+        $mform->addElement('select', 'questionid', get_string('selectquestion', 'mod_yourplugin'), $this->get_question_options());
+        $mform->getElement('questionids')->setMultiple(true);
+        $mform->setType('questionid', PARAM_SEQUENCE);
+
 
         // --- Submission period section ---
         $mform->addElement('header', 'timinghdr', get_string('submissionperiod', 'mod_smartspe'));
@@ -78,5 +79,31 @@ class mod_smartspe_mod_form extends moodleform_mod
         }
 
         return $errors;
+    }
+
+    private function get_question_options()
+    {
+        global $DB, $COURSE;
+
+        $options = [0 => get_string('choose', 'mod_yourplugin')];
+
+        // Get question categories for this course
+        $categories = $DB->get_records('question_categories', ['contextid' => \context_course::instance($COURSE->id)->id]);
+
+        if (empty($categories))
+            return $options;
+
+        // Collect all category IDs
+        $catids = array_keys($categories);
+        list($insql, $params) = $DB->get_in_or_equal($catids, SQL_PARAMS_NAMED);
+
+        // Get all questions in those categories
+        $sql = "SELECT id, name FROM {question} WHERE category $insql ORDER BY name ASC";
+        $questions = $DB->get_records_sql($sql, $params);
+
+        foreach ($questions as $q)
+            $options[$q->id] = $q->name ?: 'No name (' . $q->id . ')';
+
+        return $options;
     }
 }

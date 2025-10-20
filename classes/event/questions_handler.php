@@ -2,65 +2,26 @@
 
 namespace mod_smartspe\event;
 
-global $CFG;
-require_once($CFG->libdir . '/question/questionlib.php');
-require_once($CFG->dirroot . '/question/editlib.php');
+use question_engine;
 
 defined('MOODLE_INTERNAL') || die();
 class questions_handler
 {
-    protected $category;
-    protected $context;
-    protected $questionbankname;
-
-    public function __construct($context, $questionbankname)
+    public function get_all_questions($data)
     {
-        // Get or create the question bank
-        $this->context = $context;
-        $category = \question_category::get_category_by_name($this->context, $questionbankname);
 
-        //Create category if no category
-        if (!$category) 
-            $category = \question_category::create_category($this->context, $questionbankname);
+        // $data comes from $mform->get_data() after submission
+        if (empty($data->questionids))
+            return [];
 
-        $this->category = $category;
-        $this->questionbankname = $questionbankname;
-    }
-
-    // public function questions_create($name, $text, $qtype='multichoice')
-    // {
-
-    //     //Create question
-    //     $question = new \stdclass();
-    //     $question->category = $this->category->id;       // From mdl_question_categories
-    //     $question->qtype = $qtype;        // e.g. shortanswer, multichoice
-    //     $question->name = $name;
-    //     $qtext = '<p>'.$text.'</p>';
-    //     $question->questiontext = $qtext;
-    //     $question->questiontextformat = FORMAT_HTML;
-    //     $question->defaultmark = 0;
-    //     $question->timecreated = time();
-
-    //     //Moodle API to save questions
-    //     $questioncreated = question_create_question($question->qtype, $question);
-    //     question_save_question($questioncreated );
-
-    //     return $questioncreated->id;
-    // }
-
-    public function get_all_questions()
-    {
-        global $DB;
-
-        // Get all questions in this category
-        $records = $DB->get_records('question', ['category' => $this->category->id]);
+        $qids = explode(',', $data->questionids);
 
         // Format results as array
         $questions = [];
-        foreach ($records as $q) 
+        foreach ($qids as $q) 
         {
             // Load the full question object
-            $questionobj = \question_bank::load_question($q->id);
+            $questionobj = \question_bank::load_question($q);
 
             $questions[] = 
             [
@@ -75,5 +36,31 @@ class questions_handler
         }
 
         return $questions;
+    }
+
+    public function add_all_questions($userid, $data, $attemptid)
+    {
+        global $DB;
+
+        $quba = question_engine::make_questions_usage_by_activity('mod_smartspe', $userid);
+
+        // $data comes from $mform->get_data() after submission
+        if (empty($data->questionids))
+            return [];
+
+        $qids = explode(',', $data->questionids);
+        
+        foreach ($qids as $q)
+        {
+            $question = \question_bank::load_question($q);
+            $qa = $quba->add_question($question);
+        }
+
+        //Save the usage
+        $quba->start_all_questions();
+        $quba->finish_all_questions();
+        
+        $qubaid = $quba->get_id(); // usage ID after saving
+        $DB->set_field('smartspe_attempts', 'uniqueid', $qubaid, ['id' => $attemptid]);
     }
 }

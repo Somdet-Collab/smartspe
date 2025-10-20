@@ -28,15 +28,16 @@ class smartspe_quiz_manager
     protected $courseid;
     protected $context;
     protected $quizid;
+    protected $attemptid;
 
-    public function __construct($userid, $courseid, $context, $quizid)
+    public function __construct($userid, $courseid, $context, $quizid, $attemptid)
     {
         //Get all questions
         global $DB;
         $this->courseid = $courseid;
         $this->context = $context;
         $this->quizid = $quizid;
-        $this->questions_handler = new questions_handler($context, "Self Peer Evaluation");
+        $this->questions_handler = new questions_handler();
         $this->submission_handler = new submission_handler($userid, $courseid);
         $this->notification_handler = new notification_handler();
         $this->download_handler = new download_handler();
