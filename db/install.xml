@@ -37,10 +37,6 @@
         <KEY NAME="smartspe_fk" TYPE="foreign" FIELDS="smartspeid" REFTABLE="smartspe" REFFIELDS="id"/>
         <KEY NAME="user_fk" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
-      <INDEXES>
-        <INDEX NAME="smartspeid_idx" FIELDS="smartspeid"/>
-        <INDEX NAME="userid_idx" FIELDS="userid"/>
-      </INDEXES>
     </TABLE>
     <TABLE NAME="smartspe_evaluation" COMMENT="evaluation results are stored">
       <FIELDS>
