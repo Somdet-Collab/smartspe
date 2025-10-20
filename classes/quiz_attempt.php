@@ -13,6 +13,8 @@ use stdClass;
 
 require_once($CFG->dirroot . '/mod/quiz/classes/quiz_attempt.php');
 
+defined('MOODLE_INTERNAL') || die();
+
 class smartspe_quiz_attempt extends \mod_quiz\quiz_attempt
 {
     
