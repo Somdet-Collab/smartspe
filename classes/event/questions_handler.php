@@ -59,8 +59,10 @@ class questions_handler
         //Save the usage
         $quba->start_all_questions();
         $quba->finish_all_questions();
-        
+
         $qubaid = $quba->get_id(); // usage ID after saving
         $DB->set_field('smartspe_attempts', 'uniqueid', $qubaid, ['id' => $attemptid]);
+
+        return $quba;
     }
 }

@@ -4,10 +4,13 @@
 //Mainly interact with UI
 namespace mod_smartspe;
 
+use core\exception\moodle_exception;
+use mod_quiz\quiz_attempt;
 use mod_smartspe\event\notification_handler;
 use mod_smartspe\event\questions_handler;
 use mod_smartspe\event\data_persistence;
 use mod_smartspe\event\download_handler;
+use mod_smartspe\smartspe_quiz_attempt;
 use mod_smartspe\event\duration_controller;
 use mod_smartspe\event\submission_handler;
 use mod_smartspe\event\data_handler;
@@ -17,7 +20,7 @@ use mod_smartspe\db_team_manager;
 
 class smartspe_quiz_manager
 {
-    protected $autosave_handler; //To handle auto save
+    protected $quiz_attempt;
     protected $data_persistence; //To handle loading saved data
     protected $questions_handler; //To handle loading questions onto UI
     protected $submission_handler; //To handle submission and save data and info to database
@@ -27,16 +30,16 @@ class smartspe_quiz_manager
 
     protected $courseid;
     protected $context;
-    protected $quizid;
     protected $attemptid;
+    protected $smartspeid;
 
-    public function __construct($userid, $courseid, $context, $quizid, $attemptid)
+    public function __construct($userid, $courseid, $context, $quizid, $smartspeid)
     {
         //Get all questions
         global $DB;
         $this->courseid = $courseid;
         $this->context = $context;
-        $this->quizid = $quizid;
+        $this->smartspeid = $smartspeid;
         $this->questions_handler = new questions_handler();
         $this->submission_handler = new submission_handler($userid, $courseid);
         $this->notification_handler = new notification_handler();
@@ -49,22 +52,12 @@ class smartspe_quiz_manager
     **return array of questions
     **
     */
-    public function attempt_evaluation($userid, $attemptid)
+    public function create_evaluation_attempt($userid, $data)
     {
-        //Get all questions
-        global $DB;
+        $this->quiz_attempt = new smartspe_quiz_attempt($userid, $this->smartspeid, null, $data);
 
-        // Get current attempt
-        $attempt = $DB->get_record('quiz_attempts', [
-            'quiz' => $this->quizid,
-            'userid' => $userid,
-            'state' => 'inprogress'  // only active attempt
-        ]);
-
-        $this->data_persistence = new data_persistence($attempt->id);
-
-        $this->data_persistence->load_attempt_questions();
-        
+        if(!$this->quiz_attempt)
+            throw new moodle_exception("Quiz attempt creation failed!!");
     }
 
     public function download_file_output($filename, $extension="csv")
@@ -80,6 +73,10 @@ class smartspe_quiz_manager
     public function save_evaluation($answers, $comment, $userid, $evaluateeid)
     {
         
+    }
 
+    public function quiz_notification()
+    {
+        
     }
 }

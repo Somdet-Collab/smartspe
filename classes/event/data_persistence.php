@@ -17,8 +17,9 @@ class data_persistence
         global $DB;
 
         $this->attemptid = $attemptid;
-        $this->attempt = $DB->get_record('quiz_attempts', ['id' => $attemptid], '*', MUST_EXIST);
+        $this->attempt = $DB->get_record('smartspe_attempts', ['id' => $attemptid], '*', MUST_EXIST);
     }
+
     public function load_attempt_questions() 
     {
         // Load all questions and their current state
@@ -70,5 +71,29 @@ class data_persistence
 
         return true;
     }
+
+    public function finish_attempt()
+    {
+        global $DB;
+
+        // Load the question usage for this attempt
+        $quba = question_engine::load_questions_usage_by_activity($this->attempt->uniqueid);
+
+        // Mark all questions as finished
+        $quba->finish_all_questions();
+
+        // Save the updated question usage
+        question_engine::save_questions_usage_by_activity($quba);
+
+        // Update the attempt record to finished
+        $DB->set_field('smartspe_attempts', 'state', 'finished', ['id' => $this->attemptid]);
+        $DB->set_field('smartspe_attempts', 'timemodified', time(), ['id' => $this->attemptid]);
+
+        // Optionally reload attempt object
+        $this->attempt = $DB->get_record('smartspe_attempts', ['id' => $this->attemptid], '*', MUST_EXIST);
+
+        return true;
+    }
+
 
 }
