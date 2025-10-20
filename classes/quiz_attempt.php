@@ -74,6 +74,11 @@ class smartspe_quiz_attempt
         }
     }
 
+    public function get_attempt_id()
+    {
+        return $this->attemptid;
+    }
+
     public function attempt_evaluation()
     {
         //Get all questions

@@ -58,6 +58,10 @@ class smartspe_quiz_manager
 
         if(!$this->quiz_attempt)
             throw new moodle_exception("Quiz attempt creation failed!!");
+
+        //Get quiz id
+        $this->attemptid = $this->quiz_attempt->get_attempt_id();
+
     }
 
     public function download_file_output($filename, $extension="csv")
