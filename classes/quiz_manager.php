@@ -8,12 +8,12 @@ use core\exception\moodle_exception;
 use mod_quiz\quiz_attempt;
 use mod_smartspe\event\notification_handler;
 use mod_smartspe\event\questions_handler;
-use mod_smartspe\data_class\data_persistence;
+use mod_smartspe\event\data_persistence;
 use mod_smartspe\event\download_handler;
 use mod_smartspe\smartspe_quiz_attempt;
 use mod_smartspe\event\duration_controller;
 use mod_smartspe\event\submission_handler;
-use mod_smartspe\data_class\data_handler;
+use mod_smartspe\event\data_handler;
 use mod_smartspe\db_evaluation;
 use mod_smartspe\db_team_manager;
 

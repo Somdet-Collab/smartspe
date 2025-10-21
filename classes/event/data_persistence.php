@@ -1,6 +1,6 @@
 <?php
 
-namespace mod_smartspe\data_class;
+namespace mod_smartspe\event;
 
 use question_engine;
 use core\exception\moodle_exception;
