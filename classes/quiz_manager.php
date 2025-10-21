@@ -49,11 +49,14 @@ class smartspe_quiz_manager
         $this->data_handler = new data_handler();
     }
 
-    /*
-    **
-    **return array of questions
-    **
-    */
+    /**
+     * Create attempt once student attempt the evaluation
+     *
+     * Called when student start attempting.
+     *
+     * @param $data the data getting from mod_smartspe_mod_form
+     * @return $attemptid
+     */
     public function create_evaluation_attempt($data)
     {
         $this->quiz_attempt = new smartspe_quiz_attempt($this->userid, $this->smartspeid, null, $data);
@@ -68,7 +71,7 @@ class smartspe_quiz_manager
     }
 
     
-    public function attempt_evaluation()
+    public function start_attempt_evaluation($newdata=null)
     {
         //Create persistence object
         $this->data_persistence = $this->quiz_attempt->create_persistence();
@@ -91,9 +94,28 @@ class smartspe_quiz_manager
         return $members;
     }
 
-    public function save_evaluation_answers($answers, $userid, $memberid)
+    /**
+     * Save answers into database
+     *
+     * Called when student start submitting.
+     *
+     * @param $answers answers array
+     * @param $comment comment on members or self
+     * @param $self_comment second self comment
+     * @param $memberid member being evaluated
+     * @return boolean
+     */
+    public function quiz_is_submitted($answers, $comment, $self_comment=null, $memberid)
     {
+        //Return boolean
+        $submitted = $this->submission_handler->is_submitted($answers, $comment, 
+                                $self_comment, $memberid);
 
+        //if success in submitting, send notification to email
+        if($submitted)
+            $this->notification_handler->noti_eval_submitted($this->userid);
+
+        return $submitted;
     }
 
     public function download_file_output($filename, $extension="csv")
@@ -106,13 +128,4 @@ class smartspe_quiz_manager
 
     }
 
-    public function save_evaluation($answers, $comment, $userid, $evaluateeid)
-    {
-        
-    }
-
-    public function quiz_notification()
-    {
-        
-    }
 }

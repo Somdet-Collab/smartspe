@@ -1,6 +1,7 @@
 <?php
 namespace mod_smartspe;
 
+use core\exception\moodle_exception;
 use mod_smartspe\db_team_manager as team_manager;
 
 class db_evaluation
@@ -42,7 +43,7 @@ class db_evaluation
         }
         else
         {
-            $err_msg = "This student {$userid} has not been assigned to any team <br>";
+            throw new moodle_exception("This student {$userid} has not been assigned to any team");
         }
 
         return $success;

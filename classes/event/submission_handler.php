@@ -19,11 +19,18 @@ class submission_handler
         $this->courseid = $courseid;
     }
 
-    /*User submit the form
-    **
-    **@return bool
-    **
-    */
+    /**
+     * Wrapped in quiz_manager for handling submission and save data
+     *
+     * Called in quiz_manager.
+     *
+     * @param $answers answers array
+     * @param $comment comment on members or self
+     * @param $self_comment second self comment
+     * @param $evaluateeid member being evaluated
+     * 
+     * @return boolean
+     */
     public function is_submitted($answers, $comment, $self_comment = null, $evaluateeid)
     {
         $manager = new team_manager(); //Team management 
@@ -50,8 +57,8 @@ class submission_handler
     }
 
     //If the submission is not done by time
-    public function is_due()
+    public function is_overdue()
     {
-
+        $manager = new team_manager();
     }
 }

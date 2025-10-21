@@ -28,6 +28,17 @@ class smartspe_quiz_attempt
     protected $data;
     protected $attemptnumber; //Total number of attempts
 
+    /**
+     * Create attempt if not already created or else get retrieve the existing attempt
+     *
+     * Called when an attempt is created or continue processing from the existing attempt.
+     *
+     * @param $userid the evaluator id
+     * @param $smartspeid the instance id
+     * @param $attemptid the current attemptid
+     * @param $data the data getting from mod_smartspe_mod_form
+     * @return void
+     */
     public function __construct($userid, $smartspeid, $attemptid=null, $data)
     {
         global $DB, $USER;
@@ -66,6 +77,14 @@ class smartspe_quiz_attempt
         return $this->questions;
     }
 
+    /**
+     * Create questions usage and link usage to each attempt
+     * Make for data persistence purpose
+     *
+     * Called when a new instance of the module is created.
+     *
+     * @return data_persistence $data_persistence 
+     */
     public function create_persistence()
     {
         $question_handler = new questions_handler();

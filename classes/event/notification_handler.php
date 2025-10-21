@@ -8,6 +8,16 @@ defined('MOODLE_INTERNAL') || die();
 
  class notification_handler
  {
+
+    /**
+     * Send notification to user email
+     *
+     * Called when student submitted the quiz.
+     * Called in quiz_manager
+     *
+     * @param $userid the destination user
+     * @return mixed
+     */
     public function noti_eval_submitted($userid)
     {
         global $DB;
@@ -40,6 +50,15 @@ defined('MOODLE_INTERNAL') || die();
         return message_send($eventdata);
     }
 
+    /**
+     * Send notification to user email
+     *
+     * Called before submission deadline
+     * Called in quiz_manager
+     *
+     * @param $userid the destination user
+     * @return mixed
+     */
     public function noti_before_submission($userid)
     {
         global $DB;
@@ -72,6 +91,15 @@ defined('MOODLE_INTERNAL') || die();
         return message_send($eventdata);
     }
 
+    /**
+     * Send notification to user email
+     *
+     * Called after submission deadline.
+     * Called in quiz_manager
+     *
+     * @param $userid the destination user
+     * @return mixed
+     */
     public function after_due_date($userid)
     {
         global $DB;
