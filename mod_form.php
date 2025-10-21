@@ -18,7 +18,6 @@ class mod_smartspe_mod_form extends moodleform_mod
 
     public function definition() 
     {
-        global $CFG, $COURSE;
 
         $mform = $this->_form;
 

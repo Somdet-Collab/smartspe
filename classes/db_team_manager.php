@@ -3,6 +3,8 @@ namespace mod_smartspe;
 
 require(__DIR__ . '/config.php');
 
+use core\exception\moodle_exception;
+
 class db_team_manager
 {
     public function get_members($userid, $courseid)
@@ -26,11 +28,11 @@ class db_team_manager
                 return false;
 
             #Get all members in the same team
-            $members = $DB->get_records('groups_members', ['teamid' => $teamid]);
+            $members = $DB->get_records('groups_members', ['teamid' => $teamid], '', '*');
         }
         else
         {
-            $err_msg = "This userid ($userid) is not in the database <br>";
+            throw new moodle_exception("This userid {$userid} is not in the database");
         }
 
         return $members;
