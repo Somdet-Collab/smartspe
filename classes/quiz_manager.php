@@ -50,36 +50,55 @@ class smartspe_quiz_manager
 
     /**
      * Create attempt once student attempt the evaluation
+     * Create persistence for specific evaluatee
      *
      * Called when student start attempting.
      *
+     * @param $memberid attempt on this member
      * @param $data the data getting from mod_smartspe_mod_form
      * @return $attemptid
      */
-    public function create_evaluation_attempt($data)
+    public function start_attempt_evaluation($memberid, $questionids)
     {
-        $this->quiz_attempt = new smartspe_quiz_attempt($this->userid, $this->smartspeid, null, $data);
-
+        $this->quiz_attempt = new smartspe_quiz_attempt($this->smartspeid, $this->userid, 
+                                                $memberid, null, $questionids);
+        
         if(!$this->quiz_attempt)
             throw new moodle_exception("Quiz attempt creation failed!!");
+
+        //Create persistence object for specific member
+        $this->data_persistence = $this->quiz_attempt->create_persistence($this->context, $memberid);
+
+        if (!$this->data_persistence)
+            throw new moodle_exception("Failed to create data persistence");
 
         //Get quiz id
         $this->attemptid = $this->quiz_attempt->get_attempt_id();
 
         return $this->attemptid;
     }
-
     
-    public function start_attempt_evaluation($newdata=null)
+    public function process_attempt_evaluation($newdata=null, $finish=false)
     {
-        //Create persistence object
-        $this->data_persistence = $this->quiz_attempt->create_persistence();
-        
+        //Process autosave
+        if(!$this->data_persistence->auto_save($newdata))
+            throw new moodle_exception("Failed autosave data");
+
+        //If the evaluation finish
+        if($finish)
+            $this->data_persistence->finish_attempt();
+
+        return true;
     }
 
     public function get_questions($data)
     {
         return $this->questions_handler->get_all_questions($data);
+    }
+
+    public function get_saved_questions_answers()
+    {
+        return $this->data_persistence->load_attempt_questions();
     }
 
     public function get_members()

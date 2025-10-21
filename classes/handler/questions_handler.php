@@ -1,6 +1,6 @@
 <?php
 
-namespace mod_smartspe\event;
+namespace mod_smartspe\handler;
 
 use question_engine;
 
@@ -15,15 +15,14 @@ class questions_handler
      * @param $data the data getting from mod_smartspe_mod_form
      * @return $questions
      */
-    public function get_all_questions($data)
+    public function get_all_questions($questionids)
     {
 
         // $data comes from $mform->get_data() after submission
         if (empty($data->questionids))
             return [];
 
-        //split array{1,2,3}
-        $qids = explode(',', $data->questionids);
+        $qids = $questionids;
 
         // Format results as array
         $questions = [];
@@ -52,23 +51,23 @@ class questions_handler
      *
      * Called after the mod_form is created and teacher selected questions.
      *
-     * @param $userid the evaluator id
+     * @param $context add questions to specific context
      * @param $attemptid the current attemptid
      * @param $data the data getting from mod_smartspe_mod_form
      * @return $quba
      */
-    public function add_all_questions($userid, $data, $attemptid)
+    public function add_all_questions($context, $questionids, $attemptid)
     {
         global $DB;
 
-        $quba = question_engine::make_questions_usage_by_activity('mod_smartspe', $userid);
+        $quba = question_engine::make_questions_usage_by_activity('mod_smartspe', $context);
         $quba->set_preferred_behaviour('deferredfeedback');
 
         // $data comes from $mform->get_data() after submission
         if (empty($data->questionids))
             return [];
 
-        $qids = explode(',', $data->questionids);
+        $qids = $questionids;
         
         foreach ($qids as $q)
         {
