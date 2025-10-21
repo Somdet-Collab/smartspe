@@ -1,6 +1,6 @@
 <?php
 
-namespace mod_smartspe\event;
+namespace mod_smartspe\duration;
 
 use core\exception\moodle_exception;
 

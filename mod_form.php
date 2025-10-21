@@ -1,6 +1,6 @@
 <?php
 
-use mod_smartspe\event\duration_controller;
+use mod_smartspe\duration\duration_controller;
 use core\exception\moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();

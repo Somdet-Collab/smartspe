@@ -1,6 +1,6 @@
 <?php
 
-namespace mod_smartspe\event;
+namespace mod_smartspe\data_class;
 
 defined('MOODLE_INTERNAL') || die();
 
