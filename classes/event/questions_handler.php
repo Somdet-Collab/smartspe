@@ -1,6 +1,6 @@
 <?php
 
-namespace mod_smartspe\handler;
+namespace mod_smartspe\event;
 
 use question_engine;
 

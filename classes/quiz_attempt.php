@@ -11,8 +11,8 @@ use moodle_url;
 use question_bank;
 use stdClass;
 use question_engine;
-use mod_smartspe\data_class\data_persistence;
-use mod_smartspe\handler\questions_handler;
+use mod_smartspe\event\data_persistence;
+use mod_smartspe\event\questions_handler;
 
 defined('MOODLE_INTERNAL') || die();
 
