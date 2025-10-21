@@ -51,6 +51,7 @@
         <FIELD NAME="average" TYPE="float" DECIMALS='2' LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="self_comment" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="comment" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="attempid" TYPE="int" LENGTH="10" NOTNULL="true"/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true"/>
       </FIELDS>
       <KEYS>
@@ -58,6 +59,7 @@
         <KEY NAME="evaluatorfk" TYPE="foreign" FIELDS="evaluator" REFTABLE="groups_members" REFFIELDS="userid"/>
         <KEY NAME="evaluateefk" TYPE="foreign" FIELDS="evaluatee" REFTABLE="groups_members" REFFIELDS="userid"/>
         <KEY NAME="coursepk" TYPE="foreign" FIELDS="course" REFTABLE="course" REFFIELDS="id"/>
+        <KEY NAME="attemptfk" TYPE="foreign" FIELDS="atttemptid" REFTABLE="smartspe_attempts" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
