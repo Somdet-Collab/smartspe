@@ -32,14 +32,16 @@ class smartspe_quiz_manager
     protected $context;
     protected $attemptid;
     protected $smartspeid;
+    protected $userid;
 
-    public function __construct($userid, $courseid, $context, $quizid, $smartspeid)
+    public function __construct($userid, $courseid, $context, $smartspeid)
     {
         //Get all questions
         global $DB;
         $this->courseid = $courseid;
         $this->context = $context;
         $this->smartspeid = $smartspeid;
+        $this->userid = $userid;
         $this->questions_handler = new questions_handler();
         $this->submission_handler = new submission_handler($userid, $courseid);
         $this->notification_handler = new notification_handler();
@@ -52,15 +54,45 @@ class smartspe_quiz_manager
     **return array of questions
     **
     */
-    public function create_evaluation_attempt($userid, $data)
+    public function create_evaluation_attempt($data)
     {
-        $this->quiz_attempt = new smartspe_quiz_attempt($userid, $this->smartspeid, null, $data);
+        $this->quiz_attempt = new smartspe_quiz_attempt($this->userid, $this->smartspeid, null, $data);
 
         if(!$this->quiz_attempt)
             throw new moodle_exception("Quiz attempt creation failed!!");
 
         //Get quiz id
         $this->attemptid = $this->quiz_attempt->get_attempt_id();
+
+        return $this->attemptid;
+    }
+
+    
+    public function attempt_evaluation()
+    {
+        //Create persistence object
+        $this->data_persistence = $this->quiz_attempt->create_persistence();
+        
+    }
+
+    public function get_questions($data)
+    {
+        return $this->questions_handler->get_all_questions($data);
+    }
+
+    public function get_members()
+    {
+        $team_manager = new db_team_manager();
+        $members = $team_manager->get_members($this->userid, $this->courseid);
+
+        if (empty($members))
+            throw new moodle_exception("The members are empty in section get_members() in quiz_manager");
+        
+        return $members;
+    }
+
+    public function save_evaluation_answers($answers, $userid, $memberid)
+    {
 
     }
 

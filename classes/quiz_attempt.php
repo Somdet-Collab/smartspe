@@ -25,6 +25,7 @@ class smartspe_quiz_attempt
     protected $data_persistence; //Track student's answers
     protected $questions;
     protected $attemptid; //Attempt id
+    protected $data;
     protected $attemptnumber; //Total number of attempts
 
     public function __construct($userid, $smartspeid, $attemptid=null, $data)
@@ -33,6 +34,7 @@ class smartspe_quiz_attempt
 
         $this->smartspeid = $smartspeid;
         $this->userid = $userid;
+        $this->data = $data;
         
         if ($attemptid)
         {
@@ -52,13 +54,22 @@ class smartspe_quiz_attempt
             $record->timemodified = time();
 
             //Insert current attempt into database
-            $this->attempt->id = $DB->insert_record('smartspe_attempts', $record);
+            $this->attemptid = $DB->insert_record('smartspe_attempts', $record);
             //Get current attempt
-            $this->attempt = $DB->get_record('smartspe_attempts', ['id' => $this->attempt->id]);
+            $this->attempt = $DB->get_record('smartspe_attempts', ['id' => $this->$attemptid]);
         }
 
+    }
+
+    public function get_attempt_questions()
+    {
+        return $this->questions;
+    }
+
+    public function create_persistence()
+    {
         $question_handler = new questions_handler();
-        $this->data_persistence = new data_persistence($attemptid);
+        $this->data_persistence = new data_persistence($this->attemptid);
 
         // Load or create question usage
         if (!empty($this->attempt->uniqueid)) 
@@ -69,9 +80,11 @@ class smartspe_quiz_attempt
         else 
         {
             //Cretae questions usage and link to each attempt
-            $this->quba = $question_handler->add_all_questions($userid, $data, $attemptid);
-            $this->questions = $question_handler->get_all_questions($data);
+            $this->quba = $question_handler->add_all_questions($this->userid, $this->data, $this->attemptid);
+            $this->questions = $question_handler->get_all_questions($this->data);
         }
+
+        return $this->data_persistence;
     }
 
     public function get_attempt_id()
