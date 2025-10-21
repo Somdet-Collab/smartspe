@@ -63,16 +63,21 @@ class smartspe_quiz_manager
 
         //Get quiz id
         $this->attemptid = $this->quiz_attempt->get_attempt_id();
+
+        return $this->attemptid;
     }
 
+    
     public function attempt_evaluation()
     {
-
+        //Create persistence object
+        $this->data_persistence = $this->quiz_attempt->create_persistence();
+        
     }
 
-    public function get_questions()
+    public function get_questions($data)
     {
-
+        return $this->questions_handler->get_all_questions($data);
     }
 
     public function get_members()
@@ -84,6 +89,11 @@ class smartspe_quiz_manager
             throw new moodle_exception("The members are empty in section get_members() in quiz_manager");
         
         return $members;
+    }
+
+    public function save_evaluation_answers($answers, $userid, $memberid)
+    {
+
     }
 
     public function download_file_output($filename, $extension="csv")

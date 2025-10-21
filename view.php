@@ -11,7 +11,7 @@ $id = required_param('id', PARAM_INT); // Course module ID
 $cm = get_coursemodule_from_id('smartspe', $id, 0, false, MUST_EXIST);
 $sectionid = $cm->section;
 $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
-$context = context_module::instance($cm->id);
+$context = \context_module::instance($cm->id);
 $instanceid = $DB->get_record('smartspe', ['course' => $course], 'id');
 
 // Security and access check
@@ -31,7 +31,10 @@ $data = $mform->get_data();
 $quiz_manager = new smartspe_quiz_manager($USER->id, $course->id, $context, $instanceid);
 
 //Create attempt
-$quiz_manager->create_evaluation_attempt($data);
+$attemptid = $quiz_manager->create_evaluation_attempt($data);
+
+$questions = $quiz_manager->get_questions($data); //Load questions
+$members = $quiz_manager->get_members(); //Load members
 
 // Get renderer
 $output = $PAGE->get_renderer('mod_smartspe');
