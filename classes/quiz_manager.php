@@ -97,6 +97,11 @@ class smartspe_quiz_manager
         return $this->questions_handler->get_all_questions($data);
     }
 
+    public function get_saved_questions_answers($memberid)
+    {
+        return $this->data_persistence->load_attempt_questions();
+    }
+
     public function get_members()
     {
         $team_manager = new db_team_manager();
