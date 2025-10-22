@@ -1,4 +1,5 @@
 <?php
+
 require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/lib.php');
 require_once($CFG->dirroot . '/mod/smartspe/mod_form.php');
@@ -33,6 +34,7 @@ if ($questionids)
 }
 else
 {
+    $qids = [];
     echo "Error: No questionids returned!!<br>"; 
 }
 
