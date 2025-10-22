@@ -29,3 +29,4 @@ class view_page implements renderable, templatable {
         ];
     }
 }
+?>

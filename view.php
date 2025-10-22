@@ -48,3 +48,4 @@ $page = new view_page($cm, $smartspe, $qids);
 echo $OUTPUT->header();
 echo $OUTPUT->render($page);
 echo $OUTPUT->footer();
+?>
