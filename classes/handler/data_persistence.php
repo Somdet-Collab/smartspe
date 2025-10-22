@@ -11,13 +11,15 @@ class data_persistence
 {
     protected $attemptid;
     protected $attempt;
+    protected $memberid;
 
-    public function __construct($attemptid)
+    public function __construct($attemptid, $memberid)
     {
         global $DB;
 
         $this->attemptid = $attemptid;
         $this->attempt = $DB->get_record('smartspe_attempts', ['id' => $attemptid], '*', MUST_EXIST);
+        $this->memberid = $memberid;
     }
 
     /**

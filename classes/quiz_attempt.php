@@ -26,7 +26,6 @@ class smartspe_quiz_attempt
     protected $questions;
     protected $attemptid; //Attempt id
     protected $data;
-    protected $attemptnumber; //Total number of attempts
 
     /**
      * Create attempt if not already created or else get retrieve the existing attempt
@@ -35,32 +34,35 @@ class smartspe_quiz_attempt
      *
      * @param $userid the evaluator id
      * @param $smartspeid the instance id
+     * @param $memberid attempt on this member
      * @param $attemptid the current attemptid
      * @param $data the data getting from mod_smartspe_mod_form
      * @return void
      */
-    public function __construct($userid, $smartspeid, $attemptid=null, $data)
+    public function __construct($smartspeid, $userid, $memberid, $attemptid=null, $data)
     {
-        global $DB, $USER;
+        global $DB;
 
         $this->smartspeid = $smartspeid;
         $this->userid = $userid;
         $this->data = $data;
+
+        // Check if this member already has a usage record
+        $memberusage = $DB->get_record('smartspe_member_usage', [
+            'userid' => $this->userid,
+            'memberid' => $memberid
+        ]);
         
-        if ($attemptid)
+        if ($memberusage)
         {
             $this->attempt = $DB->get_record('smartspe_attempts', ['id' => $attemptid], '*', MUST_EXIST);
-            $this->attemptnumber = $this->attempt->attempt;
         }
         else
         {
-            // Create new attempt
-            $this->attemptnumber = $DB->count_records('smartspe_attempts', ['smartspeid' => $smartspeid, 'userid' => $userid]) + 1;
-
             $record = new stdClass();
             $record->smartspeid = $smartspeid;
             $record->userid = $userid;
-            $record->attempt = $this->attemptnumber;
+            $record->memberid = $memberid;
             $record->timecreated = time();
             $record->timemodified = time();
 
@@ -82,13 +84,15 @@ class smartspe_quiz_attempt
      * Make for data persistence purpose
      *
      * Called when a new instance of the module is created.
-     *
+     * 
+     *@param $context context of the questions
+     *@param $memberid create persistence on this person
      * @return data_persistence $data_persistence 
      */
-    public function create_persistence()
+    public function create_persistence($context, $memberid)
     {
         $question_handler = new questions_handler();
-        $this->data_persistence = new data_persistence($this->attemptid);
+        $this->data_persistence = new data_persistence($this->attemptid, $memberid);
 
         // Load or create question usage
         if (!empty($this->attempt->uniqueid)) 
@@ -99,7 +103,7 @@ class smartspe_quiz_attempt
         else 
         {
             //Cretae questions usage and link to each attempt
-            $this->quba = $question_handler->add_all_questions($this->userid, $this->data, $this->attemptid);
+            $this->quba = $question_handler->add_all_questions($context, $this->data, $this->attemptid);
             $this->questions = $question_handler->get_all_questions($this->data);
         }
 
