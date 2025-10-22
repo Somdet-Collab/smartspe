@@ -1,7 +1,7 @@
 <?php
 require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/lib.php');
-require_once($CFG->dirroot . '/mod/smartspe/mod_smartspe_mod_form.php');
+require_once($CFG->dirroot . '/mod/smartspe/mod_form.php');
 
 use mod_smartspe\output\view_page;
 
