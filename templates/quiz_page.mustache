@@ -1,22 +1,26 @@
-<h3>Evaluating: {{membername}}</h3>
+<div class="quiz-container">
+    <h3>Evaluating {{membername}}</h3>
 
-<form method="post" action="submit.php">
-    <input type="hidden" name="smartspeid" value="{{smartspeid}}">
-    <input type="hidden" name="memberindex" value="{{memberindex}}">
+    <form method="post" action="">
+        <input type="hidden" name="id" value="{{id}}">
+        <input type="hidden" name="memberindex" value="{{memberindex}}">
+        
+        {{#questions}}
+            <div class="question">
+                <label>{{text}}</label>
+                <input type="text" name="answers[{{id}}]" value="{{answer}}">
+            </div>
+        {{/questions}}
 
-    {{#questions}}
-    <div class="question">
-        <p>{{text}}</p>
-        <input type="text" name="answers[{{slot}}]" value="{{answer}}">
-    </div>
-    <hr>
-    {{/questions}}
-
-    {{#islast}}
-    <button type="submit" name="action" value="preview">Preview Answers</button>
-    {{/islast}}
-    {{^islast}}
-    <button type="submit" name="action" value="next">Next</button>
-    {{/islast}}
-</form>
-    
+        {{#islast}}
+            <button type="submit" name="action" value="submit" class="btn btn-success">
+                {{#str}} submit, mod_smartspe {{/str}}
+            </button>
+        {{/islast}}
+        {{^islast}}
+            <button type="submit" name="action" value="next" class="btn btn-primary">
+                {{#str}} next, mod_smartspe {{/str}}
+            </button>
+        {{/islast}}
+    </form>
+</div>

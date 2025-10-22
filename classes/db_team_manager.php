@@ -21,18 +21,17 @@ class db_team_manager
             $record = $DB->get_record('groups_members', ['userid = ?', [$userid]]);
 
             //Check if user team id is in any of the team
-            if (in_array($record->teamid, $teams))
+            if (in_array($record->groupid, $teams))
                 $teamid = $record->groupid;#get team id of this user
-
             else
                 return false;
 
             #Get all members in the same team
-            $members = $DB->get_records('groups_members', ['teamid' => $teamid], '', '*');
+            $members = $DB->get_records('groups_members', ['groupid' => $teamid], '', 'userid');
         }
         else
         {
-            throw new moodle_exception("This userid {$userid} is not in the database");
+            throw new moodle_exception("This userid {$userid} is not in any team");
         }
 
         return $members;

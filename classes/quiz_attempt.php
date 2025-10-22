@@ -25,7 +25,7 @@ class smartspe_quiz_attempt
     protected $data_persistence; //Track student's answers
     protected $questions;
     protected $attemptid; //Attempt id
-    protected $data;
+    protected $questionids;
 
     /**
      * Create attempt if not already created or else get retrieve the existing attempt
@@ -36,16 +36,16 @@ class smartspe_quiz_attempt
      * @param $smartspeid the instance id
      * @param $memberid attempt on this member
      * @param $attemptid the current attemptid
-     * @param $data the data getting from mod_smartspe_mod_form
+     * @param $questionids the questionids getting from mod_smartspe_mod_form
      * @return void
      */
-    public function __construct($smartspeid, $userid, $memberid, $attemptid=null, $data)
+    public function __construct($smartspeid, $userid, $memberid, $attemptid=null, $questionids)
     {
         global $DB;
 
         $this->smartspeid = $smartspeid;
         $this->userid = $userid;
-        $this->data = $data;
+        $this->questionids = $questionids;
 
         // Check if this member already has a usage record
         $memberusage = $DB->get_record('smartspe_member_usage', [
@@ -103,8 +103,8 @@ class smartspe_quiz_attempt
         else 
         {
             //Cretae questions usage and link to each attempt
-            $this->quba = $question_handler->add_all_questions($context, $this->data, $this->attemptid);
-            $this->questions = $question_handler->get_all_questions($this->data);
+            $this->quba = $question_handler->add_all_questions($context, $this->questionids, $this->attemptid);
+            $this->questions = $question_handler->get_all_questions($this->questionids);
         }
 
         return $this->data_persistence;

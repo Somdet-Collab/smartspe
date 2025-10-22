@@ -15,7 +15,7 @@ class questions_handler
      * @param $data the data getting from mod_smartspe_mod_form
      * @return $questions
      */
-    public function get_all_questions($data)
+    public function get_all_questions($questionids)
     {
 
         // $data comes from $mform->get_data() after submission
@@ -23,7 +23,7 @@ class questions_handler
             return [];
 
         //split array{1,2,3}
-        $qids = explode(',', $data->questionids);
+        $qids = explode(',', $questionids);
 
         // Format results as array
         $questions = [];
@@ -57,7 +57,7 @@ class questions_handler
      * @param $data the data getting from mod_smartspe_mod_form
      * @return $quba
      */
-    public function add_all_questions($context, $data, $attemptid)
+    public function add_all_questions($context, $questionids, $attemptid)
     {
         global $DB;
 
@@ -68,7 +68,7 @@ class questions_handler
         if (empty($data->questionids))
             return [];
 
-        $qids = explode(',', $data->questionids);
+        $qids = explode(',', $questionids);
         
         foreach ($qids as $q)
         {

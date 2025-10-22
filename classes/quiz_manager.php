@@ -58,10 +58,10 @@ class smartspe_quiz_manager
      * @param $data the data getting from mod_smartspe_mod_form
      * @return $attemptid
      */
-    public function start_attempt_evaluation($memberid, $data)
+    public function start_attempt_evaluation($memberid, $questionids)
     {
         $this->quiz_attempt = new smartspe_quiz_attempt($this->smartspeid, $this->userid, 
-                                                $memberid, null, $data);
+                                                $memberid, null, $questionids);
         
         if(!$this->quiz_attempt)
             throw new moodle_exception("Quiz attempt creation failed!!");

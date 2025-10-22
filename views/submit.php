@@ -3,6 +3,7 @@ require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/lib.php');
 
 use mod_smartspe\smartspe_quiz_manager;
+use core\exception\moodle_exception;
 
 global $DB, $USER;
 
@@ -29,10 +30,14 @@ switch ($action)
     case 'next':
         // Save current member's answers
         $quiz_manager->process_attempt_evaluation(null,false);
+        $questions = $quiz_manager->get_saved_questions_answers();
 
         // Redirect to next member
-        $memberindex++;
-        redirect(new moodle_url('/mod/smartspe/view.php', ['id'=>$smartspeid, 'member'=>$memberindex]));
+        $page = new \mod_smartspe\output\quiz_page($instanceid, $members[$memberindex], 
+                                                $questions, $memberindex, $total_member);
+        echo $OUTPUT->header();
+        echo $OUTPUT->render($page);
+        echo $OUTPUT->footer();
         break;
 
     case 'preview':
