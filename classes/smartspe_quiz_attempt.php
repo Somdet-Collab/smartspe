@@ -39,7 +39,7 @@ class smartspe_quiz_attempt
      * @param $questionids the questionids getting from mod_smartspe_mod_form
      * @return void
      */
-    public function __construct($smartspeid, $userid, $memberid, $attemptid=null, $questionids)
+    public function __construct($smartspeid, $userid, $memberid, $questionids, $attemptid=null)
     {
         global $DB;
 

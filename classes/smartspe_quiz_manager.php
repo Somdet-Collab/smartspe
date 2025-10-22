@@ -13,7 +13,6 @@ use mod_smartspe\handler\download_handler;
 use mod_smartspe\smartspe_quiz_attempt;
 use mod_smartspe\handler\duration_controller;
 use mod_smartspe\handler\submission_handler;
-use mod_smartspe\handler\data_handler;
 use mod_smartspe\db_team_manager;
 
 
@@ -45,7 +44,6 @@ class smartspe_quiz_manager
         $this->submission_handler = new submission_handler($userid, $courseid);
         $this->notification_handler = new notification_handler();
         $this->download_handler = new download_handler();
-        $this->data_handler = new data_handler();
     }
 
     /**
@@ -123,11 +121,11 @@ class smartspe_quiz_manager
      * @param $memberid member being evaluated
      * @return boolean
      */
-    public function quiz_is_submitted($answers, $comment, $self_comment=null, $memberid)
+    public function quiz_is_submitted($answers, $memberid, $comment, $self_comment=null)
     {
         //Return boolean
-        $submitted = $this->submission_handler->is_submitted($answers, $comment, 
-                                $self_comment, $memberid);
+        $submitted = $this->submission_handler->is_submitted($answers, $memberid, 
+                                                        $comment, $self_comment);
 
         //if success in submitting, send notification to email
         if($submitted)
