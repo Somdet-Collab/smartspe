@@ -1,0 +1,22 @@
+<h3>Evaluating: {{membername}}</h3>
+
+<form method="post" action="submit.php">
+    <input type="hidden" name="smartspeid" value="{{smartspeid}}">
+    <input type="hidden" name="memberindex" value="{{memberindex}}">
+
+    {{#questions}}
+    <div class="question">
+        <p>{{text}}</p>
+        <input type="text" name="answers[{{slot}}]" value="{{answer}}">
+    </div>
+    <hr>
+    {{/questions}}
+
+    {{#islast}}
+    <button type="submit" name="action" value="preview">Preview Answers</button>
+    {{/islast}}
+    {{^islast}}
+    <button type="submit" name="action" value="next">Next</button>
+    {{/islast}}
+</form>
+    

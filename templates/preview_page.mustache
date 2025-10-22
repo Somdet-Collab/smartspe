@@ -1,0 +1,15 @@
+<h3>Preview Your Evaluation</h3>
+
+{{#members}}
+<h4>{{name}}</h4>
+<ul>
+    {{#answers.[id]}}
+    <li>Q{{slot}}: {{answer}}</li>
+    {{/answers.[id]}}
+</ul>
+{{/members}}
+
+<form method="post" action="submit.php">
+    <input type="hidden" name="action" value="submit_final">
+    <button type="submit">Confirm & Submit</button>
+</form>

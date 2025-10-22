@@ -4,6 +4,7 @@ require_once(__DIR__ . '/lib.php');
 require_once($CFG->dirroot . '/mod/smartspe/mod_smartspe_mod_form.php');
 
 use mod_smartspe\smartspe_quiz_manager;
+use mod_smartspe\output\quiz_page;
 
 global $DB, $USER;
 
@@ -28,18 +29,12 @@ $PAGE->set_pagelayout('incourse');
 $mform = new mod_smartspe_mod_form($instanceid, $sectionid, $cm, $course);
 $data = $mform->get_data();
 
-$quiz_manager = new smartspe_quiz_manager($USER->id, $course->id, $context, $instanceid);
-
-//Create attempt
-$attemptid = $quiz_manager->create_evaluation_attempt($data);
-
 $questions = $quiz_manager->get_questions($data); //Load questions
 $members = $quiz_manager->get_members(); //Load members
 
-// Get renderer
-$output = $PAGE->get_renderer('mod_smartspe');
+$page = new quiz_page($smartspeid, $current_member, $questions, $memberindex, $total_members);
 
-// Render page content
-echo $output->header();
-echo $output->render_mainpage(); // Custom renderer method (in classes/output/main.php)
-echo $output->footer();
+// Render using Moodle renderer
+echo $OUTPUT->header();
+echo $OUTPUT->render($page);
+echo $OUTPUT->footer();
