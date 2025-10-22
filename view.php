@@ -24,6 +24,18 @@ $mform = new mod_smartspe_mod_form($smartspe->id, $sectionid, $cm, $course);
 $data = $mform->get_data();
 $questionids = $data->questionids;
 
+if ($questionids)
+{
+    if (is_string($questionids))
+        $qids = explode(',', $questionids);
+    elseif(is_array($questionids))
+        $qids = $questionids;
+}
+else
+{
+    echo "Error: No questionids returned!!<br>"; 
+}
+
 // Page setup
 $PAGE->set_url('/mod/smartspe/view.php', ['id' => $id]);
 $PAGE->set_title(format_string($smartspe->name));
@@ -32,7 +44,7 @@ $PAGE->set_context($context);
 $PAGE->set_pagelayout('incourse');
 
 // Use renderable and Mustache
-$page = new view_page($cm, $smartspe, $questionids);
+$page = new view_page($cm, $smartspe, $qids);
 echo $OUTPUT->header();
 echo $OUTPUT->render($page);
 echo $OUTPUT->footer();

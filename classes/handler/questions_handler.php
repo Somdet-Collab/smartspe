@@ -22,8 +22,7 @@ class questions_handler
         if (empty($data->questionids))
             return [];
 
-        //split array{1,2,3}
-        $qids = explode(',', $questionids);
+        $qids = $questionids;
 
         // Format results as array
         $questions = [];
@@ -68,7 +67,7 @@ class questions_handler
         if (empty($data->questionids))
             return [];
 
-        $qids = explode(',', $questionids);
+        $qids = $questionids;
         
         foreach ($qids as $q)
         {
