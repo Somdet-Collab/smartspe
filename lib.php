@@ -20,10 +20,11 @@ defined('MOODLE_INTERNAL') || die();
  */
 function smartspe_add_instance($data, $mform) 
 {
-    global $DB;
+    global $DB, $COURSE;
 
     $instance = new stdClass();
     $instance->name = $data->name;
+    $instance->course = $COURSE->id;
     $instance->questionids = implode(',', $data->questionids); // save teacher-selected questions
     $instance->startdate = $data->startdate;
     $instance->enddate = $data->enddate;
@@ -47,10 +48,11 @@ function smartspe_add_instance($data, $mform)
  */
 function smartspe_update_instance($data, $mform) 
 {
-    global $DB;
+    global $DB, $COURSE;
 
     $instance = new stdClass();
     $instance->id = $data->id;
+    $instance->course = $COURSE->id;
     $instance->name = $data->name;
     $instance->questionids = implode(',', $data->questionids);
     $instance->startdate = $data->startdate;
