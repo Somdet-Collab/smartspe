@@ -29,6 +29,7 @@ function smartspe_add_instance($data, $mform)
     $instance->startdate = $data->startdate;
     $instance->enddate = $data->enddate;
     $instance->timecreated = time();
+    $instance->timemodified = time();
 
     // Insert new record into the module table.
     $id = $DB->insert_record('smartspe', $instance);

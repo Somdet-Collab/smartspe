@@ -12,17 +12,17 @@ $cm = get_coursemodule_from_id('smartspe', $id, 0, false, MUST_EXIST);
 $sectionid = $cm->section;
 $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
 $context = \context_module::instance($cm->id);
-$instanceid = $DB->get_record('smartspe', ['course' => $course], 'id');
+$instanceid = $cm->instance;
 
 // Security and access check
 require_login($course, true, $cm);
 
-if (!$smartspeid) {
+if (!$instanceid) {
     die("smartspeid is required. Example: view.php?smartspeid=1");
 }
 
 // --- Get teacher-selected questions from the module instance ---
-$smartspe = $DB->get_record('smartspe', ['id' => $smartspeid], '*', MUST_EXIST);
+$smartspe = $DB->get_record('smartspe', ['id' => $instanceid], '*', MUST_EXIST);
 
 // `questionids` field stores selected question IDs (assuming serialized or comma-separated)
 $teacher_selected_questionids = explode(',', $smartspe->questionids);
