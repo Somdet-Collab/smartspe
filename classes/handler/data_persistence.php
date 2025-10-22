@@ -112,7 +112,7 @@ class data_persistence
      * @param $newdata new answer to be saved
      * @return boolean
      */
-    public function update_attempt_answers($slot, $newdata)
+    private function update_attempt_answers($slot, $newdata)
     {
         global $DB;
         $quba = question_engine::load_questions_usage_by_activity($this->attempt->uniqueid);
@@ -168,7 +168,7 @@ class data_persistence
         $DB->set_field('smartspe_attempts', 'state', 'finished', ['id' => $this->attemptid]);
         $DB->set_field('smartspe_attempts', 'timemodified', time(), ['id' => $this->attemptid]);
 
-        // Optionally reload attempt object
+        // Reload attempt
         $this->attempt = $DB->get_record('smartspe_attempts', ['id' => $this->attemptid], '*', MUST_EXIST);
 
         return true;

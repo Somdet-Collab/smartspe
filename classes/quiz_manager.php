@@ -56,12 +56,18 @@ class smartspe_quiz_manager
      * @param $data the data getting from mod_smartspe_mod_form
      * @return $attemptid
      */
-    public function create_evaluation_attempt($data)
+    public function start_attempt_evaluation($data)
     {
         $this->quiz_attempt = new smartspe_quiz_attempt($this->userid, $this->smartspeid, null, $data);
-
+        
         if(!$this->quiz_attempt)
             throw new moodle_exception("Quiz attempt creation failed!!");
+
+        //Create persistence object
+        $this->data_persistence = $this->quiz_attempt->create_persistence();
+
+        if (!$this->data_persistence)
+            throw new moodle_exception("Failed to create data persistence");
 
         //Get quiz id
         $this->attemptid = $this->quiz_attempt->get_attempt_id();
@@ -70,11 +76,17 @@ class smartspe_quiz_manager
     }
 
     
-    public function start_attempt_evaluation($newdata=null)
+    public function process_attempt_evaluation($newdata=null, $finish=false)
     {
-        //Create persistence object
-        $this->data_persistence = $this->quiz_attempt->create_persistence();
-        
+        //Process autosave
+        if(!$this->data_persistence->auto_save($newdata))
+            throw new moodle_exception("Failed autosave data");
+
+        //If the evaluation finish
+        if($finish)
+            $this->data_persistence->finish_attempt();
+
+        return true;
     }
 
     public function get_questions($data)

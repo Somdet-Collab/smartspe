@@ -111,12 +111,4 @@ class smartspe_quiz_attempt
         return $this->attemptid;
     }
 
-    public function attempt_evaluation()
-    {
-        //Get all questions
-        global $DB;
-
-        // Get current attempt
-        
-    }
 }
