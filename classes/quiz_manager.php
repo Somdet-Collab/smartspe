@@ -77,7 +77,6 @@ class smartspe_quiz_manager
 
         return $this->attemptid;
     }
-
     
     public function process_attempt_evaluation($newdata=null, $finish=false)
     {
@@ -97,7 +96,7 @@ class smartspe_quiz_manager
         return $this->questions_handler->get_all_questions($data);
     }
 
-    public function get_saved_questions_answers($memberid)
+    public function get_saved_questions_answers()
     {
         return $this->data_persistence->load_attempt_questions();
     }

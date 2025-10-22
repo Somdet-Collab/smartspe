@@ -18,6 +18,7 @@ $userid = $USER->id;
 
 $quiz_manager = new smartspe_quiz_manager($USER->id, $course->id, $context, $instanceid);
 $members = $quiz_manager->get_members();
+$total_member = count($members);
 $current_member = $members[$memberindex];
 
 // Collect answers if any
@@ -27,7 +28,7 @@ switch ($action)
 {
     case 'next':
         // Save current member's answers
-        
+        $quiz_manager->process_attempt_evaluation(null,false);
 
         // Redirect to next member
         $memberindex++;
@@ -39,7 +40,8 @@ switch ($action)
         $quiz_manager->quiz_is_submitted($answers, '', '', $current_member->id);
 
         // Collect all answers for preview (fetch from database or data_persistence)
-        $all_answers = $quiz_manager->data_persistence->load_all_answers();
+        $questions = $quiz_manager->get_saved_questions_answers();
+        $all_answers = $questions['current_answer'];
 
         $page = new \mod_smartspe\output\preview_page($all_answers, $members);
         echo $OUTPUT->header();
@@ -49,7 +51,9 @@ switch ($action)
 
     case 'submit_final':
         // Final submission
-        $quiz_manager->finish_attempt(); // Mark attempt finished
+        $quiz_manager->process_attempt_evaluation(null, true); // Mark attempt finished
+        $quiz_manager->quiz_is_submitted($answers, $comment, $self_comment, $member[$memberindex]);
+        
         redirect(new moodle_url('/mod/smartspe/view.php', ['id'=>$smartspeid, 'submitted'=>1]));
         break;
 
