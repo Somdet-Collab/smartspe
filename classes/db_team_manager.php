@@ -27,7 +27,7 @@ class db_team_manager
         }
 
         // Get all members in the same group.
-        $members = $DB->get_records('groups_members', ['groupid' => $groupid]);
+        $members = $DB->get_records('groups_members', ['groupid' => $groupid], '', 'userid');
 
         if (empty($members)) {
             throw new moodle_exception("No members found in the group for user {$userid}.");
