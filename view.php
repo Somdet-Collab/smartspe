@@ -30,7 +30,7 @@ if (empty($teacher_selected_questionids)) {
     die("No questions selected for this SmartSpe activity.");
 }
 
-$quiz_manager = new smartspe_quiz_manager($USER->id, $id, $context, $smartspeid);
+$quiz_manager = new smartspe_quiz_manager($USER->id, $id, $context, $instanceid);
 
 // --- Step 1: Get members of team ---
 try {
