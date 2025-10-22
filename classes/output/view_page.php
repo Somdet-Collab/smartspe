@@ -24,7 +24,7 @@ class view_page implements renderable, templatable {
             'starturl' => (new moodle_url('/mod/smartspe/attempt.php', [
                 'id' => $this->cm->id,
                 'memberindex' => 0,
-                'questionids' => implode(',', $this->questionids)
+                'questionids' => explode(',', $this->questionids),
             ]))->out(false)
         ];
     }
