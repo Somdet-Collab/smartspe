@@ -121,11 +121,11 @@ class smartspe_quiz_manager
      * @param $memberid member being evaluated
      * @return boolean
      */
-    public function quiz_is_submitted($answers, $comment, $self_comment=null, $memberid)
+    public function quiz_is_submitted($answers, $memberid, $comment, $self_comment=null)
     {
         //Return boolean
-        $submitted = $this->submission_handler->is_submitted($answers, $comment, 
-                                $self_comment, $memberid);
+        $submitted = $this->submission_handler->is_submitted($answers, $memberid, 
+                                                        $comment, $self_comment);
 
         //if success in submitting, send notification to email
         if($submitted)

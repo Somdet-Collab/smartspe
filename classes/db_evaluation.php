@@ -6,7 +6,7 @@ use mod_smartspe\db_team_manager as team_manager;
 
 class db_evaluation
 {
-    public function save_answers_db($answers, $comment, $self_comment=null, $userid, $evaluateeid, $courseid)
+    public function save_answers_db($answers, $userid, $evaluateeid, $courseid, $comment, $self_comment=null)
     {
         global $DB;
         $success = false;
