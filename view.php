@@ -1,8 +1,7 @@
 <?php
 require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/lib.php');
-
-use mod_smartspe\smartspe_quiz_manager;
+require_once($CFG->dirroot . '/mod/smartspe/mod_smartspe_mod_form.php');
 
 global $DB, $USER;
 
