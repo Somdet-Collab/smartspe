@@ -10,6 +10,7 @@ $id = required_param('id', PARAM_INT); // Course module ID
 
 // Setup course + context
 $cm = get_coursemodule_from_id('smartspe', $id, 0, false, MUST_EXIST);
+$sectionid = $cm->section;
 $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
 $context = \context_module::instance($cm->id);
 $smartspe = $DB->get_record('smartspe', ['id' => $cm->instance], '*', MUST_EXIST);
