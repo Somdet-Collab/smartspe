@@ -10,29 +10,27 @@ class db_team_manager
     public function get_members($userid, $courseid)
     {
         global $DB;
-        $members = [];
 
-        if ($this->record_exist('groups_members', ['userid' => $userid]))
+        if (!$this->record_exist('groups_members', ['userid' => $userid])) 
         {
-            //Get teams regarding to courseid
-            $teams = $DB->get_records('groups', ['courseid ?', [$courseid]]);
-
-            #Get record of $userid
-            $record = $DB->get_record('groups_members', ['userid = ?', [$userid]]);
-
-            //Check if user team id is in any of the team
-            if (in_array($record->teamid, $teams))
-                $teamid = $record->groupid;#get team id of this user
-
-            else
-                return false;
-
-            #Get all members in the same team
-            $members = $DB->get_records('groups_members', ['teamid' => $teamid], '', '*');
+            throw new moodle_exception("User {$userid} is not in any group.");
         }
-        else
+
+        // Get the group record of this user.
+        $user = $DB->get_record('groups_members', ['userid' => $userid], '*', MUST_EXIST);
+        $groupid = $user->groupid;
+
+        // Ensure the group belongs to this course.
+        if (!$this->record_exist('groups', ['id' => $groupid, 'courseid' => $courseid])) 
         {
-            throw new moodle_exception("This userid {$userid} is not in the database");
+            throw new moodle_exception("User {$userid}’s group does not belong to course {$courseid}.");
+        }
+
+        // Get all members in the same group.
+        $members = $DB->get_records('groups_members', ['groupid' => $groupid]);
+
+        if (empty($members)) {
+            throw new moodle_exception("No members found in the group for user {$userid}.");
         }
 
         return $members;
