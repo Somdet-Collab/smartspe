@@ -14,8 +14,6 @@ $action = optional_param('action', '', PARAM_TEXT);
 $answers = optional_param_array('answers', [], PARAM_RAW);
 $questionids = optional_param_array('questionids', [], PARAM_INT);
 
-// Course + context setup
-$id = required_param('id', PARAM_INT); //Course module ID 
 // Setup course + context
 $cm = get_coursemodule_from_id('smartspe', $id, 0, false, MUST_EXIST);
 $sectionid = $cm->section;
@@ -49,7 +47,8 @@ if ($action === 'next' || $action === 'submit')
         $quiz_manager->process_attempt_evaluation(null, false);
 }
 
-if ($action === 'next') {
+if ($action === 'next') 
+{
     $nextmemberindex = $memberindex + 1;
 
     redirect(new moodle_url('/mod/smartspe/attempt.php', [
