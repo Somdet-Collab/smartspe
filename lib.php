@@ -18,16 +18,19 @@ defined('MOODLE_INTERNAL') || die();
  * @param mod_smartspe_mod_form $mform
  * @return int new smartspe instance id
  */
-function smartspe_add_instance($data, $mform = null) 
+function smartspe_add_instance($data, $mform) 
 {
     global $DB;
 
-    // Add created time.
-    $data->timecreated = time();
-    $data->timemodified = time();
+    $instance = new stdClass();
+    $instance->name = $data->name;
+    $instance->questionids = implode(',', $data->questionids); // save teacher-selected questions
+    $instance->startdate = $data->startdate;
+    $instance->enddate = $data->enddate;
+    $instance->timecreated = time();
 
     // Insert new record into the module table.
-    $id = $DB->insert_record('smartspe', $data);
+    $id = $DB->insert_record('smartspe', $instance);
 
     // Return the new instance id.
     return $id;
@@ -42,14 +45,19 @@ function smartspe_add_instance($data, $mform = null)
  * @param mod_smartspe_mod_form $mform
  * @return bool true on success, false otherwise
  */
-function smartspe_update_instance($data, $mform = null) 
+function smartspe_update_instance($data, $mform) 
 {
     global $DB;
 
-    $data->timemodified = time();
-    $data->id = $data->instance; // Important: set the correct id.
+    $instance = new stdClass();
+    $instance->id = $data->id;
+    $instance->name = $data->name;
+    $instance->questionids = implode(',', $data->questionids);
+    $instance->startdate = $data->startdate;
+    $instance->enddate = $data->enddate;
+    $instance->timemodified = time();
 
-    return $DB->update_record('smartspe', $data);
+    return $DB->update_record('smartspe', $instance);
 }
 
 /**
@@ -68,11 +76,6 @@ function smartspe_delete_instance($id)
     {
         return false;
     }
-
-    // Delete dependent records first if any (like evaluations, teams, etc.)
-    // Example:
-    // $DB->delete_records('smartspe_evaluations', ['smartspeid' => $id]);
-    // $DB->delete_records('smartspe_teams', ['smartspeid' => $id]);
 
     // Delete main instance.
     $DB->delete_records('smartspe', ['id' => $id]);
@@ -95,16 +98,4 @@ function smartspe_supports($feature)
         case FEATURE_BACKUP_MOODLE2:     return true;
         default:                         return null;
     }
-}
-
-/**
- * Extend settings navigation with smartspe specific settings.
- *
- * @param settings_navigation $settingsnav
- * @param navigation_node $smartspe_node
- */
-function smartspe_extend_settings_navigation($settingsnav, $smartspe_node) 
-{
-    // Example: add a custom link to your plugin page.
-    // $url = new moodle_url('/mod/smartspe/custom.php', ['id' => $smartspe_node->id]);
 }

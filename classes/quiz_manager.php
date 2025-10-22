@@ -13,7 +13,6 @@ use mod_smartspe\handler\download_handler;
 use mod_smartspe\smartspe_quiz_attempt;
 use mod_smartspe\handler\duration_controller;
 use mod_smartspe\handler\submission_handler;
-use mod_smartspe\handler\data_handler;
 use mod_smartspe\db_team_manager;
 
 
@@ -45,7 +44,6 @@ class smartspe_quiz_manager
         $this->submission_handler = new submission_handler($userid, $courseid);
         $this->notification_handler = new notification_handler();
         $this->download_handler = new download_handler();
-        $this->data_handler = new data_handler();
     }
 
     /**
