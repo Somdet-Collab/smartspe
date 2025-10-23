@@ -101,7 +101,7 @@ class smartspe_quiz_manager
      * Return member ids
      *
      *
-     * @return array $members
+     * @return array $member ids
      */
     public function get_members()
     {
