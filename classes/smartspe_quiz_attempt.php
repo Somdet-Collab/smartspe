@@ -94,7 +94,7 @@ class smartspe_quiz_attempt
         $this->data_persistence = new data_persistence($this->attemptid, $memberid);
 
         //Check if the usage has already been created and linked
-        $usage_exist = $DB->get_record('question_usage', ['qubaid' => $this->attempt->uniqueid]);
+        $usage_exist = $DB->get_record('question_usages', ['id' => $this->attempt->uniqueid]);
 
         // Load or create question usage
         if (!empty($this->attempt->uniqueid) && $usage_exist)
