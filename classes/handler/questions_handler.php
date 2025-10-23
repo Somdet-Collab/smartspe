@@ -1,6 +1,6 @@
 <?php
 
-namespace mod_smartspe\handler;s
+namespace mod_smartspe\handler;
 
 defined('MOODLE_INTERNAL') || die();
 class questions_handler
