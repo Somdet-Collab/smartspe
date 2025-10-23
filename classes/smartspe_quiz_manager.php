@@ -59,6 +59,7 @@ class smartspe_quiz_manager
         $this->quiz_attempt = new smartspe_quiz_attempt($this->smartspeid, $this->userid, 
                                                 $memberid, $questionids);
         
+        //Failed in creating a quiz attempt
         if(!$this->quiz_attempt)
             throw new moodle_exception("Quiz attempt creation failed!!");
 
