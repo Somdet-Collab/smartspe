@@ -80,23 +80,5 @@
         <KEY NAME="evaluatpk" TYPE="foreign" FIELDS="evaluationid" REFTABLE="smartspe_evaluation" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="smartspe_member_usage" COMMENT="Tracks individual member usage for SmartSPE attempts">
-        <FIELDS>
-            <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-            <FIELD NAME="attemptid" TYPE="int" LENGTH="10" NOTNULL="true"/>
-            <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true"/>
-            <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true"/>
-            <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false"/>
-        </FIELDS>
-        <KEYS>
-            <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-            <KEY NAME="attempt_unique" TYPE="foreign" REFTABLE="smartspe_attempts" REFFIELDS="id"/>
-            <KEY NAME="userfk" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
-        </KEYS>
-        <INDEXES>
-            <INDEX NAME="smartspe_idx" FIELDS="smartspeid"/>
-            <INDEX NAME="user_idx" FIELDS="userid"/>
-        </INDEXES>
-    </TABLE>
   </TABLES>
 </XMLDB>

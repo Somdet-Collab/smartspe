@@ -39,7 +39,7 @@ class smartspe_quiz_attempt
      * @param $questionids the questionids getting from mod_smartspe_mod_form
      * @return void
      */
-    public function __construct($smartspeid, $userid, $memberid, $questionids, $attemptid=null)
+    public function __construct($smartspeid, $userid, $memberid, $questionids)
     {
         global $DB;
 
@@ -47,15 +47,17 @@ class smartspe_quiz_attempt
         $this->userid = $userid;
         $this->questionids = $questionids;
 
-        // Check if this member already has a usage record
-        $memberusage = $DB->get_record('smartspe_member_usage', [
-            'userid' => $this->userid,
+        // Check if evaluator has already processed on this member
+        $memberusage = $DB->get_record('smartspe_attempts', [
+            'userid' => $userid,
             'memberid' => $memberid
         ]);
         
+        //If exist, get the attempt
         if ($memberusage)
         {
-            $this->attempt = $DB->get_record('smartspe_attempts', ['id' => $attemptid], '*', MUST_EXIST);
+            $this->attempt = $DB->get_record('smartspe_attempts', 
+                                ['userid' => $userid, 'memberid' => $memberid], '*', MUST_EXIST);
         }
         else
         {
@@ -69,7 +71,7 @@ class smartspe_quiz_attempt
             //Insert current attempt into database
             $this->attemptid = $DB->insert_record('smartspe_attempts', $record);
             //Get current attempt
-            $this->attempt = $DB->get_record('smartspe_attempts', ['id' => $this->$attemptid]);
+            $this->attempt = $DB->get_record('smartspe_attempts', ['id' => $this->attemptid]);
         }
 
     }
