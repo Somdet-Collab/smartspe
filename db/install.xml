@@ -80,18 +80,23 @@
         <KEY NAME="evaluatpk" TYPE="foreign" FIELDS="evaluationid" REFTABLE="smartspe_evaluation" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="smartspe_autosave" COMMENT="This table temporarily holds data for data persistence">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="attemptid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="evaluateeid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="data" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="as_pk" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="userfk" TYPE="foreign" FIELDS="evaluateeid" REFTABLE="user" REFFIELDS="id"/>
-      </KEYS>
+    <TABLE NAME="smartspe_member_usage" COMMENT="Tracks individual member usage for SmartSPE attempts">
+        <FIELDS>
+            <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+            <FIELD NAME="attemptid" TYPE="int" LENGTH="10" NOTNULL="true"/>
+            <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true"/>
+            <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true"/>
+            <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false"/>
+        </FIELDS>
+        <KEYS>
+            <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            <KEY NAME="attempt_unique" TYPE="unique" FIELDS="attemptid"/>
+            
+        </KEYS>
+        <INDEXES>
+            <INDEX NAME="smartspe_idx" FIELDS="smartspeid"/>
+            <INDEX NAME="user_idx" FIELDS="userid"/>
+        </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>
