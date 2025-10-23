@@ -36,7 +36,7 @@ if (empty($teacher_selected_questionids)) {
 }
 
 //Create attempt
-$attemptid = $quiz_manager->start_attempt_evaluation($data, $teacher_selected_questionids); // changed this function to align with the one from quiz_manager.php
+//$attemptid = $quiz_manager->start_attempt_evaluation($data, $teacher_selected_questionids); // changed this function to align with the one from quiz_manager.php -- commenting this out because i don't think we have to create it here
 $quiz_manager = new smartspe_quiz_manager($USER->id, $courseid, $context, $instanceid);
 
 // --- Step 1: Get members of team ---
