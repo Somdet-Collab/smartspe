@@ -24,6 +24,7 @@ if (!$instanceid) {
 
 // --- Get teacher-selected questions from the module instance ---
 $smartspe = $DB->get_record('smartspe', ['id' => $instanceid], '*', MUST_EXIST);
+$questionids = explode(',', $smartspe->questionids);
 
 $quiz_manager = new smartspe_quiz_manager($USER->id, $courseid, $context, $instanceid);
 
@@ -40,7 +41,7 @@ foreach ($members as $memberid)
 {
     // --- Step 2a: Start attempt with teacher-selected question IDs ---
     try {
-        $attemptid = $quiz_manager->start_attempt_evaluation($memberid, $smartspe->questionids);
+        $attemptid = $quiz_manager->start_attempt_evaluation($memberid, $questionids);
         echo "Attempt created for member $memberid: Attempt ID $attemptid<br>";
     } catch (moodle_exception $e) {
         echo "Failed to start attempt for member $memberid: " . $e->getMessage() . "<br>";
@@ -52,7 +53,7 @@ foreach ($members as $memberid)
     $mcq_count = 0;
     $comment_count = 0;
 
-    $questions = $quiz_manager->get_questions($smartspe->questionids);
+    $questions = $quiz_manager->get_questions($questionids);
 
     foreach ($questions as $question) 
     {
