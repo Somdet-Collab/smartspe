@@ -19,7 +19,7 @@ class mod_smartspe_mod_form extends moodleform_mod
     public function definition() 
     {
 
-        $mform = $this->_form;
+        $mform = $this->_form; // mform object is mooodle's form builder
 
         // Activity name.
         $mform->addElement('text', 'name', get_string('smartspe_name', 'mod_smartspe'), ['size' => '64']);
