@@ -48,9 +48,9 @@ foreach ($members as $memberid)
     // --- Step 2a: Start attempt with teacher-selected question IDs ---
     try {
         $attemptid = $quiz_manager->start_attempt_evaluation($memberid, $teacher_selected_questionids);
-        echo "Attempt created for member $memberid: Attempt ID $attemptid<br>";
+        echo "Attempt created for member {$memberid}: Attempt ID {$attemptid}<br>";
     } catch (moodle_exception $e) {
-        echo "Failed to start attempt for member $memberid: " . $e->getMessage() . "<br>";
+        echo "Failed to start attempt for member {$memberid}: " . $e->getMessage() . "<br>";
         continue;
     }
 
@@ -66,28 +66,28 @@ foreach ($members as $memberid)
             $answers[$qid] = rand(1, 4); // simulate MCQ answer
             $mcq_count++;
         } elseif ($question->qtype === 'comment' && $comment_count < 1) {
-            $answers[$qid] = "This is a comment for member $memberid";
+            $answers[$qid] = "This is a comment for member {$memberid}";
             $comment_count++;
         }
     }
 
-    $comment = "Peer comment for member $memberid";
+    $comment = "Peer comment for member {$memberid}";
     $self_comment = "My self comment";
 
     // --- Step 2c: Autosave ---
     try {
         $quiz_manager->process_attempt_evaluation($answers, false);
-        echo "Autosaved answers for member $memberid<br>";
+        echo "Autosaved answers for member {$memberid}<br>";
     } catch (moodle_exception $e) {
-        echo "Failed autosave for member $memberid: " . $e->getMessage() . "<br>";
+        echo "Failed autosave for member {$memberid}: " . $e->getMessage() . "<br>";
     }
 
     // --- Step 2d: Submit ---
     try {
         $submitted = $quiz_manager->quiz_is_submitted($answers, $comment, $self_comment, $memberid);
-        echo $submitted ? "Submitted evaluation for member $memberid<br>" : "Failed submission for member $memberid<br>";
+        echo $submitted ? "Submitted evaluation for member {$memberid}<br>" : "Failed submission for member {$memberid}<br>";
     } catch (moodle_exception $e) {
-        echo "Submission error for member $memberid: " . $e->getMessage() . "<br>";
+        echo "Submission error for member {$memberid}: " . $e->getMessage() . "<br>";
     }
 }
 
