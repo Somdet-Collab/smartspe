@@ -2,15 +2,8 @@
 
 namespace mod_smartspe;
 
-use cm_info;
-use coding_exception;
-use context;
-use context_module;
 use moodle_exception;
-use moodle_url;
-use question_bank;
 use stdClass;
-use question_engine;
 use mod_smartspe\handler\data_persistence;
 use mod_smartspe\handler\questions_handler;
 
@@ -93,11 +86,16 @@ class smartspe_quiz_attempt
      */
     public function create_persistence($context, $memberid)
     {
+        global $DB;
+
         $question_handler = new questions_handler();
         $this->data_persistence = new data_persistence($this->attemptid, $memberid);
 
+        //Check if the usage has already been created and linked
+        $usage_exist = $DB->get_record('question_usage', ['qubaid' => $this->attempt->uniqueid]);
+
         // Load or create question usage
-        if (!empty($this->attempt->uniqueid)) 
+        if (!empty($this->attempt->uniqueid) && $usage_exist)
         {
             //Load questions 
             $this->questions = $this->data_persistence->load_attempt_questions();

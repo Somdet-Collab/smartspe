@@ -20,6 +20,12 @@ class data_persistence
 
         $this->attemptid = $attemptid;
         $this->attempt = $DB->get_record('smartspe_attempts', ['id' => $attemptid], '*', MUST_EXIST);
+
+        //Verify qudaid exist in question_usage
+        $record = $DB->get_record('question_usage', ['qudaid' => $this->attempt->uniqueid]);
+        if(!$record)
+            throw new moodle_exception("In data persistence class: usage id does not exist {$this->attempt->uniqueid}");
+        
         $this->memberid = $memberid;
     }
 
