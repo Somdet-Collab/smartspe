@@ -13,7 +13,6 @@ use mod_smartspe\handler\download_handler;
 use mod_smartspe\smartspe_quiz_attempt;
 use mod_smartspe\handler\duration_controller;
 use mod_smartspe\handler\submission_handler;
-use mod_smartspe\handler\data_handler;
 use mod_smartspe\db_team_manager;
 
 
@@ -45,26 +44,28 @@ class smartspe_quiz_manager
         $this->submission_handler = new submission_handler($userid, $courseid);
         $this->notification_handler = new notification_handler();
         $this->download_handler = new download_handler();
-        $this->data_handler = new data_handler();
     }
 
     /**
      * Create attempt once student attempt the evaluation
+     * Create persistence for specific evaluatee
      *
      * Called when student start attempting.
      *
+     * @param $memberid attempt on this member
      * @param $data the data getting from mod_smartspe_mod_form
      * @return $attemptid
      */
-    public function start_attempt_evaluation($data)
+    public function start_attempt_evaluation($memberid, $questionids)
     {
-        $this->quiz_attempt = new smartspe_quiz_attempt($this->userid, $this->smartspeid, null, $data);
+        $this->quiz_attempt = new smartspe_quiz_attempt($this->smartspeid, $this->userid, 
+                                                $memberid, $questionids, null);
         
         if(!$this->quiz_attempt)
             throw new moodle_exception("Quiz attempt creation failed!!");
 
-        //Create persistence object
-        $this->data_persistence = $this->quiz_attempt->create_persistence();
+        //Create persistence object for specific member
+        $this->data_persistence = $this->quiz_attempt->create_persistence($this->context, $memberid);
 
         if (!$this->data_persistence)
             throw new moodle_exception("Failed to create data persistence");
@@ -74,7 +75,6 @@ class smartspe_quiz_manager
 
         return $this->attemptid;
     }
-
     
     public function process_attempt_evaluation($newdata=null, $finish=false)
     {
@@ -92,6 +92,11 @@ class smartspe_quiz_manager
     public function get_questions($data)
     {
         return $this->questions_handler->get_all_questions($data);
+    }
+
+    public function get_saved_questions_answers()
+    {
+        return $this->data_persistence->load_attempt_questions();
     }
 
     public function get_members()
@@ -116,11 +121,11 @@ class smartspe_quiz_manager
      * @param $memberid member being evaluated
      * @return boolean
      */
-    public function quiz_is_submitted($answers, $comment, $self_comment=null, $memberid)
+    public function quiz_is_submitted($answers, $memberid, $comment, $self_comment=null)
     {
         //Return boolean
-        $submitted = $this->submission_handler->is_submitted($answers, $comment, 
-                                $self_comment, $memberid);
+        $submitted = $this->submission_handler->is_submitted($answers, $memberid, 
+                                                        $comment, $self_comment);
 
         //if success in submitting, send notification to email
         if($submitted)

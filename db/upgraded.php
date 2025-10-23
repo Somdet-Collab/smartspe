@@ -12,9 +12,6 @@ function xmldb_smartspe_upgrade($oldversion) {
 
     $dbman = $DB->get_manager(); // loads ddl manager
 
-    // =========================================
-    // Version 1: create smartspe table
-    // =========================================
     if ($oldversion < 2025101901) {
 
         // Table: smartspe
@@ -39,9 +36,6 @@ function xmldb_smartspe_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2025101901, 'mod', 'smartspe');
     }
 
-    // =========================================
-    // Version 2: create smartspe_evaluation table
-    // =========================================
     if ($oldversion < 2025101902) {
 
         $table = new xmldb_table('smartspe_evaluation');
@@ -70,9 +64,6 @@ function xmldb_smartspe_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2025101901, 'mod', 'smartspe');
     }
 
-    // =========================================
-    // Version 3: create smartspe_sentiment_analysis table
-    // =========================================
     if ($oldversion < 2025101903) {
 
         $table = new xmldb_table('smartspe_sentiment_analysis');
@@ -91,9 +82,6 @@ function xmldb_smartspe_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2025101901, 'mod', 'smartspe');
     }
 
-    // =========================================
-    // Version 4: create smartspe_autosave table
-    // =========================================
     if ($oldversion < 2025101904) {
 
         $table = new xmldb_table('smartspe_autosave');

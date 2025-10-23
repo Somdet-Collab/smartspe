@@ -24,6 +24,9 @@ $string['submissionopen'] = 'Submission is open';
 $string['submissionclosed'] = 'Submission is closed';
 
 // names for admin view
+//Buttons
+$string['startattempt'] = 'Attempt Evaluation';
+
 $string['pluginadministration'] = 'Self Peer Evaluation administration'; // Admin menu
 $string['privacy:metadata'] = 'The Self Peer Evaluation plugin stores user submissions and peer evaluation data.';
 

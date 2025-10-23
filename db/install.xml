@@ -11,6 +11,7 @@
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" COMMENT="Activity name"/>
         <FIELD NAME="intro" TYPE="text" NOTNULL="false" COMMENT="Intro text"/>
         <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="false" DEFAULT="0"/>
+        <FIELD NAME="questionids" TYPE="text" NOTNULL="false" DEFAULT="" COMMENT="Comma-separated question IDs selected by teacher"/>
         <FIELD NAME="startdate" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
         <FIELD NAME="enddate" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true"/>
@@ -26,6 +27,7 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="smartspeid" TYPE="int" LENGTH="10" NOTNULL="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="memberid" TYPE="int" LENGTH="10" NOTNULL="true"/>
         <FIELD NAME="attempt" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1"/>
         <FIELD NAME="uniqueid" TYPE="int" LENGTH="10" NOTNULL="false"/>
         <FIELD NAME="state" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="inprogress"/>
@@ -36,6 +38,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="smartspe_fk" TYPE="foreign" FIELDS="smartspeid" REFTABLE="smartspe" REFFIELDS="id"/>
         <KEY NAME="user_fk" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="member_fk" TYPE="foreign" FIELDS="memberid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="smartspe_evaluation" COMMENT="evaluation results are stored">
@@ -51,7 +54,7 @@
         <FIELD NAME="average" TYPE="float" DECIMALS='2' LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="self_comment" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="comment" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="attempid" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="attemptid" TYPE="int" LENGTH="10" NOTNULL="true"/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true"/>
       </FIELDS>
       <KEYS>
@@ -59,7 +62,7 @@
         <KEY NAME="evaluatorfk" TYPE="foreign" FIELDS="evaluator" REFTABLE="groups_members" REFFIELDS="userid"/>
         <KEY NAME="evaluateefk" TYPE="foreign" FIELDS="evaluatee" REFTABLE="groups_members" REFFIELDS="userid"/>
         <KEY NAME="coursepk" TYPE="foreign" FIELDS="course" REFTABLE="course" REFFIELDS="id"/>
-        <KEY NAME="attemptfk" TYPE="foreign" FIELDS="atttemptid" REFTABLE="smartspe_attempts" REFFIELDS="id"/>
+        <KEY NAME="attemptfk" TYPE="foreign" FIELDS="attemptid" REFTABLE="smartspe_attempts" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
