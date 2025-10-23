@@ -46,14 +46,14 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="evaluator" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="evaluatee" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="q1" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="q2" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="q3" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="q4" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="q5" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="average" TYPE="float" DECIMALS='2' LENGTH="4" DEFAULT="0.0" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="q1" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="q2" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="q3" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="q4" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="q5" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="average" TYPE="float" DECIMALS="2" LENGTH="4" NOTNULL="true" DEFAULT="0.00"/>
         <FIELD NAME="self_comment" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="comment" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="comment" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="attemptid" TYPE="int" LENGTH="10" NOTNULL="true"/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true"/>
       </FIELDS>
