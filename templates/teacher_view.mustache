@@ -1,0 +1,47 @@
+<div class="smartspe-teacher-container">
+
+  <h2>{{activityname}}</h2>
+  <p>{{description}}</p>
+
+  {{#hasdata}}
+  <div class="smartspe-stats">
+    <h3>Evaluation Summary</h3>
+    <table class="generaltable">
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Average Score</th>
+          <th>Sentiment</th>
+          <th>Consistency</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#results}}
+        <tr>
+          <td>{{studentname}}</td>
+          <td>{{avgscore}}</td>
+          <td>
+            {{#sentiment_positive}}<span class="badge badge-success">Positive</span>{{/sentiment_positive}}
+            {{#sentiment_negative}}<span class="badge badge-danger">Negative</span>{{/sentiment_negative}}
+            {{#sentiment_neutral}}<span class="badge badge-secondary">Neutral</span>{{/sentiment_neutral}}
+            {{#sentiment_null}}<span class="badge badge-light">Null</span>{{/sentiment_null}}
+          </td>
+          <td>{{consistency}}</td>
+        </tr>
+        {{/results}}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="smartspe-actions">
+    <h3>Actions</h3>
+    <a href="{{downloadlink}}" class="btn btn-primary">Download Report</a>
+    <a href="{{questionbanklink}}" class="btn btn-secondary">Edit Questions</a>
+  </div>
+  {{/hasdata}}
+
+  {{^hasdata}}
+  <p>No evaluation data available yet.</p>
+  {{/hasdata}}
+
+</div>
