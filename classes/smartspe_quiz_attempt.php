@@ -99,16 +99,17 @@ class smartspe_quiz_attempt
         if (!empty($this->attempt->uniqueid) && $usage_exist)
         {
             //Load questions 
+            $this->data_persistence = new data_persistence($this->attemptid, $memberid);
             $this->questions = $this->data_persistence->load_attempt_questions();
         } 
         else 
         {
             //Cretae questions usage and link to each attempt
             $this->quba = $question_handler->add_all_questions($context, $this->questionids, $this->attemptid);
-            $this->questions = $question_handler->get_all_questions($this->questionids);
+            $this->data_persistence = new data_persistence($this->attemptid, $memberid);
+            $this->questions = $this->data_persistence->load_attempt_questions();
         }
 
-        $this->data_persistence = new data_persistence($this->attemptid, $memberid);
 
         return $this->data_persistence;
     }
