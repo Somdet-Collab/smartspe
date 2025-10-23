@@ -91,7 +91,6 @@ class smartspe_quiz_attempt
         global $DB;
 
         $question_handler = new questions_handler();
-        $this->data_persistence = new data_persistence($this->attemptid, $memberid);
 
         //Check if the usage has already been created and linked
         $usage_exist = $DB->record_exists('question_usages', ['id' => $this->attempt->uniqueid]);
@@ -108,6 +107,8 @@ class smartspe_quiz_attempt
             $this->quba = $question_handler->add_all_questions($context, $this->questionids, $this->attemptid);
             $this->questions = $question_handler->get_all_questions($this->questionids);
         }
+
+        $this->data_persistence = new data_persistence($this->attemptid, $memberid);
 
         return $this->data_persistence;
     }
