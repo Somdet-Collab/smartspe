@@ -39,7 +39,6 @@ class smartspe_quiz_manager
         $this->smartspeid = $smartspeid;
         $this->userid = $userid;
         $this->questions_handler = new questions_handler();
-        $this->submission_handler = new submission_handler($userid, $courseid);
         $this->notification_handler = new notification_handler();
         $this->download_handler = new download_handler();
     }
@@ -128,6 +127,7 @@ class smartspe_quiz_manager
      */
     public function quiz_is_submitted($answers, $memberid, $comment, $self_comment=null)
     {
+        $this->submission_handler = new submission_handler($this->userid, $this->courseid, $this->attemptid);
         //Return boolean
         $submitted = $this->submission_handler->is_submitted($answers, $memberid, 
                                                         $comment, $self_comment);

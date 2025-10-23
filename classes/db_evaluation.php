@@ -6,7 +6,7 @@ use mod_smartspe\db_team_manager as team_manager;
 
 class db_evaluation
 {
-    public function save_answers_db($answers, $userid, $evaluateeid, $courseid, $comment, $self_comment=null)
+    public function save_answers_db($answers, $userid, $evaluateeid, $courseid, $comment, $attemptid, $self_comment=null)
     {
         global $DB;
         $success = false;
@@ -22,6 +22,7 @@ class db_evaluation
             $record->evaluator = $userid;
             $record->evaluatee = $evaluateeid;
             $record->course = $courseid;
+            $record->attemptid = $attemptid;
 
             //Loop all answers
             foreach ($answers as $index => $answer)
