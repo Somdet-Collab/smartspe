@@ -7,7 +7,7 @@ use core\exception\moodle_exception;
 
 class db_team_manager
 {
-    public function get_members($userid, $courseid)
+    public function get_members_id($userid, $courseid)
     {
         global $DB;
 
@@ -33,7 +33,9 @@ class db_team_manager
             throw new moodle_exception("No members found in the group for user {$userid}.");
         }
 
-        return $members;
+        $members_id = array_map(fn($m) => $m->userid, $members);
+
+        return $members_id;
     }
 
     public function record_exist($table, $record)

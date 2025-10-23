@@ -54,7 +54,7 @@ class smartspe_quiz_manager
      *
      * @param $memberid attempt on this member
      * @param $data the data getting from mod_smartspe_mod_form
-     * @return $attemptid
+     * @return int $attemptid
      */
     public function start_attempt_evaluation($memberid, $questionids)
     {
@@ -99,10 +99,16 @@ class smartspe_quiz_manager
         return $this->data_persistence->load_attempt_questions();
     }
 
+    /**
+     * Return member ids
+     *
+     *
+     * @return array $members
+     */
     public function get_members()
     {
         $team_manager = new db_team_manager();
-        $members = $team_manager->get_members($this->userid, $this->courseid);
+        $members = $team_manager->get_members_id($this->userid, $this->courseid);
 
         if (empty($members))
             throw new moodle_exception("The members are empty in section get_members() in quiz_manager");
