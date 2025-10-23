@@ -54,9 +54,12 @@ foreach ($members as $memberid)
     $comment_count = 0;
 
     $questions = $quiz_manager->get_questions($questionids);
+    $member = $DB->get_record('user', ['id' => $memberid]);
+    $member_name = $member->firstname;
 
     foreach ($questions as $question) 
     {
+        echo "Question for $member_name: $question <br>";
         if ($question->qtype === 'multichoice' && $mcq_count < 5) {
             $answers[$qid] = rand(1, 4); // simulate MCQ answer
             $mcq_count++;
