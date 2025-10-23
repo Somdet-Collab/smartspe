@@ -3,6 +3,9 @@
 namespace mod_smartspe\handler;
 
 defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once($CFG->dirroot . '/question/engine/lib.php');
+
 class questions_handler
 {
     /**

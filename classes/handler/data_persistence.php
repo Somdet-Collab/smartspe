@@ -5,6 +5,8 @@ namespace mod_smartspe\handler;
 use core\exception\moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once($CFG->dirroot . '/question/engine/lib.php');
 
 class data_persistence
 {
