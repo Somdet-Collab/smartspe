@@ -25,12 +25,6 @@ if (!$instanceid) {
 // --- Get teacher-selected questions from the module instance ---
 $smartspe = $DB->get_record('smartspe', ['id' => $instanceid], '*', MUST_EXIST);
 
-// `questionids` field stores selected question IDs (assuming serialized or comma-separated)
-$teacher_selected_questionids = $smartspe->questionids;
-if (empty($teacher_selected_questionids)) {
-    die("No questions selected for this SmartSpe activity.");
-}
-
 $quiz_manager = new smartspe_quiz_manager($USER->id, $courseid, $context, $instanceid);
 
 // --- Step 1: Get members of team ---
@@ -58,9 +52,10 @@ foreach ($members as $memberid)
     $mcq_count = 0;
     $comment_count = 0;
 
-    foreach ($teacher_selected_questionids as $qid) {
-        // Check question type from DB
-        $question = $DB->get_record('question', ['id' => $qid], 'id, qtype', MUST_EXIST);
+    $questions = $quiz_manager->get_questions($smartspe->questionids);
+
+    foreach ($questions as $question) 
+    {
         if ($question->qtype === 'multichoice' && $mcq_count < 5) {
             $answers[$qid] = rand(1, 4); // simulate MCQ answer
             $mcq_count++;
@@ -83,7 +78,8 @@ foreach ($members as $memberid)
 
     // --- Step 2d: Submit ---
     try {
-        $submitted = $quiz_manager->quiz_is_submitted($answers, $comment, $self_comment, $memberid);
+        $quiz_manager->process_attempt_evaluation($answers, true);
+        $submitted = $quiz_manager->quiz_is_submitted($answers, $memberid, $comment, $self_comment);
         echo $submitted ? "Submitted evaluation for member $memberid<br>" : "Failed submission for member $memberid<br>";
     } catch (moodle_exception $e) {
         echo "Submission error for member $memberid: " . $e->getMessage() . "<br>";

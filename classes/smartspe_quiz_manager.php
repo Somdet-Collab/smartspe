@@ -87,9 +87,9 @@ class smartspe_quiz_manager
         return true;
     }
 
-    public function get_questions($data)
+    public function get_questions($questionids)
     {
-        return $this->questions_handler->get_all_questions($data);
+        return $this->questions_handler->get_all_questions($questionids);
     }
 
     public function get_saved_questions_answers()

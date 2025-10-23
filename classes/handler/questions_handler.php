@@ -14,7 +14,7 @@ class questions_handler
      * Called when loading data and display questions to users.
      *
      * @param $data the data getting from mod_smartspe_mod_form
-     * @return $questions
+     * @return array $questions
      */
     public function get_all_questions($questionids)
     {
@@ -23,7 +23,7 @@ class questions_handler
         if (empty($data->questionids))
             return [];
 
-        $qids = $questionids;
+        $qids = json_decode($questionids, true);
 
         // Format results as array
         $questions = [];
@@ -65,10 +65,10 @@ class questions_handler
         $quba->set_preferred_behaviour('deferredfeedback');
 
         // $data comes from $mform->get_data() after submission
-        if (empty($data->questionids))
+        if (empty($questionids))
             return [];
 
-        $qids = $questionids;
+        $qids = json_decode($questionids, true);
         
         foreach ($qids as $q)
         {
