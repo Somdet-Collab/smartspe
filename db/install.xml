@@ -90,8 +90,8 @@
         </FIELDS>
         <KEYS>
             <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-            <KEY NAME="attempt_unique" TYPE="unique" FIELDS="attemptid"/>
-            
+            <KEY NAME="attempt_unique" TYPE="foreign" REFTABLE="smartspe_attempts" REFFIELDS="id"/>
+            <KEY NAME="userfk" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
         </KEYS>
         <INDEXES>
             <INDEX NAME="smartspe_idx" FIELDS="smartspeid"/>
