@@ -47,8 +47,7 @@ class submission_handler
             //Save evaluation info into database
             //Return true if data are saved in db successfully
             return $evaluation->save_answers_db($answers, $userid, 
-                                            $evaluateeid, $this->courseid, $comment,
-                                                $this->attemptid, $self_comment);
+                                            $evaluateeid, $this->courseid, $comment, $self_comment);
         }
         else
         {
