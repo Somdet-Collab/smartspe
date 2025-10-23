@@ -25,7 +25,7 @@ function smartspe_add_instance($data, $mform)
     $instance = new stdClass();
     $instance->name = $data->name;
     $instance->course = $COURSE->id;
-    $instance->questionids = json_encode($data->questionids); // save teacher-selected questions
+    $instance->questionids = $data->questionids; // save teacher-selected questions
     $instance->startdate = $data->startdate;
     $instance->enddate = $data->enddate;
     $instance->timecreated = time();
@@ -55,7 +55,7 @@ function smartspe_update_instance($data, $mform)
     $instance->id = $data->id;
     $instance->course = $COURSE->id;
     $instance->name = $data->name;
-    $instance->questionids = json_encode($data->questionids);
+    $instance->questionids = $data->questionids;
     $instance->startdate = $data->startdate;
     $instance->enddate = $data->enddate;
     $instance->timemodified = time();

@@ -40,7 +40,7 @@ foreach ($members as $memberid)
 {
     // --- Step 2a: Start attempt with teacher-selected question IDs ---
     try {
-        $attemptid = $quiz_manager->start_attempt_evaluation($memberid, json_decode($smartspe->questionids, true));
+        $attemptid = $quiz_manager->start_attempt_evaluation($memberid, $smartspe->questionids);
         echo "Attempt created for member $memberid: Attempt ID $attemptid<br>";
     } catch (moodle_exception $e) {
         echo "Failed to start attempt for member $memberid: " . $e->getMessage() . "<br>";

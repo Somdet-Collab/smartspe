@@ -23,7 +23,7 @@ class questions_handler
         if (empty($data->questionids))
             return [];
 
-        $qids = json_decode($questionids, true);
+        $qids = $questionids;
 
         // Format results as array
         $questions = [];
@@ -68,7 +68,7 @@ class questions_handler
         if (empty($questionids))
             return [];
 
-        $qids = json_decode($questionids, true);
+        $qids = $questionids;
         
         foreach ($qids as $q)
         {
