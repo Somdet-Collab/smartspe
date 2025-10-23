@@ -2,7 +2,6 @@
 
 namespace mod_smartspe\handler;
 
-use question_engine;
 use core\exception\moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
@@ -32,7 +31,7 @@ class data_persistence
     public function load_attempt_questions() 
     {
         // Load all questions and their current state
-        $quba = question_engine::load_questions_usage_by_activity($this->attempt->uniqueid);
+        $quba = \question_engine::load_questions_usage_by_activity($this->attempt->uniqueid);
 
         //Get all questions
         $questions = [];
@@ -69,7 +68,7 @@ class data_persistence
         global $DB;
 
         // Load all questions and their current state
-        $quba = question_engine::load_questions_usage_by_activity($this->attempt->uniqueid);
+        $quba = \question_engine::load_questions_usage_by_activity($this->attempt->uniqueid);
 
         // Loop through all slots in this usage
         foreach ($quba->get_slots() as $slot)
@@ -99,7 +98,7 @@ class data_persistence
         }
 
         // Save the updated usage
-        question_engine::save_questions_usage_by_activity($quba);
+        \question_engine::save_questions_usage_by_activity($quba);
 
         return true;
     }
@@ -117,7 +116,7 @@ class data_persistence
     private function update_attempt_answers($slot, $newdata)
     {
         global $DB;
-        $quba = question_engine::load_questions_usage_by_activity($this->attempt->uniqueid);
+        $quba = \question_engine::load_questions_usage_by_activity($this->attempt->uniqueid);
 
         $qa = $quba->get_question_attempt($slot);
 
@@ -138,7 +137,7 @@ class data_persistence
             //Update time modified
             $DB->set_field('smartspe_attempts', 'timemodified', time(), ['id' => $this->attemptid]);
             // Save the updated quba
-            question_engine::save_questions_usage_by_activity($quba);
+            \question_engine::save_questions_usage_by_activity($quba);
         }
 
         return true;
@@ -158,13 +157,13 @@ class data_persistence
         global $DB;
 
         // Load the question usage for this attempt
-        $quba = question_engine::load_questions_usage_by_activity($this->attempt->uniqueid);
+        $quba = \question_engine::load_questions_usage_by_activity($this->attempt->uniqueid);
 
         // Mark all questions as finished
         $quba->finish_all_questions();
 
         // Save the updated question usage
-        question_engine::save_questions_usage_by_activity($quba);
+        \question_engine::save_questions_usage_by_activity($quba);
 
         // Update the attempt record to finished
         $DB->set_field('smartspe_attempts', 'state', 'finished', ['id' => $this->attemptid]);

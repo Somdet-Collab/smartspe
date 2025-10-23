@@ -2,8 +2,6 @@
 
 namespace mod_smartspe\handler;
 
-use question_engine;
-
 defined('MOODLE_INTERNAL') || die();
 class questions_handler
 {
@@ -60,7 +58,7 @@ class questions_handler
     {
         global $DB;
 
-        $quba = question_engine::make_questions_usage_by_activity('mod_smartspe', $context);
+        $quba = \question_engine::make_questions_usage_by_activity('mod_smartspe', $context);
         $quba->set_preferred_behaviour('deferredfeedback');
 
         // $data comes from $mform->get_data() after submission
@@ -77,7 +75,7 @@ class questions_handler
 
         //Save the usage
         $quba->start_all_questions();
-        question_engine::save_questions_usage_by_activity($quba);
+        \question_engine::save_questions_usage_by_activity($quba);
 
         $qubaid = $quba->get_id(); // usage ID after saving
         $DB->set_field('smartspe_attempts', 'uniqueid', $qubaid, ['id' => $attemptid]);

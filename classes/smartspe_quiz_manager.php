@@ -5,10 +5,8 @@
 namespace mod_smartspe;
 
 use core\exception\moodle_exception;
-use mod_quiz\quiz_attempt;
 use mod_smartspe\handler\notification_handler;
 use mod_smartspe\handler\questions_handler;
-use mod_smartspe\handler\data_persistence;
 use mod_smartspe\handler\download_handler;
 use mod_smartspe\smartspe_quiz_attempt;
 use mod_smartspe\handler\duration_controller;
@@ -54,12 +52,12 @@ class smartspe_quiz_manager
      *
      * @param $memberid attempt on this member
      * @param $data the data getting from mod_smartspe_mod_form
-     * @return $attemptid
+     * @return int $attemptid
      */
     public function start_attempt_evaluation($memberid, $questionids)
     {
         $this->quiz_attempt = new smartspe_quiz_attempt($this->smartspeid, $this->userid, 
-                                                $memberid, $questionids, null);
+                                                $memberid, $questionids);
         
         if(!$this->quiz_attempt)
             throw new moodle_exception("Quiz attempt creation failed!!");
@@ -99,10 +97,16 @@ class smartspe_quiz_manager
         return $this->data_persistence->load_attempt_questions();
     }
 
+    /**
+     * Return member ids
+     *
+     *
+     * @return array $members
+     */
     public function get_members()
     {
         $team_manager = new db_team_manager();
-        $members = $team_manager->get_members($this->userid, $this->courseid);
+        $members = $team_manager->get_members_id($this->userid, $this->courseid);
 
         if (empty($members))
             throw new moodle_exception("The members are empty in section get_members() in quiz_manager");
