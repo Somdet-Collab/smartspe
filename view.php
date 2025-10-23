@@ -26,7 +26,7 @@ if (!$instanceid) {
 $smartspe = $DB->get_record('smartspe', ['id' => $instanceid], '*', MUST_EXIST);
 
 // `questionids` field stores selected question IDs (assuming serialized or comma-separated)
-$teacher_selected_questionids = explode(',', $smartspe->questionids);
+$teacher_selected_questionids = $smartspe->questionids;
 if (empty($teacher_selected_questionids)) {
     die("No questions selected for this SmartSpe activity.");
 }
