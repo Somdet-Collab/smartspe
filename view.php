@@ -10,6 +10,7 @@ global $DB, $USER;
 $id = required_param('id', PARAM_INT); // Course module ID
 $cm = get_coursemodule_from_id('smartspe', $id, 0, false, MUST_EXIST);
 $sectionid = $cm->section;
+$courseid = $cm->course;
 $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
 $context = \context_module::instance($cm->id);
 $instanceid = $cm->instance;
@@ -30,7 +31,7 @@ if (empty($teacher_selected_questionids)) {
     die("No questions selected for this SmartSpe activity.");
 }
 
-$quiz_manager = new smartspe_quiz_manager($USER->id, $id, $context, $instanceid);
+$quiz_manager = new smartspe_quiz_manager($USER->id, $courseid, $context, $instanceid);
 
 // --- Step 1: Get members of team ---
 try {
