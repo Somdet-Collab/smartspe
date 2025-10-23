@@ -127,6 +127,7 @@ class smartspe_quiz_manager
      */
     public function quiz_is_submitted($answers, $memberid, $comment, $self_comment=null)
     {
+        $this->submission_handler = new submission_handler($this->userid, $this->courseid, $this->attemptid);
         //Return boolean
         $submitted = $this->submission_handler->is_submitted($answers, $memberid, 
                                                         $comment, $self_comment);
