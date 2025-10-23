@@ -5,10 +5,8 @@
 namespace mod_smartspe;
 
 use core\exception\moodle_exception;
-use mod_quiz\quiz_attempt;
 use mod_smartspe\handler\notification_handler;
 use mod_smartspe\handler\questions_handler;
-use mod_smartspe\handler\data_persistence;
 use mod_smartspe\handler\download_handler;
 use mod_smartspe\smartspe_quiz_attempt;
 use mod_smartspe\handler\duration_controller;
