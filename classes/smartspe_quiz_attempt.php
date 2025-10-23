@@ -51,6 +51,8 @@ class smartspe_quiz_attempt
         {
             $this->attempt = $DB->get_record('smartspe_attempts', 
                                 ['userid' => $userid, 'memberid' => $memberid], '*', MUST_EXIST);
+            //get attempt id
+            $this->attemptid = $this->attempt->id;
         }
         else
         {
