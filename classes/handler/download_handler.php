@@ -41,7 +41,7 @@ class download_handler
 
         //Open file 
         $fp = fopen('php://output', 'w');
-        if ($fp)
+        if (!$fp)
             throw new moodle_exception("Cannot open file stream");
 
         $header = array("StudentID", "Name", "Memberid", "Member_Name", "Group", "Polarity", "Sentiment_Scores", 
@@ -81,11 +81,11 @@ class download_handler
     {
         global $DB;
 
-        $stdid = $record->evaluator; //Get evalutor id
-        $name = $DB->get_record('user', ['id' => $stdid], 'name'); //Get member name
+        $userid = $record->evaluator; //Get evalutor id
+        $name = $DB->get_record('user', ['id' => $userid], 'firstname'); //Get member name
         $memberid = $record->evaluatee; //Get evalutee id
-        $member_name = $DB->get_record('user', ['id' => $memberid], 'name'); //Get member name
-        $group = $DB->get_record('groups_members', ['userid' => $stdid], 'groupid'); //get teamid
+        $member_name = $DB->get_record('user', ['id' => $memberid], 'firstname'); //Get member name
+        $group = $DB->get_record('groups_members', ['userid' => $userid], 'groupid'); //get teamid
         $polarity = $DB->get_record('smartspe_sentiment_analysis', ['evaluationid' => $record->id], 'polarity');
         $sentiment_score = $DB->get_record('smartspe_sentiment_analysis', ['evaluationid' => $record->id], 'sentimentscore');
         $q1 = $record->q1;
@@ -96,7 +96,7 @@ class download_handler
         $comment = $record->comment;
         $self_comment = $record->self_comment;
 
-        $line = array($stdid, $name, $memberid, $member_name, $group, $polarity, $sentiment_score,
+        $line = array($userid, $name, $memberid, $member_name, $group, $polarity, $sentiment_score,
                         $q1, $q2, $q3, $q4, $q5, $comment, $self_comment);
 
         return $line;
