@@ -178,17 +178,22 @@ class smartspe_quiz_manager
             [$questions, $comments] = $data_persistence->load_attempt_questions();
 
             //Get all saved answers
-            foreach($questions['current_answer'] as $key => $answer)
-                $answers[] = $answer;
+            foreach($data_persistence->get_slots() as $slot)
+            {
+                foreach($questions[$slot]['current_answer'] as $key => $answer)
+                    $answers[] = $answer;
 
-            //Get comment
-            $comment = $comments['comment'];
-            
-            //Get self comment
-            if(!$comments['self_comment'])
-                $self_comment = null;
-            else
-                $self_comment = $comments['self_comment'];
+                //Get comment
+                if($comments)
+                {
+                    $comment = $comments['comment'];
+                    //Get self comment
+                    if(!$comments['self_comment'])
+                        $self_comment = null;
+                    else
+                        $self_comment = $comments['self_comment'];
+                }
+            }
 
             $this->submission_handler = new submission_handler($this->userid, 
                             $this->courseid, $this->attemptids[$memberid]);

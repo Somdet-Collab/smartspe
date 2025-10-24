@@ -54,7 +54,12 @@ class data_persistence
         //Get comment
         // Load comment from your plugin table
         $record = $DB->get_record('smartspe_attempts', ['id' => $this->attemptid], 'comment');
-        $comments = json_decode($record->comment, true);
+
+        //If the comment exist
+        if($record->comment)
+            $comments = json_decode($record->comment, true);
+        else
+            $comments = null;
 
         //Get all questions
         $questions = [];
@@ -210,6 +215,13 @@ class data_persistence
         $this->attempt = $DB->get_record('smartspe_attempts', ['id' => $this->attemptid], '*', MUST_EXIST);
 
         return true;
+    }
+
+    public function get_slots()
+    {
+        $quba = \question_engine::load_questions_usage_by_activity($this->attempt->uniqueid);
+
+        return $quba->get_slots();
     }
 
 

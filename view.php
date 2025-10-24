@@ -84,7 +84,7 @@ foreach ($members as $memberid)
 
     // --- Step 2c: Autosave ---
     try {
-        $quiz_manager->process_attempt_evaluation($answers, false);
+        $quiz_manager->process_attempt_evaluation($answers, $comment, $self_comment, false);
         echo "Autosaved answers for member $memberid<br>";
     } catch (moodle_exception $e) {
         echo "Failed autosave for member $memberid: " . $e->getMessage() . "<br>";
@@ -92,7 +92,7 @@ foreach ($members as $memberid)
 
     // --- Step 2d: Submit ---
     try {
-        $quiz_manager->process_attempt_evaluation($answers, true);
+        $quiz_manager->process_attempt_evaluation($answers, $comment, $self_comment, true);
         $submitted = $quiz_manager->quiz_is_submitted();
         echo $submitted ? "Submitted evaluation for member $memberid<br>" : "Failed submission for member $memberid<br>";
     } catch (moodle_exception $e) {
