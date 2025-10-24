@@ -11,6 +11,12 @@ defined('MOODLE_INTERNAL') || die();
 
 class sentiment_analysis_handler
 {
+    /**
+     * Feed data into AI model and get polarity and score
+     * 
+     *@param $evaluationid process through each evaluationid
+     * @return boolean if download is successful
+     */
     public function process_sentiment_analysis($evaluationid)
     {
         global $DB;

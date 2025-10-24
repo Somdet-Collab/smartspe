@@ -14,6 +14,13 @@ class data_persistence
     protected $attempt;
     protected $memberid;
 
+    /**
+     * Taking care of loading saved answers of specific question
+     * 
+     *@param $attemptid the current attempt student evaluating
+     *@param $member the current member being evaluated
+     * @return void
+     */
     public function __construct($attemptid, $memberid)
     {
         global $DB;

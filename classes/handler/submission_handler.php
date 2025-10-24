@@ -14,6 +14,7 @@ class submission_handler
     protected $courseid;
     protected $attemptid;
 
+    
     public function __construct($evaluator, $courseid, $attemptid)
     {
         $this->evaluator = $evaluator;

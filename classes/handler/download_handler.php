@@ -7,23 +7,43 @@ defined('MOODLE_INTERNAL') || die();
 
 class download_handler
 {
+    /**
+     * Download the report
+     *
+     * Called when teacher/Unit coordinator request download
+     * 
+     *@param $filename file name
+     *@param $extension file extension
+     * @return boolean if download is successful
+     */
     public function download_file($filename, $extension)
     {
         //Check the extension
         if ($extension == "csv")
-            $this->create_file_csv($filename);
+            return $this->create_file_csv($filename);
         else if($extension == "pdf")
-            $this->create_file_pdf(($filename));
+            return $this->create_file_pdf(($filename));
         else
             throw new moodle_exception(("The file extension is not supported: {$extension}"));
     }
 
+    /**
+     * Create report for .csv
+     *
+     * Called when teacher/Unit coordinator request download for csv file
+     * 
+     *@param $filename file name
+     * @return boolean if download is successful
+     */
     private function create_file_csv($filename)
     {
         global $DB;
 
         //Open file 
         $fp = fopen('php://output', 'w');
+        if ($fp)
+            throw new moodle_exception("Cannot open file stream");
+
         $header = array("StudentID", "Name", "Memberid", "Member_Name", "Group", "Polarity", "Sentiment_Scores", 
                         "Q1", "Q2", "Q3", "Q4","Q5", "comment", "self_comment"); //header line
         fputcsv($fp, $header); //Write header
@@ -40,18 +60,23 @@ class download_handler
         fclose($fp);
         header('Content-type:application/csv');
         header('Content-disposition:attachment;filename="'.$filename.'"');
+
+        return true;
     }
 
     private function create_file_pdf($filename)
     {
         global $DB;
+
+        return true;
     }
 
-    /*
-    *@return line of record
-    *
-    *
-    */
+    /**
+     *Helper in splitting data into columns
+     * 
+     *@param $record record of evaluation
+     * @return array of data
+     */
     private function get_line_record($record)
     {
         global $DB;

@@ -30,6 +30,15 @@ class smartspe_quiz_manager
     protected $smartspeid;
     protected $userid;
 
+    /**
+     * Initializing context and plugin details
+     * 
+     *@param $userid user who attempting the quiz
+     *@param $courseid course where this attempt belong to
+     *@param $context context of the plugin
+     *@param $smartspeid instance id
+     * @return void
+     */
     public function __construct($userid, $courseid, $context, $smartspeid)
     {
         //Get all questions
@@ -73,6 +82,16 @@ class smartspe_quiz_manager
         return $this->attemptid;
     }
     
+    /**
+     *Auto save the answers
+     *if the evaluation is done, mark finish
+     *
+     *Called after start_attempt_evaluation
+     * 
+     *@param $newdata data to be autosaved
+     *@param $finish if the evaluation finish
+     * @return boolean
+     */
     public function process_attempt_evaluation($newdata=null, $finish=false)
     {
         //Process autosave
@@ -86,11 +105,23 @@ class smartspe_quiz_manager
         return true;
     }
 
+     /**
+     *Get list of questions from question bank with no saved answers 
+     *
+     * 
+     *@param $questionids questionids selected by teacher
+     * @return array questions
+     */
     public function get_questions($questionids)
     {
         return $this->questions_handler->get_all_questions($questionids);
     }
 
+    /**
+     * Get list of questions with state and saved answers
+     * 
+     * @return array questions
+     */
     public function get_saved_questions_answers()
     {
         return $this->data_persistence->load_attempt_questions();
@@ -98,7 +129,6 @@ class smartspe_quiz_manager
 
     /**
      * Return member ids
-     *
      *
      * @return array $member ids
      */
@@ -138,17 +168,26 @@ class smartspe_quiz_manager
         return $submitted;
     }
 
+    /**
+     * Download the report
+     *
+     * Called when teacher/Unit coordinator request download
+     * 
+     *@param $filename file name
+     *@param $extension file extension
+     * @return boolean if download is successful
+     */
     public function download_report($filename, $extension="csv")
     {
         if (!strcasecmp($extension, "csv") || !strcasecmp($extension, "pdf"))
             throw new moodle_exception("quiz_manager: error file extension");
 
-        $this->download_handler->download_file($filename, $extension);
+        return $this->download_handler->download_file($filename, $extension);
     }
 
     public function write_file_data($filename, $content, $extension= "csv")
     {
-        
+
     }
 
 }
