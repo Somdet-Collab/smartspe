@@ -42,11 +42,19 @@ class data_persistence
      * Called when student attempting the quiz.
      *
      * @return $questions
+     * @return $comments
      */
     public function load_attempt_questions() 
     {
+        global $DB;
+
         // Load all questions and their current state
         $quba = \question_engine::load_questions_usage_by_activity($this->attempt->uniqueid);
+
+        //Get comment
+        // Load comment from your plugin table
+        $record = $DB->get_record('smartspe_attempts', ['id' => $this->attemptid], 'comment');
+        $comments = json_decode($record->comment, true);
 
         //Get all questions
         $questions = [];
@@ -65,7 +73,7 @@ class data_persistence
             ];
         }
 
-        return $questions;
+        return [$questions, $comments];
     }
 
     /**
@@ -85,16 +93,30 @@ class data_persistence
         // Load all questions and their current state
         $quba = \question_engine::load_questions_usage_by_activity($this->attempt->uniqueid);
 
+        if (isset($newdata['comment'])) 
+        {
+            //encode it before passing into database
+            $comment = json_encode($newdata['comment']);
+
+            $DB->set_field(
+            'smartspe_attempts',
+            'comment',
+            $comment,
+            ['id' => $this->attemptid]
+            );
+        }
+
         // Loop through all slots in this usage
-        foreach ($quba->get_slots() as $slot)
+        foreach ($quba->get_slots() as $index => $slot)
         {
             $qa = $quba->get_question_attempt($slot);
 
             //if new data is not null
-            if ($newdata && isset($newdata[$slot]))
+            if ($newdata && isset($newdata['answers'][$index]))
             {
+                $slotdata[$slot] = ['answer' => $newdata['answers'][$index]];
                 //Update new data
-                $this->update_attempt_answers($slot, $newdata[$slot]);
+                $this->update_attempt_answers($slot, $slotdata[$slot]);
             }
             else //If no new data added
             {

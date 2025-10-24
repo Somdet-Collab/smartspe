@@ -79,6 +79,8 @@ foreach ($members as $memberid)
     
     if ($USER->id == $memberid)
         $self_comment = "My self comment";
+    else
+        $self_comment = null;
 
     // --- Step 2c: Autosave ---
     try {
@@ -91,7 +93,7 @@ foreach ($members as $memberid)
     // --- Step 2d: Submit ---
     try {
         $quiz_manager->process_attempt_evaluation($answers, true);
-        $submitted = $quiz_manager->quiz_is_submitted($answers, $memberid, $comment, $self_comment);
+        $submitted = $quiz_manager->quiz_is_submitted();
         echo $submitted ? "Submitted evaluation for member $memberid<br>" : "Failed submission for member $memberid<br>";
     } catch (moodle_exception $e) {
         echo "Submission error for member $memberid: " . $e->getMessage() . "<br>";

@@ -12,7 +12,7 @@ use mod_smartspe\smartspe_quiz_attempt;
 use mod_smartspe\handler\duration_controller;
 use mod_smartspe\handler\submission_handler;
 use mod_smartspe\db_team_manager;
-
+use mod_smartspe\handler\data_persistence;
 
 class smartspe_quiz_manager
 {
@@ -26,9 +26,10 @@ class smartspe_quiz_manager
 
     protected $courseid;
     protected $context;
-    protected $attemptid;
     protected $smartspeid;
     protected $userid;
+    protected $attemptids;
+    protected $members; //it also includes attemptid for specific members
 
     /**
      * Initializing context and plugin details
@@ -49,6 +50,13 @@ class smartspe_quiz_manager
         $this->questions_handler = new questions_handler();
         $this->notification_handler = new notification_handler();
         $this->download_handler = new download_handler();
+
+        //Get members of this $userid
+        $team_manager = new db_team_manager();
+        $this->members = $team_manager->get_members_id($this->userid, $this->courseid);
+
+        if (empty($this->members))
+            throw new moodle_exception("The members are empty in section get_members() in quiz_manager");
     }
 
     /**
@@ -59,7 +67,7 @@ class smartspe_quiz_manager
      *
      * @param $memberid attempt on this member
      * @param $data the data getting from mod_smartspe_mod_form
-     * @return int $attemptid
+     * @return array attempt ids
      */
     public function start_attempt_evaluation($memberid, $questionids)
     {
@@ -76,10 +84,11 @@ class smartspe_quiz_manager
         if (!$this->data_persistence)
             throw new moodle_exception("Failed to create data persistence");
 
-        //Get quiz id
-        $this->attemptid = $this->quiz_attempt->get_attempt_id();
+        //Collect attemptid for specific member
+        $this->attemptids[$memberid] = $this->quiz_attempt->get_attempt_id();
 
-        return $this->attemptid;
+        //return attemptid
+        return $this->attemptids[$memberid];
     }
     
     /**
@@ -92,15 +101,29 @@ class smartspe_quiz_manager
      *@param $finish if the evaluation finish
      * @return boolean
      */
-    public function process_attempt_evaluation($newdata=null, $finish=false)
+    public function process_attempt_evaluation($answers, $comment, $self_comment=null, $finish=false)
     {
+        //Assign comment
+        $comments['comment'] = $comment;
+
+        if ($self_comment)
+            $comments['self_comment'] = $self_comment;
+
+        //Wrap data
+        $newdata = [
+            'answers' => $answers,
+            'comment' => $comments
+        ];
+
         //Process autosave
         if(!$this->data_persistence->auto_save($newdata))
             throw new moodle_exception("Failed autosave data");
 
         //If the evaluation finish
         if($finish)
+        {
             $this->data_persistence->finish_attempt();
+        }
 
         return true;
     }
@@ -121,6 +144,7 @@ class smartspe_quiz_manager
      * Get list of questions with state and saved answers
      * 
      * @return array questions
+     * @return array comments
      */
     public function get_saved_questions_answers()
     {
@@ -134,38 +158,53 @@ class smartspe_quiz_manager
      */
     public function get_members()
     {
-        $team_manager = new db_team_manager();
-        $members = $team_manager->get_members_id($this->userid, $this->courseid);
-
-        if (empty($members))
-            throw new moodle_exception("The members are empty in section get_members() in quiz_manager");
-        
-        return $members;
+        return $this->members;
     }
 
     /**
-     * Save answers into database
+     * Save all answers into database
      *
-     * Called when student start submitting.
+     * Called when student confirm submitting.
      *
-     * @param $answers answers array
-     * @param $comment comment on members or self
-     * @param $self_comment second self comment
-     * @param $memberid member being evaluated
      * @return boolean
      */
-    public function quiz_is_submitted($answers, $memberid, $comment, $self_comment=null)
+    public function quiz_is_submitted()
     {
-        $this->submission_handler = new submission_handler($this->userid, $this->courseid, $this->attemptid);
-        //Return boolean
-        $submitted = $this->submission_handler->is_submitted($answers, $memberid, 
+        foreach($this->members as $memberid)
+        {
+            //Create object for specific member
+            $data_persistence = new data_persistence($this->attemptids[$memberid], $memberid);
+            //Load autosaved questions with answers and comments
+            [$questions, $comments] = $data_persistence->load_attempt_questions();
+
+            //Get all saved answers
+            foreach($questions['current_answer'] as $key => $answer)
+                $answers[] = $answer;
+
+            //Get comment
+            $comment = $comments['comment'];
+            
+            //Get self comment
+            if(!$comments['self_comment'])
+                $self_comment = null;
+            else
+                $self_comment = $comments['self_comment'];
+
+            $this->submission_handler = new submission_handler($this->userid, 
+                            $this->courseid, $this->attemptids[$memberid]);
+
+            //Return boolean
+            $submitted = $this->submission_handler->is_submitted($answers, $memberid, 
                                                         $comment, $self_comment);
 
-        //if success in submitting, send notification to email
-        if($submitted)
-            $this->notification_handler->noti_eval_submitted($this->userid);
+            if (!$submitted)
+                throw new moodle_exception('In quiz_manager: Failed in submitting the evaluation');
+        }
 
-        return $submitted;
+        //if success in submitting all data, send notification to email
+        $this->notification_handler->noti_eval_submitted($this->userid);
+
+        return true;
     }
 
     /**
