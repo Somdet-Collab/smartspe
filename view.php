@@ -76,7 +76,9 @@ foreach ($members as $memberid)
     }
 
     $comment = "Peer comment for member $memberid";
-    $self_comment = "My self comment";
+    
+    if ($USER->id == $memberid)
+        $self_comment = "My self comment";
 
     // --- Step 2c: Autosave ---
     try {

@@ -18,7 +18,7 @@ class download_handler
             throw new moodle_exception(("The file extension is not supported: {$extension}"));
     }
 
-    public function create_file_csv($filename)
+    private function create_file_csv($filename)
     {
         global $DB;
 
@@ -42,7 +42,7 @@ class download_handler
         header('Content-disposition:attachment;filename="'.$filename.'"');
     }
 
-    public function create_file_pdf($filename)
+    private function create_file_pdf($filename)
     {
         global $DB;
     }
@@ -52,7 +52,7 @@ class download_handler
     *
     *
     */
-    public function get_line_record($record)
+    private function get_line_record($record)
     {
         global $DB;
 
@@ -61,8 +61,8 @@ class download_handler
         $memberid = $record->evaluatee; //Get evalutee id
         $member_name = $DB->get_record('user', ['id' => $memberid], 'name'); //Get member name
         $group = $DB->get_record('groups_members', ['userid' => $stdid], 'groupid'); //get teamid
-        $polarity = $DB->get_record('smartspe_sentiment_analysis', ['evalutionid' => $record->id], 'polarity');
-        $sentiment_score = $DB->get_record('smartspe_sentiment_analysis', ['evalutionid' => $record->id], 'sentimentscore');
+        $polarity = $DB->get_record('smartspe_sentiment_analysis', ['evaluationid' => $record->id], 'polarity');
+        $sentiment_score = $DB->get_record('smartspe_sentiment_analysis', ['evaluationid' => $record->id], 'sentimentscore');
         $q1 = $record->q1;
         $q2 = $record->q2;
         $q3 = $record->q3;

@@ -33,7 +33,6 @@ class smartspe_quiz_manager
     public function __construct($userid, $courseid, $context, $smartspeid)
     {
         //Get all questions
-        global $DB;
         $this->courseid = $courseid;
         $this->context = $context;
         $this->smartspeid = $smartspeid;
@@ -139,14 +138,17 @@ class smartspe_quiz_manager
         return $submitted;
     }
 
-    public function download_file_output($filename, $extension="csv")
+    public function download_report($filename, $extension="csv")
     {
-        
+        if (!strcasecmp($extension, "csv") || !strcasecmp($extension, "pdf"))
+            throw new moodle_exception("quiz_manager: error file extension");
+
+        $this->download_handler->download_file($filename, $extension);
     }
 
     public function write_file_data($filename, $content, $extension= "csv")
     {
-
+        
     }
 
 }
