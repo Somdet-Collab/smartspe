@@ -172,6 +172,7 @@ class smartspe_quiz_manager
     {
         foreach($this->members as $memberid)
         {
+            $answers = [];
             //Create object for specific member
             $data_persistence = new data_persistence($this->attemptids[$memberid], $memberid);
             //Load autosaved questions with answers and comments
@@ -179,20 +180,18 @@ class smartspe_quiz_manager
 
             //Get all saved answers
             foreach($data_persistence->get_slots() as $slot)
-            {
                 foreach($questions[$slot]['current_answer'] as $key => $answer)
                     $answers[] = $answer;
 
-                //Get comment
-                if($comments)
-                {
-                    $comment = $comments['comment'];
-                    //Get self comment
-                    if(!$comments['self_comment'])
-                        $self_comment = null;
-                    else
-                        $self_comment = $comments['self_comment'];
-                }
+            //Get comment
+            if($comments)
+            {
+                $comment = $comments['comment'];
+                //Get self comment
+                if(!$comments['self_comment'])
+                    $self_comment = null;
+                else
+                    $self_comment = $comments['self_comment'];
             }
 
             $this->submission_handler = new submission_handler($this->userid, 

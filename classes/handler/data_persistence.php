@@ -100,13 +100,23 @@ class data_persistence
 
         if (isset($newdata['comment'])) 
         {
-            //encode it before passing into database
-            $comment = json_encode($newdata['comment']);
+            if(isset($newdata['self_comment']))
+            {
+                //If there is a self_comment
+                $comments['comment'] = $newdata['comment'];
+                $comments['self_comment'] = $newdata['self_comment'];
+                $js_comments = json_encode($comments);
+            }
+            else
+            {
+                //If there is no self_comment
+                $js_comments = json_encode($newdata['comment']);
+            }
 
             $DB->set_field(
             'smartspe_attempts',
             'comment',
-            $comment,
+            $js_comments,
             ['id' => $this->attemptid]
             );
         }
