@@ -63,6 +63,8 @@ foreach ($members as $memberid)
     $member = $DB->get_record('user', ['id' => $memberid]);
     $member_name = $member->firstname;
 
+    $comment = null;
+
     foreach ($questions as $question) 
     {
         echo "Question for $member_name: $question <br>";
@@ -70,12 +72,10 @@ foreach ($members as $memberid)
             $answers[$qid] = rand(1, 4); // simulate MCQ answer
             $mcq_count++;
         } elseif ($question->qtype === 'comment' && $comment_count < 1) {
-            $answers[$qid] = "This is a comment for member $memberid";
+            $comment = "Peer comment for member $memberid";
             $comment_count++;
         }
     }
-
-    $comment = "Peer comment for member $memberid";
     
     if ($USER->id == $memberid)
         $self_comment = "My self comment";

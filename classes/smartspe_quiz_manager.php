@@ -78,14 +78,15 @@ class smartspe_quiz_manager
         if(!$this->quiz_attempt)
             throw new moodle_exception("Quiz attempt creation failed!!");
 
-        //Create persistence object for specific member
-        $this->data_persistence = $this->quiz_attempt->create_persistence($this->context, $memberid);
+        //Collect attemptid for specific member
+        $this->attemptids[$memberid] = $this->quiz_attempt->get_attempt_id();
+        if (isset($this->attemptids[$memberid])) //Create persistence object for specific member
+            $this->data_persistence = $this->quiz_attempt->create_persistence($this->context, $memberid);
+        else
+            throw new moodle_exception("Failed to create quiz attempt for {$memberid}");
 
         if (!$this->data_persistence)
             throw new moodle_exception("Failed to create data persistence");
-
-        //Collect attemptid for specific member
-        $this->attemptids[$memberid] = $this->quiz_attempt->get_attempt_id();
 
         //return attemptid
         return $this->attemptids[$memberid];
@@ -172,9 +173,14 @@ class smartspe_quiz_manager
     {
         foreach($this->members as $memberid)
         {
+            //Initialize
+            $comment = null;
+            $self_comment = null;
             $answers = [];
+
             //Create object for specific member
             $data_persistence = new data_persistence($this->attemptids[$memberid], $memberid);
+
             //Load autosaved questions with answers and comments
             [$questions, $comments] = $data_persistence->load_attempt_questions();
 
@@ -197,11 +203,11 @@ class smartspe_quiz_manager
             $this->submission_handler = new submission_handler($this->userid, 
                             $this->courseid, $this->attemptids[$memberid]);
 
-            //Return boolean
-            $submitted = $this->submission_handler->is_submitted($answers, $memberid, 
+            //Return evaluation id
+            $evaluationid = $this->submission_handler->is_submitted($answers, $memberid, 
                                                         $comment, $self_comment);
 
-            if (!$submitted)
+            if (!$evaluationid)
                 throw new moodle_exception('In quiz_manager: Failed in submitting the evaluation');
         }
 
