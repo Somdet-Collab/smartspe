@@ -53,7 +53,7 @@ class data_persistence
 
         //Get comment
         // Load comment from your plugin table
-        $record = $DB->get_record('smartspe_attempts', ['id' => $this->attemptid], 'comment');
+        $record = $DB->get_record('smartspe_attempts', ['id' => $this->attemptid]);
 
         //If the comment exist
         if($record->comment)
@@ -110,7 +110,9 @@ class data_persistence
             else
             {
                 //If there is no self_comment
-                $js_comments = json_encode($newdata['comment']);
+                $comments['comment'] = $newdata['comment'];
+                $comments['self_comment'] = null;
+                $js_comments = json_encode($comments);
             }
 
             $DB->set_field(
