@@ -30,11 +30,18 @@ class db_evaluation
                 $record->$field = $answer;
             }
             
-            //If have self comment 
-            if ($self_comment)
-                $record->self_comment = $self_comment;
+            // Flatten comment/self_comment if array
+            if (is_array($comment)) {
+                $comment = implode(', ', $comment);
+            }
+            if (is_array($self_comment)) {
+                $self_comment = implode(', ', $self_comment);
+            }
 
-            $record->comment = $comment;
+            $record->comment = $comment ?? '';
+            if ($self_comment) {
+                $record->self_comment = $self_comment;
+            }
 
             //Insert record into database
             $evaluationid = $DB->insert_record('smartspe_evaluation', $record);
