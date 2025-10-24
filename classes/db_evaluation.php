@@ -9,7 +9,6 @@ class db_evaluation
     public function save_answers_db($answers, $userid, $evaluateeid, $courseid, $comment, $attemptid, $self_comment=null)
     {
         global $DB;
-        $success = false;
 
         $manager = new team_manager();
 
@@ -38,16 +37,15 @@ class db_evaluation
             $record->comment = $comment;
 
             //Insert record into database
-            $DB->insert_record('smartspe_evaluation', $record);
+            $evaluationid = $DB->insert_record('smartspe_evaluation', $record);
 
-            $success = true;
         }
         else
         {
             throw new moodle_exception("This student {$userid} has not been assigned to any team");
         }
 
-        return $success;
+        return $evaluationid;
     }
 
     public function get_answers_db($userid)
@@ -96,6 +94,51 @@ class db_evaluation
         return $comment;
     }
     
+    public function save_sentiment_analysis($evaluationid, $polarity, $score)
+    {
+        global $DB;
+
+        $manager = new team_manager();
+
+        //Call check function from team_manager
+        //To confirm that this evaluationid exist
+        if ($manager->record_exist('smartspe_evaluation', ['evaluationid' => $evaluationid]))
+        {
+            //Save record
+            $record = new \stdClass();
+            $record->sentimentscore = $score;
+            $record->polarity = $polarity;
+
+            //Insert record
+            $sentimentid = $DB->insert_record('smartspe_sentiment_analysis', $record);
+        }
+        else 
+        {
+            throw new moodle_exception("db_evaluation: This evaluationid ({$evaluationid}) has not been created");
+        }
+
+        return $sentimentid;
+    }
+
+    public function get_polarity($evaluationid)
+    {
+        global $DB;
+
+        //get data from db
+        $record = $DB->get_record('smartspe_sentiment_analysis', ['evaluationid' => $evaluationid]);
+
+        return $record->polarity;
+    }
+
+    public function get_sentiment_score($evaluationid)
+    {
+        global $DB;
+
+        //get data from db
+        $record = $DB->get_record('smartspe_sentiment_analysis', ['evaluationid' => $evaluationid]);
+
+        return $record->sentimentscore;
+    }
 }
 
 ?>
