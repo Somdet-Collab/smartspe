@@ -71,7 +71,7 @@ foreach ($members as $memberid)
         if ($question->qtype === 'multichoice' && $mcq_count < 5) {
             $answers[$qid] = rand(1, 4); // simulate MCQ answer
             $mcq_count++;
-        } elseif ($question->qtype === 'comment' && $comment_count < 1) {
+        } elseif ($question->qtype === 'essay' && $comment_count < 1) {
             $comment = "Peer comment for member $memberid";
             $comment_count++;
         }
