@@ -63,41 +63,35 @@ foreach ($members as $memberid)
     $member = $DB->get_record('user', ['id' => $memberid]);
     $member_name = $member->firstname;
 
+    if (!$questions || !$questions['qtype'])
+    {
+        echo "Question is empty (view.php) <br>";
+        break;
+    }
+
     $comment = null;
 
-    foreach ($questions as $question) {
-        // Debug: inspect the whole question structure and qtype
-        echo '<pre>QUESTION STRUCTURE: ';
-        var_export($question);
-        echo "</pre><br>";
-
-        // support both array and object shapes
-        $qtype = null;
-        if (is_array($question) && array_key_exists('qtype', $question)) 
-        {
-            echo "Question is array <br>";
-            $qtype = trim((string) $question['qtype']);
-        } 
-        elseif (is_object($question) && property_exists($question, 'qtype')) 
-        {
-            echo "Question is object <br>";
-            $qtype = trim((string) $question->qtype);
-        }
-
-        $qtext = is_array($question) ? ($question['text'] ?? '') : ($question->questiontext ?? '');
+    foreach ($questions as $question) 
+    {
+        $qtext = $question['text'];
         echo "Question for $member_name: $qtext <br>";
-        echo "Detected qtype: " . ($qtype === null ? 'NULL' : htmlspecialchars($qtype)) . "<br>";
-
-        // tolerant match for multichoice and essay
-        if ($qtype !== null && stripos($qtype, 'multichoice') !== false && $mcq_count < 5) {
+        if ($question['qtype'] === 'multichoice' && $mcq_count < 5) 
+        {
             $answers[$mcq_count] = rand(1, 3); // simulate MCQ answer
             $current_answer = $answers[$mcq_count];
             echo "Answer: $current_answer <br>";
             $mcq_count++;
-        } elseif ($qtype !== null && stripos($qtype, 'essay') !== false && $comment_count < 1) {
+        } 
+        elseif ($question['qtype'] === 'essay' && $comment_count < 1) 
+        {
             $comment = "Peer comment for member $memberid";
             echo "Comment: $comment <br>";
             $comment_count++;
+        }
+        else
+        {
+            echo "There is no match type ($qtext) <br>";
+            break;
         }
     }
     
