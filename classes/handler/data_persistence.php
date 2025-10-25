@@ -5,6 +5,8 @@ namespace mod_smartspe\handler;
 use core\exception\moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once($CFG->dirroot . '/question/engine/lib.php');
 
 class data_persistence
 {
@@ -12,12 +14,25 @@ class data_persistence
     protected $attempt;
     protected $memberid;
 
+    /**
+     * Taking care of loading saved answers of specific question
+     * 
+     *@param $attemptid the current attempt student evaluating
+     *@param $member the current member being evaluated
+     * @return void
+     */
     public function __construct($attemptid, $memberid)
     {
         global $DB;
 
         $this->attemptid = $attemptid;
         $this->attempt = $DB->get_record('smartspe_attempts', ['id' => $attemptid], '*', MUST_EXIST);
+
+        //Verify qudaid exist in question_usage
+        $record = $DB->get_record('question_usages', ['id' => $this->attempt->uniqueid]);
+        if(!$record)
+            throw new moodle_exception("In data persistence class: usage id does not exist {$this->attempt->uniqueid}");
+        
         $this->memberid = $memberid;
     }
 
@@ -27,30 +42,44 @@ class data_persistence
      * Called when student attempting the quiz.
      *
      * @return $questions
+     * @return $comments
      */
     public function load_attempt_questions() 
     {
+        global $DB;
+
         // Load all questions and their current state
         $quba = \question_engine::load_questions_usage_by_activity($this->attempt->uniqueid);
+
+        //Get comment
+        // Load comment from your plugin table
+        $record = $DB->get_record('smartspe_attempts', ['id' => $this->attemptid]);
+
+        //If the comment exist
+        if($record->comment)
+            $comments = json_decode($record->comment, true);
+        else
+            $comments = null;
 
         //Get all questions
         $questions = [];
         foreach ($quba->get_slots() as $slot) 
         {
-            $qa = $quba->get_question_attempt($slot);
-            $question = $qa->get_question();
+            $qa = $quba->get_question_attempt($slot); //get qa
+            $question = $qa->get_question(); //get question of this slot
+            $currentdata = $qa->get_last_qt_data(); //get saved answer, array($string)
 
-            $questions[$slot] = 
+            $questions[] =
             [
                 'id' => $question->id,
                 'name' => $question->name,
                 'text' => $question->questiontext,
                 'state' => $qa->get_state(),
-                'current_answer' => $qa->get_submitted_data()
+                'current_answer' => (int)$currentdata['answer'] //convert string to int
             ];
         }
 
-        return $questions;
+        return [$questions, $comments];
     }
 
     /**
@@ -70,16 +99,38 @@ class data_persistence
         // Load all questions and their current state
         $quba = \question_engine::load_questions_usage_by_activity($this->attempt->uniqueid);
 
+        if (!empty($newdata['comment'])) 
+        {
+            $comments = [
+                'comment' => $newdata['comment'] ?? null,
+                'self_comment' => $newdata['self_comment'] ?? null
+            ];
+
+            //Save comment into attempt db
+            $DB->set_field(
+                'smartspe_attempts',
+                'comment',
+                json_encode($comments, JSON_UNESCAPED_UNICODE),
+                ['id' => $this->attemptid]
+            );
+        }
+
+        $answers = $newdata['answers'];
+        if (!$answers)
+            throw new moodle_exception('In data_persistence: $answers empty');
+
         // Loop through all slots in this usage
-        foreach ($quba->get_slots() as $slot)
+        foreach ($quba->get_slots() as $index => $slot)
         {
             $qa = $quba->get_question_attempt($slot);
 
             //if new data is not null
-            if ($newdata && isset($newdata[$slot]))
+            if (isset($answers[$index]))
             {
+                // Wrap the answer as an array expected by process_autosave
+                $formatteddata = ['answer' => strval($answers[$index])];
                 //Update new data
-                $this->update_attempt_answers($slot, $newdata[$slot]);
+                $this->update_attempt_answers($slot, $formatteddata);
             }
             else //If no new data added
             {
@@ -173,6 +224,13 @@ class data_persistence
         $this->attempt = $DB->get_record('smartspe_attempts', ['id' => $this->attemptid], '*', MUST_EXIST);
 
         return true;
+    }
+
+    public function get_slots()
+    {
+        $quba = \question_engine::load_questions_usage_by_activity($this->attempt->uniqueid);
+
+        return $quba->get_slots();
     }
 
 

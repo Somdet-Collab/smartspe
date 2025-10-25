@@ -6,12 +6,13 @@ use mod_smartspe\db_team_manager as team_manager;
 
 class db_evaluation
 {
-    public function save_answers_db($answers, $userid, $evaluateeid, $courseid, $comment, $self_comment=null)
+    public function save_answers_db($answers, $userid, $evaluateeid, $courseid, $comment, $attemptid, $self_comment=null)
     {
         global $DB;
-        $success = false;
 
         $manager = new team_manager();
+        $sum = 0;
+        $nums = 0;
 
         //Call check function from team_manager
         //To confirm that userid is assigned to the team
@@ -22,31 +23,46 @@ class db_evaluation
             $record->evaluator = $userid;
             $record->evaluatee = $evaluateeid;
             $record->course = $courseid;
+            $record->attemptid = $attemptid;
 
             //Loop all answers
             foreach ($answers as $index => $answer)
             {
+                if (!$answer)
+                    throw new moodle_exception("In db_evaluation: No answer added with answers[$index]");
+
+                $sum += $answer;
+
                 $field = 'q'.($index+1); //q1, q2, etc. (database column for questions)
                 $record->$field = $answer;
+                $nums++;
             }
-            
-            //If have self comment 
-            if ($self_comment)
-                $record->self_comment = $self_comment;
 
-            $record->comment = $comment;
+            $record->average = $sum / $nums;
+            
+            // Flatten comment/self_comment if array
+            if (is_array($comment)) {
+                $comment = implode(', ', $comment);
+            }
+            if (is_array($self_comment)) {
+                $self_comment = implode(', ', $self_comment);
+            }
+
+            $record->comment = $comment ?? '';
+            if ($self_comment) {
+                $record->self_comment = $self_comment;
+            }
 
             //Insert record into database
-            $DB->insert_record('smartspe_evaluation', $record);
+            $evaluationid = $DB->insert_record('smartspe_evaluation', $record);
 
-            $success = true;
         }
         else
         {
             throw new moodle_exception("This student {$userid} has not been assigned to any team");
         }
 
-        return $success;
+        return $evaluationid;
     }
 
     public function get_answers_db($userid)
@@ -95,6 +111,51 @@ class db_evaluation
         return $comment;
     }
     
+    public function save_sentiment_analysis($evaluationid, $polarity, $score)
+    {
+        global $DB;
+
+        $manager = new team_manager();
+
+        //Call check function from team_manager
+        //To confirm that this evaluationid exist
+        if ($manager->record_exist('smartspe_evaluation', ['evaluationid' => $evaluationid]))
+        {
+            //Save record
+            $record = new \stdClass();
+            $record->sentimentscore = $score;
+            $record->polarity = $polarity;
+
+            //Insert record
+            $sentimentid = $DB->insert_record('smartspe_sentiment_analysis', $record);
+        }
+        else 
+        {
+            throw new moodle_exception("db_evaluation: This evaluationid ({$evaluationid}) has not been created");
+        }
+
+        return $sentimentid;
+    }
+
+    public function get_polarity($evaluationid)
+    {
+        global $DB;
+
+        //get data from db
+        $record = $DB->get_record('smartspe_sentiment_analysis', ['evaluationid' => $evaluationid]);
+
+        return $record->polarity;
+    }
+
+    public function get_sentiment_score($evaluationid)
+    {
+        global $DB;
+
+        //get data from db
+        $record = $DB->get_record('smartspe_sentiment_analysis', ['evaluationid' => $evaluationid]);
+
+        return $record->sentimentscore;
+    }
 }
 
 ?>

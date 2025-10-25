@@ -89,6 +89,9 @@ function smartspe_delete_instance($id)
         return false;
     }
 
+    //delete attempts
+    $DB->delete_records('smartspe_attempt', ['smartspeid' => $id]);
+
     // Delete main instance.
     $DB->delete_records('smartspe', ['id' => $id]);
 

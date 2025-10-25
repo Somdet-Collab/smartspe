@@ -23,6 +23,12 @@ $string['submissionwindow'] = 'Submission Window';
 $string['submissionopen'] = 'Submission is open';
 $string['submissionclosed'] = 'Submission is closed';
 
+//Events
+$string['event_attempt_start'] = 'Attempt started';
+$string['event_attempt_finish'] = 'Attempt finished';
+$string['event_download'] = 'File downloaded';
+$string['event_evaluation_after_duedate'] = 'Evaluation submitted after due date';
+
 // names for admin view
 //Buttons
 $string['startattempt'] = 'Attempt Evaluation';

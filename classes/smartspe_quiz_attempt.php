@@ -2,15 +2,8 @@
 
 namespace mod_smartspe;
 
-use cm_info;
-use coding_exception;
-use context;
-use context_module;
 use moodle_exception;
-use moodle_url;
-use question_bank;
 use stdClass;
-use question_engine;
 use mod_smartspe\handler\data_persistence;
 use mod_smartspe\handler\questions_handler;
 
@@ -58,6 +51,8 @@ class smartspe_quiz_attempt
         {
             $this->attempt = $DB->get_record('smartspe_attempts', 
                                 ['userid' => $userid, 'memberid' => $memberid], '*', MUST_EXIST);
+            //get attempt id
+            $this->attemptid = $this->attempt->id;
         }
         else
         {
@@ -93,21 +88,28 @@ class smartspe_quiz_attempt
      */
     public function create_persistence($context, $memberid)
     {
+        global $DB;
+
         $question_handler = new questions_handler();
-        $this->data_persistence = new data_persistence($this->attemptid, $memberid);
+
+        //Check if the usage has already been created and linked
+        $usage_exist = $DB->record_exists('question_usages', ['id' => $this->attempt->uniqueid]);
 
         // Load or create question usage
-        if (!empty($this->attempt->uniqueid)) 
+        if (!empty($this->attempt->uniqueid) && $usage_exist)
         {
             //Load questions 
-            $this->questions = $this->data_persistence->load_attempt_questions();
+            $this->data_persistence = new data_persistence($this->attemptid, $memberid);
+            [$this->questions, $comments] = $this->data_persistence->load_attempt_questions();
         } 
         else 
         {
             //Cretae questions usage and link to each attempt
             $this->quba = $question_handler->add_all_questions($context, $this->questionids, $this->attemptid);
-            $this->questions = $question_handler->get_all_questions($this->questionids);
+            $this->data_persistence = new data_persistence($this->attemptid, $memberid);
+            [$this->questions, $comments] = $this->data_persistence->load_attempt_questions();
         }
+
 
         return $this->data_persistence;
     }
