@@ -128,6 +128,10 @@ foreach ($members as $memberid)
     else
         $self_comment = null;
 
+    echo '<pre>Review answers before autosave: ';
+    print_r($answers);
+    echo '</pre>';
+
     // --- Step 2c: Autosave ---
     try {
         $quiz_manager->process_attempt_evaluation($answers, $comment, $self_comment, false);
@@ -136,6 +140,9 @@ foreach ($members as $memberid)
         echo "Failed autosave for member $memberid: " . $e->getMessage() . "<br>";
     }
 
+    echo '<pre>Review answers before submitting: ';
+    print_r($answers);
+    echo '</pre>';
     // --- Step 2d: Submit ---
     try {
         $quiz_manager->process_attempt_evaluation($answers, $comment, $self_comment, true);

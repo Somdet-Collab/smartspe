@@ -26,6 +26,9 @@ class db_evaluation
             //Loop all answers
             foreach ($answers as $index => $answer)
             {
+                if ($answer)
+                    throw new moodle_exception("In db_evaluation: No answer added with answers[$index]");
+
                 $field = 'q'.($index+1); //q1, q2, etc. (database column for questions)
                 $record->$field = $answer;
             }

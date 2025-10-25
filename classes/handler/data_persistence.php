@@ -113,17 +113,20 @@ class data_persistence
             );
         }
 
+        $answers = $newdata['answers'];
+        if (!$answers)
+            throw new moodle_exception('In data_persistence: $answers empty');
+
         // Loop through all slots in this usage
         foreach ($quba->get_slots() as $index => $slot)
         {
             $qa = $quba->get_question_attempt($slot);
 
             //if new data is not null
-            if ($newdata && isset($newdata['answers'][$index]))
+            if (isset($answers[$index]))
             {
-                $slotdata = ['answer' => $newdata['answers'][$index]];
                 //Update new data
-                $this->update_attempt_answers($slot, $slotdata);
+                $this->update_attempt_answers($slot, $answers[$index]);
             }
             else //If no new data added
             {
