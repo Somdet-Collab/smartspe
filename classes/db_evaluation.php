@@ -11,6 +11,8 @@ class db_evaluation
         global $DB;
 
         $manager = new team_manager();
+        $sum = 0;
+        $nums = 0;
 
         //Call check function from team_manager
         //To confirm that userid is assigned to the team
@@ -29,9 +31,14 @@ class db_evaluation
                 if ($answer)
                     throw new moodle_exception("In db_evaluation: No answer added with answers[$index]");
 
+                $sum += $answer;
+
                 $field = 'q'.($index+1); //q1, q2, etc. (database column for questions)
                 $record->$field = $answer;
+                $nums++;
             }
+
+            $record->average = $sum / $nums;
             
             // Flatten comment/self_comment if array
             if (is_array($comment)) {
