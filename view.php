@@ -59,6 +59,10 @@ foreach ($members as $memberid)
     $mcq_count = 0;
     $comment_count = 0;
 
+    echo '<pre>Questionids: ';
+    print_r($questionids);
+    echo '</pre>';
+
     $questions = $quiz_manager->get_questions($questionids);
     $member = $DB->get_record('user', ['id' => $memberid]);
     $member_name = $member->firstname;
@@ -74,11 +78,27 @@ foreach ($members as $memberid)
 
     foreach ($questions as $question) 
     {
-        echo '<pre>QUESTION STRUCTURE: ';
-        var_export($question);
-        echo "</pre><br>";
+        echo 'QUESTION STRUCTURE: ';
+        echo '<h4>' . format_string($question['name']) . '</h4>';
+        echo format_text($question['text'], FORMAT_HTML);
+
+        // Access qtype safely
+        echo '<p><strong>Type:</strong> ' . $question['qtype'] . '</p>';
+
+        // If it has answers (for MCQ type)
+        if (!empty($question['answers'])) {
+            echo '<ul>';
+            foreach ($question['answers'] as $answer) {
+                // $answer is an object (from question_bank)
+                echo '<li>' . format_text($answer->answer, FORMAT_HTML) . '</li>';
+            }
+            echo '</ul>';
+        }
+
+        echo 'End of question structure<br>';
 
         $qtext = $question['text'];
+        $qtype = $question['type'];
         echo "Question for $member_name: $qtext <br>";
         if ($question['qtype'] === 'multichoice' && $mcq_count < 5) 
         {
@@ -95,7 +115,7 @@ foreach ($members as $memberid)
         }
         else
         {
-            echo "There is no match type ($qtext) <br>";
+            echo "There is no match type ($qtype) <br>";
             break;
         }
     }
