@@ -114,6 +114,12 @@ class smartspe_quiz_manager
         return $members;
     }
 
+    public function get_smartspeid() 
+    {
+        return $this->smartspeid;
+    }
+
+
     /**
      * Save answers into database
      *
