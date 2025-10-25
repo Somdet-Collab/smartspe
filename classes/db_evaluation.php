@@ -28,7 +28,7 @@ class db_evaluation
             //Loop all answers
             foreach ($answers as $index => $answer)
             {
-                if ($answer)
+                if (!$answer)
                     throw new moodle_exception("In db_evaluation: No answer added with answers[$index]");
 
                 $sum += $answer;

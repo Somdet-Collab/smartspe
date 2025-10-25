@@ -196,6 +196,10 @@ class smartspe_quiz_manager
             //Load autosaved questions with answers and comments
             [$questions, $comments] = $data_persistence->load_attempt_questions();
 
+            //For debug purpose
+            echo  "Questions structure in quiz_manager";
+            echo '<pre>'; print_r($questions); echo '</pre>';
+
             //Get all saved answers
             foreach ($questions as $question) 
                 $answers[] = (int)$question['current_answer'];
