@@ -100,6 +100,6 @@ foreach ($members as $memberid)
 
 //Final Submit
 $submitted = $quiz_manager->quiz_is_submitted();
-echo $submitted ? "Submitted evaluation for member $memberid<br>" : "Failed submission for member $memberid<br>";
+echo $submitted ? "Submitted evaluation<br>" : "Failed submission";
 
 echo "<hr>Test completed.";
