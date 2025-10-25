@@ -98,28 +98,18 @@ class data_persistence
         // Load all questions and their current state
         $quba = \question_engine::load_questions_usage_by_activity($this->attempt->uniqueid);
 
-        if (isset($newdata['comment'])) 
+        if (!empty($newdata['comment'])) 
         {
-            if(isset($newdata['self_comment']))
-            {
-                //If there is a self_comment
-                $comments['comment'] = $newdata['comment'];
-                $comments['self_comment'] = $newdata['self_comment'];
-                $js_comments = json_encode($comments);
-            }
-            else
-            {
-                //If there is no self_comment
-                $comments['comment'] = $newdata['comment'];
-                $comments['self_comment'] = null;
-                $js_comments = json_encode($comments);
-            }
+            $comments = [
+                'comment' => $newdata['comment'],
+                'self_comment' => $newdata['self_comment'] ?? null
+            ];
 
             $DB->set_field(
-            'smartspe_attempts',
-            'comment',
-            $js_comments,
-            ['id' => $this->attemptid]
+                'smartspe_attempts',
+                'comment',
+                json_encode($comments, JSON_UNESCAPED_UNICODE),
+                ['id' => $this->attemptid]
             );
         }
 

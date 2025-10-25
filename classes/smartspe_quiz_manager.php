@@ -165,7 +165,8 @@ class smartspe_quiz_manager
      */
     public function get_saved_questions_answers()
     {
-        return $this->data_persistence->load_attempt_questions();
+        [$questions, $comments] = $this->data_persistence->load_attempt_questions();
+        return $questions;
     }
 
     /**
