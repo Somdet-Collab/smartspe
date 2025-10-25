@@ -49,6 +49,7 @@ if ($is_teacher) {
 
 
 echo $OUTPUT->footer();
+/*
 // --- Get teacher-selected questions from the module instance ---
 $smartspe = $DB->get_record('smartspe', ['id' => $instanceid], '*', MUST_EXIST);
 $questionids = explode(',', $smartspe->questionids);
@@ -179,3 +180,4 @@ $submitted = $quiz_manager->quiz_is_submitted();
 echo $submitted ? "Submitted evaluation<br>" : "Failed submission";
 
 echo "<hr>Test completed.";
+*/
