@@ -30,7 +30,8 @@ $instanceid = $smartspe->id;
 $quiz_manager = new smartspe_quiz_manager($USER->id, $course->id, $context, $instanceid);
 
 // --- 5. Determine user role ---
-$is_teacher = has_capability('mod/smartspe:grade', $context);
+$is_teacher = has_capability('mod/smartspe:manage', $context);
+$is_student = has_capability('mod/smartspe:submit', $context);
 
 // --- 6. Get renderer ---
 $output = $PAGE->get_renderer('mod_smartspe');
@@ -39,11 +40,12 @@ $output = $PAGE->get_renderer('mod_smartspe');
 echo $OUTPUT->header();
 
 if ($is_teacher) {
-    // TEACHER VIEW
     echo $output->render(new \mod_smartspe\output\teacher_view($quiz_manager));
-} else {
-    // STUDENT VIEW
+} else if ($is_student) {
     echo $output->render(new \mod_smartspe\output\student_view($quiz_manager));
+} else {
+    echo $OUTPUT->notification(get_string('nopermissiontospe', 'mod_smartspe'), 'notifyproblem');
 }
+
 
 echo $OUTPUT->footer();
