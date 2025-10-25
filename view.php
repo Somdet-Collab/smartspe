@@ -98,7 +98,7 @@ foreach ($members as $memberid)
         echo 'End of question structure<br>';
 
         $qtext = $question['text'];
-        $qtype = $question['type'];
+        $qtype = $question['qtype'];
         echo "Question for $member_name: $qtext <br>";
         if ($question['qtype'] === 'multichoice' && $mcq_count < 5) 
         {
