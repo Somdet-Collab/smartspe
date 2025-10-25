@@ -67,6 +67,7 @@ class data_persistence
         {
             $qa = $quba->get_question_attempt($slot);
             $question = $qa->get_question();
+            $currentdata = $qa->get_last_qt_data();
 
             $questions[] = 
             [
@@ -74,7 +75,6 @@ class data_persistence
                 'name' => $question->name,
                 'text' => $question->questiontext,
                 'state' => $qa->get_state(),
-                $currentdata = $qa->get_last_qt_data(),
                 'current_answer' => (int)$currentdata['answer']
             ];
         }
