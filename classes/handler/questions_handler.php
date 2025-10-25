@@ -20,7 +20,7 @@ class questions_handler
     {
 
         // $data comes from $mform->get_data() after submission
-        if (empty($data->questionids))
+        if (empty($questionids))
             return [];
 
         $qids = $questionids;
