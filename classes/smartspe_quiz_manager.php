@@ -57,6 +57,8 @@ class smartspe_quiz_manager
 
         if (empty($this->members))
             throw new moodle_exception("The members are empty in section get_members() in quiz_manager");
+
+        $this->attemptids = []; //initialize attemptids
     }
 
     /**
@@ -80,6 +82,7 @@ class smartspe_quiz_manager
 
         //Collect attemptid for specific member
         $this->attemptids[$memberid] = $this->quiz_attempt->get_attempt_id();
+
         if (isset($this->attemptids[$memberid])) //Create persistence object for specific member
             $this->data_persistence = $this->quiz_attempt->create_persistence($this->context, $memberid);
         else
