@@ -93,11 +93,13 @@ foreach ($members as $memberid)
     // --- Step 2d: Submit ---
     try {
         $quiz_manager->process_attempt_evaluation($answers, $comment, $self_comment, true);
-        $submitted = $quiz_manager->quiz_is_submitted();
-        echo $submitted ? "Submitted evaluation for member $memberid<br>" : "Failed submission for member $memberid<br>";
     } catch (moodle_exception $e) {
         echo "Submission error for member $memberid: " . $e->getMessage() . "<br>";
     }
 }
+
+//Final Submit
+$submitted = $quiz_manager->quiz_is_submitted();
+echo $submitted ? "Submitted evaluation for member $memberid<br>" : "Failed submission for member $memberid<br>";
 
 echo "<hr>Test completed.";
