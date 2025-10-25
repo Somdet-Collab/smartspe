@@ -68,13 +68,14 @@ class data_persistence
             $qa = $quba->get_question_attempt($slot);
             $question = $qa->get_question();
 
-            $questions[$slot] = 
+            $questions[] = 
             [
                 'id' => $question->id,
                 'name' => $question->name,
                 'text' => $question->questiontext,
                 'state' => $qa->get_state(),
-                'current_answer' => $qa->get_submitted_data()
+                $currentdata = $qa->get_last_qt_data(),
+                'current_answer' => (int)$currentdata['answer']
             ];
         }
 
@@ -125,8 +126,10 @@ class data_persistence
             //if new data is not null
             if (isset($answers[$index]))
             {
+                // Wrap the answer as an array expected by process_autosave
+                $formatteddata = ['answer' => strval($answers[$index])];
                 //Update new data
-                $this->update_attempt_answers($slot, $answers[$index]);
+                $this->update_attempt_answers($slot, $formatteddata);
             }
             else //If no new data added
             {
