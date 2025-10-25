@@ -37,10 +37,10 @@ class questions_handler
                 'id' => $questionobj->id,
                 'name' => $questionobj->name,
                 'text' => $questionobj->questiontext,
-                'qtype' => $questionobj->qtype,
+                'qtype' => $questionobj->qtype->name(),
                 'defaultmark' => $questionobj->defaultmark,
                 'questiontextformat' => $questionobj->questiontextformat,
-                'answers' => $questionobj->answers
+                'answers' => $questionobj->answers ? array_values($questionobj->answers) : []
             ];
         }
 
