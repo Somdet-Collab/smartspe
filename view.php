@@ -70,16 +70,22 @@ foreach ($members as $memberid)
         $qtext = $question['text'];
         echo "Question for $member_name: $qtext <br>";
         if ($question['qtype'] === 'multichoice' && $mcq_count < 5) {
-            $answers[] = rand(1, 3); // simulate MCQ answer
+            $answers[$mcq_count] = rand(1, 3); // simulate MCQ answer
+            $current_answer = $answers[$mcq_count];
+            echo "Answer: $current_answer <br>";
             $mcq_count++;
         } elseif ($question['qtype'] === 'essay' && $comment_count < 1) {
             $comment = "Peer comment for member $memberid";
+            echo "Comment: $comment <br>";
             $comment_count++;
         }
     }
     
     if ($USER->id == $memberid)
+    {
         $self_comment = "My self comment";
+        echo "Self Comment: $self_comment <br>";
+    }
     else
         $self_comment = null;
 

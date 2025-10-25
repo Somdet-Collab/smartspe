@@ -121,9 +121,9 @@ class data_persistence
             //if new data is not null
             if ($newdata && isset($newdata['answers'][$index]))
             {
-                $slotdata[$slot] = ['answer' => $newdata['answers'][$index]];
+                $slotdata = ['answer' => $newdata['answers'][$index]];
                 //Update new data
-                $this->update_attempt_answers($slot, $slotdata[$slot]);
+                $this->update_attempt_answers($slot, $slotdata);
             }
             else //If no new data added
             {

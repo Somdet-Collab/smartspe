@@ -120,16 +120,11 @@ class smartspe_quiz_manager
      */
     public function process_attempt_evaluation($answers, $comment, $self_comment=null, $finish=false)
     {
-        //Assign comment
-        $comments['comment'] = $comment;
-
-        if ($self_comment)
-            $comments['self_comment'] = $self_comment;
-
         //Wrap data
         $newdata = [
             'answers' => $answers,
-            'comment' => $comments
+            'comment' => $comment,
+            'self_comment' => $self_comment
         ];
 
         //Process autosave
