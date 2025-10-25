@@ -65,17 +65,17 @@ class data_persistence
         $questions = [];
         foreach ($quba->get_slots() as $slot) 
         {
-            $qa = $quba->get_question_attempt($slot);
-            $question = $qa->get_question();
-            $currentdata = $qa->get_last_qt_data();
+            $qa = $quba->get_question_attempt($slot); //get qa
+            $question = $qa->get_question(); //get question of this slot
+            $currentdata = $qa->get_last_qt_data(); //get saved answer, array($string)
 
-            $questions[] = 
+            $questions[] =
             [
                 'id' => $question->id,
                 'name' => $question->name,
                 'text' => $question->questiontext,
                 'state' => $qa->get_state(),
-                'current_answer' => (int)$currentdata['answer']
+                'current_answer' => (int)$currentdata['answer'] //convert string to int
             ];
         }
 
@@ -102,10 +102,11 @@ class data_persistence
         if (!empty($newdata['comment'])) 
         {
             $comments = [
-                'comment' => $newdata['comment'],
+                'comment' => $newdata['comment'] ?? null,
                 'self_comment' => $newdata['self_comment'] ?? null
             ];
 
+            //Save comment into attempt db
             $DB->set_field(
                 'smartspe_attempts',
                 'comment',

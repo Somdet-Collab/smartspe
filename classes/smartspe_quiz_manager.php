@@ -197,16 +197,8 @@ class smartspe_quiz_manager
             [$questions, $comments] = $data_persistence->load_attempt_questions();
 
             //Get all saved answers
-            foreach ($data_persistence->get_slots() as $slot) 
-            {
-                //Ensure it is in correct format array[1,2,3,4]
-                $current = $questions[$slot]['current_answer'];
-                if (is_array($current)) {
-                    $answers[] = (int) reset($current);
-                } else {
-                    $answers[] = (int) $current;
-                }
-            }
+            foreach ($questions as $question) 
+                $answers[] = (int)$question['current_answer'];
 
             //Get comment
             if($comments)
