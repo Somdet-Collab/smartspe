@@ -42,6 +42,8 @@ class smartspe_quiz_manager
      */
     public function __construct($userid, $courseid, $context, $smartspeid)
     {
+        global $DB;
+
         //Get all questions
         $this->courseid = $courseid;
         $this->context = $context;
@@ -58,7 +60,18 @@ class smartspe_quiz_manager
         if (empty($this->members))
             throw new moodle_exception("The members are empty in section get_members() in quiz_manager");
 
-        $this->attemptids = []; //initialize attemptids
+        //Retrive existing attempt
+        foreach ($this->members as $memberid) 
+        {
+            $attempt = $DB->get_record('smartspe_attempts', [
+                'smartspeid' => $this->smartspeid,
+                'userid' => $this->userid,
+                'memberid' => $memberid
+            ]);
+            
+            if ($attempt)
+                $this->attemptids[$memberid] = $attempt->id;
+        }
     }
 
     /**
