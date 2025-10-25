@@ -63,7 +63,8 @@ foreach ($members as $memberid)
     $member = $DB->get_record('user', ['id' => $memberid]);
     $member_name = $member->firstname;
 
-    if (!$questions || !$questions['qtype'])
+    //Check
+    if (!$questions || !$questions[0]['qtype'])
     {
         echo "Question is empty (view.php) <br>";
         break;
@@ -73,6 +74,10 @@ foreach ($members as $memberid)
 
     foreach ($questions as $question) 
     {
+        echo '<pre>QUESTION STRUCTURE: ';
+        var_export($question);
+        echo "</pre><br>";
+
         $qtext = $question['text'];
         echo "Question for $member_name: $qtext <br>";
         if ($question['qtype'] === 'multichoice' && $mcq_count < 5) 
