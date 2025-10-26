@@ -39,6 +39,12 @@ class download_handler
     {
         global $DB;
 
+        // Set headers
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
         //Open file 
         $fp = fopen('php://output', 'w');
         if (!$fp)
@@ -58,8 +64,6 @@ class download_handler
         }
 
         fclose($fp);
-        header('Content-type:application/csv');
-        header('Content-disposition:attachment;filename="'.$filename.'"');
 
         return true;
     }
