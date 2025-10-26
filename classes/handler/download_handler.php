@@ -61,7 +61,7 @@ class download_handler
         fclose($fp);
 
         // Use Moodle file sending function
-        send_file($csvcontent, $filename.'.csv', 0, 0, true, 'text/csv');
+        send_file($csvcontent, $filename.'.csv', 0, 0, true, false, 'text/csv');
 
         // Stop Moodle rendering page
         exit;
