@@ -25,11 +25,16 @@ function smartspe_add_instance($data, $mform)
     $instance = new stdClass();
     $instance->name = $data->name;
     $instance->course = $COURSE->id;
-    $instance->questionids = implode(',', $data->questionids); // save teacher-selected questions
     $instance->startdate = $data->startdate;
     $instance->enddate = $data->enddate;
     $instance->timecreated = time();
     $instance->timemodified = time();
+    if (is_array($data->questionids)) {
+    $instance->questionids = implode(',', $data->questionids);
+    } else {
+        $instance->questionids = $data->questionids; // already a string
+    }
+
 
     // Insert new record into the module table.
     $id = $DB->insert_record('smartspe', $instance);
@@ -55,11 +60,15 @@ function smartspe_update_instance($data, $mform)
     $instance->id = $data->id;
     $instance->course = $COURSE->id;
     $instance->name = $data->name;
-    $instance->questionids = implode(',', $data->questionids);
     $instance->startdate = $data->startdate;
     $instance->enddate = $data->enddate;
     $instance->timemodified = time();
-
+    if (is_array($data->questionids)) {
+    $instance->questionids = implode(',', $data->questionids);
+    } else {
+        $instance->questionids = $data->questionids; // already a string
+    }
+    
     return $DB->update_record('smartspe', $instance);
 }
 

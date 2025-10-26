@@ -1,31 +1,54 @@
 <?php
 require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/lib.php');
-//require_once($CFG->dirroot . '/mod/smartspe/mod_smartspe_mod_form.php');
-// commented the above line out, doesn't seem to be required
 
 use mod_smartspe\smartspe_quiz_manager;
 use core\exception\moodle_exception;
 
-global $DB, $USER;
+global $DB, $USER, $PAGE;
 
+// --- 1. Get basic parameters ---
 $id = required_param('id', PARAM_INT); // Course module ID
+
 $cm = get_coursemodule_from_id('smartspe', $id, 0, false, MUST_EXIST);
-$sectionid = $cm->section;
-$courseid = $cm->course;
 $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
 $context = \context_module::instance($cm->id);
-$instance = $DB->get_record('smartspe', ['course' => $course->id], '*', MUST_EXIST);
-$instanceid = $instance->id;
-// fixed the two lines above -- 16 & 17, because there seemed to be a bug
-
-// Security and access check
 require_login($course, true, $cm);
 
-if (!$instanceid) {
-    die("smartspeid is required. Example: view.php?smartspeid=1");
+// --- 2. Set up the page ---
+$PAGE->set_url('/mod/smartspe/view.php', ['id' => $id]);
+$PAGE->set_title(get_string('pluginname', 'mod_smartspe'));
+$PAGE->set_heading($course->fullname);
+$PAGE->set_context($context);
+$PAGE->set_pagelayout('incourse');
+
+// --- 3. Load activity instance ---
+$smartspe = $DB->get_record('smartspe', ['id' => $cm->instance], '*', MUST_EXIST);
+$instanceid = $smartspe->id;
+
+// --- 4. Create the quiz manager ---
+$quiz_manager = new smartspe_quiz_manager($USER->id, $course->id, $context, $instanceid);
+
+// --- 5. Determine user role ---
+$is_teacher = has_capability('mod/smartspe:manage', $context);
+$is_student = has_capability('mod/smartspe:submit', $context);
+
+// --- 6. Get renderer ---
+$output = $PAGE->get_renderer('mod_smartspe');
+
+// --- 7️. Handle UI rendering ---
+echo $OUTPUT->header();
+
+if ($is_teacher) {
+    echo $output->render(new \mod_smartspe\output\teacher_view($quiz_manager));
+} else if ($is_student) {
+    echo $output->render(new \mod_smartspe\output\student_view($quiz_manager));
+} else {
+    echo $OUTPUT->notification(get_string('nopermissiontospe', 'mod_smartspe'), 'notifyproblem');
 }
 
+
+echo $OUTPUT->footer();
 // --- Get teacher-selected questions from the module instance ---
 $smartspe = $DB->get_record('smartspe', ['id' => $instanceid], '*', MUST_EXIST);
 $questionids = explode(',', $smartspe->questionids);

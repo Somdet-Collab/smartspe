@@ -1,0 +1,41 @@
+<div class="smartspe-student-container">
+  <h2>{{activityname}}</h2>
+  <p>{{description}}</p>
+
+  {{#members}}
+  <div class="smartspe-member-block">
+    <h4>Evaluate Member {{.}}</h4>
+
+    <form method="post" action="{{{formaction}}}">
+      <input type="hidden" name="memberid" value="{{.}}">
+
+      <ol>
+        {{#questions}}
+        <li>
+          <label>{{text}}</label><br>
+          <select name="q{{id}}" required>
+            <option value="1">1 - Strongly Disagree</option>
+            <option value="2">2 - Disagree</option>
+            <option value="3">3 - Neutral</option>
+            <option value="4">4 - Agree</option>
+            <option value="5">5 - Strongly Agree</option>
+          </select>
+        </li>
+        {{/questions}}
+      </ol>
+
+      <label>Comments:</label><br>
+      <textarea name="comment" rows="3"></textarea><br>
+
+      <label>Self-comment (optional):</label><br>
+      <textarea name="self_comment" rows="3"></textarea><br>
+
+      <button type="submit" class="btn btn-primary">Submit Evaluation</button>
+    </form>
+  </div>
+  {{/members}}
+
+  {{^members}}
+  <p><em>No group members found.</em></p>
+  {{/members}}
+</div>
