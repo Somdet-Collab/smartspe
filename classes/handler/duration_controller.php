@@ -19,15 +19,21 @@ class duration_controller
 
     private $timezone;
 
-    public function __construct($startdate, $enddate, $timezone=null)
+    public function __construct($instanceid, $timezone=null)
     {
-        global $USER;
+        global $DB, $USER;
+
+        $record = $DB->get_record('smartspe', ['id' => $instanceid]);
+
+        if ($record)
+        {
+            $this->startdate = $record->startdate;
+            $this->enddate = $record->enddate;
+        }
         
-        if ($startdate >= $enddate) 
+        if ($this->startdate >= $this->enddate) 
             throw new moodle_exception('Start date must be before end date.');
 
-        $this->startdate = $startdate;
-        $this->enddate = $enddate;
         $this->timezone = $timezone ?? $USER->timezone;
     }
     

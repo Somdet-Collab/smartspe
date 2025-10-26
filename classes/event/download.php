@@ -13,7 +13,7 @@ class download extends \core\event\base
 
     protected function init() 
     {
-        $this->data['objecttable'] = 'smartspe_downloads'; // or null if not stored
+        $this->data['objecttable'] = null;
         $this->data['crud'] = 'r'; // read
         $this->data['edulevel'] = self::LEVEL_OTHER;
     }

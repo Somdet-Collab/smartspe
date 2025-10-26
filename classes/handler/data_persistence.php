@@ -174,7 +174,7 @@ class data_persistence
                     $answer_index++;
                 }
             }
-            else
+            else if ($qtype === 'essay')
             {
                 //No update for comment
                 //As it already stores in smartspe_attempt
@@ -183,6 +183,10 @@ class data_persistence
                 // Update time modified
                 $DB->set_field('smartspe_attempts', 'timemodified', 
                                 time(), ['id' => $this->attemptid]);
+            }
+            else
+            {
+                throw new moodle_exception("$qtype is not currently supported in this plugin");
             }
         }
 
