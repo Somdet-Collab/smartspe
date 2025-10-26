@@ -81,19 +81,19 @@ function smartspe_update_instance($data, $mform)
  * @param int $id ID of the module instance
  * @return bool true on success, false otherwise
  */
-function smartspe_delete_instance($id) 
+function smartspe_delete_instance($id)
 {
     global $DB;
 
-    if (!$record = $DB->get_record('smartspe', ['id' => $id])) 
-    {
+    // Check record exists
+    if (!$DB->record_exists('smartspe', ['id' => $id])) {
         return false;
     }
 
-    //delete attempts
-    $DB->delete_records('smartspe_attempt', ['smartspeid' => $id]);
+    // Delete related attempts
+    $DB->delete_records('smartspe_attempts', ['smartspeid' => $id]);
 
-    // Delete main instance.
+    // Delete main record
     $DB->delete_records('smartspe', ['id' => $id]);
 
     return true;
