@@ -160,7 +160,7 @@ class smartspe_quiz_manager
      */
     public function get_saved_questions_answers()
     {
-        [$questions, $comments] = $this->data_persistence->load_attempt_questions();
+        $questions = $this->data_persistence->load_attempt_questions();
         return $questions;
     }
 
@@ -200,15 +200,24 @@ class smartspe_quiz_manager
             $data_persistence = new data_persistence($this->attemptids[$memberid], $memberid);
 
             //Load autosaved questions with answers and comments
-            [$questions, $comments] = $data_persistence->load_attempt_questions();
+            $questions = $data_persistence->load_attempt_questions();
 
             //For debug purpose
             echo  "Questions structure in quiz_manager";
             echo '<pre>'; print_r($questions); echo '</pre>';
 
-            //Get all saved answers
-            foreach ($questions as $question) 
-                $answers[] = (int)$question['current_answer'];
+            foreach ($questions as $question) {
+                $qtype = $question['qtype'];
+
+                if ($qtype === 'multichoice') {
+                    //Get all saved answers
+                    $answers[] = (int) $question['current_answer'];
+                } elseif ($qtype === 'essay') {
+                    $comments = $question['current_answer'];
+                } else {
+                    throw new moodle_exception("Currently question type ($qtype)");
+                }
+            }
 
             //Get comment
             if($comments)

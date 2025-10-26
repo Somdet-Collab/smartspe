@@ -41,8 +41,7 @@ class data_persistence
      *
      * Called when student attempting the quiz.
      *
-     * @return $questions
-     * @return $comments
+     * @return array $questions
      */
     public function load_attempt_questions() 
     {
@@ -67,19 +66,34 @@ class data_persistence
         {
             $qa = $quba->get_question_attempt($slot); //get qa
             $question = $qa->get_question(); //get question of this slot
-            $currentdata = $qa->get_last_qt_data(); //get saved answer, array($string)
+            $qtype = $question->qtype->name();
+            $last_saved = $qa->get_last_qt_data(); //get saved answer, array($string)
+            $currentdata = null;
+
+            switch($qtype)
+            {
+                case 'multichoice':
+                case 'truefalse':
+                    $currentdata = $last_saved['answer'] ?? null;
+                    break;
+
+                case 'essay':
+                    $currentdata = $comments; //comments['comment', 'self_comment']
+                    break;
+            }
 
             $questions[] =
             [
                 'id' => $question->id,
                 'name' => $question->name,
                 'text' => $question->questiontext,
-                'state' => $qa->get_state(),
+                'qtype' => $qtype,
+                'state' => $qa->get_state()->__toString(),
                 'current_answer' => $currentdata
             ];
         }
 
-        return [$questions, $comments];
+        return $questions;
     }
 
     /**

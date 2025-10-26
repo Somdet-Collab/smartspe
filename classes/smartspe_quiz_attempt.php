@@ -100,14 +100,14 @@ class smartspe_quiz_attempt
         {
             //Load questions 
             $this->data_persistence = new data_persistence($this->attemptid, $memberid);
-            [$this->questions, $comments] = $this->data_persistence->load_attempt_questions();
+            $this->questions = $this->data_persistence->load_attempt_questions();
         } 
         else 
         {
             //Cretae questions usage and link to each attempt
             $this->quba = $question_handler->add_all_questions($context, $this->questionids, $this->attemptid);
             $this->data_persistence = new data_persistence($this->attemptid, $memberid);
-            [$this->questions, $comments] = $this->data_persistence->load_attempt_questions();
+            $this->questions = $this->data_persistence->load_attempt_questions();
         }
 
 
