@@ -170,7 +170,7 @@ class data_persistence
                     // Update time modified
                     $DB->set_field('smartspe_attempts', 'timemodified', 
                                     time(), ['id' => $this->attemptid]);
-                                    
+
                     $answer_index++;
                 }
             }
@@ -178,6 +178,7 @@ class data_persistence
             {
                 //No update for comment
                 //As it already stores in smartspe_attempt
+                $quba->process_action($slot, [], time()); // Update blank
 
                 // Update time modified
                 $DB->set_field('smartspe_attempts', 'timemodified', 
