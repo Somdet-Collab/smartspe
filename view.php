@@ -5,7 +5,7 @@ require_once(__DIR__ . '/lib.php');
 use mod_smartspe\smartspe_quiz_manager;
 use core\exception\moodle_exception;
 
-global $DB, $USER, $PAGE;
+global $DB, $USER;
 
 // --- 1. Get basic parameters ---
 $id = required_param('id', PARAM_INT); // Course module ID
@@ -13,9 +13,9 @@ $id = required_param('id', PARAM_INT); // Course module ID
 $cm = get_coursemodule_from_id('smartspe', $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
 $context = \context_module::instance($cm->id);
-require_login($course, true, $cm);
 $instance = $DB->get_record('smartspe', ['course' => $course->id], '*', MUST_EXIST);
 $instanceid = $instance->id;
+require_login($course, true, $cm);
 
 // --- Get teacher-selected questions from the module instance ---
 $smartspe = $DB->get_record('smartspe', ['id' => $instanceid], '*', MUST_EXIST);
@@ -23,7 +23,7 @@ $questionids = explode(',', $smartspe->questionids);
 
 //Create attempt
 //$attemptid = $quiz_manager->start_attempt_evaluation($data, $teacher_selected_questionids); // changed this function to align with the one from quiz_manager.php -- commenting this out because i don't think we have to create it here
-$quiz_manager = new smartspe_quiz_manager($USER->id, $courseid, $context, $instanceid);
+$quiz_manager = new smartspe_quiz_manager($USER->id, $cm->course, $context, $instanceid);
 
 // --- Step 1: Get members of team ---
 try {
