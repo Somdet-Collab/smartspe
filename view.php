@@ -156,8 +156,6 @@ echo $submitted ? "Submitted evaluation<br>" : "Failed submission";
 
 echo "<hr>Test completed.";
 
-// Define default filename
-$defaultfilename = 'smartspe_report_' . time();
 ?>
 
 <hr>
@@ -178,7 +176,7 @@ if (optional_param('download_csv', 0, PARAM_INT)) {
     $extension = required_param('extension', PARAM_ALPHA);
     
     try {
-        $quiz_manager->download_report($filename, $extension);
+        $quiz_manager->download_report($extension);
     } catch (moodle_exception $e) {
         echo '<div class="alert alert-danger">Download error: ' . $e->getMessage() . '</div>';
     }
