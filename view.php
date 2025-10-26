@@ -13,6 +13,8 @@ $id = required_param('id', PARAM_INT); // Course module ID
 $cm = get_coursemodule_from_id('smartspe', $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
 $context = \context_module::instance($cm->id);
+$instance = $DB->get_record('smartspe', ['course' => $course->id], '*', MUST_EXIST);
+$instanceid = $instance->id;
 require_login($course, true, $cm);
 
 // --- 2. Set up the page ---
@@ -27,7 +29,7 @@ $smartspe = $DB->get_record('smartspe', ['id' => $cm->instance], '*', MUST_EXIST
 $instanceid = $smartspe->id;
 
 // --- 4. Create the quiz manager ---
-$quiz_manager = new smartspe_quiz_manager($USER->id, $course->id, $context, $instanceid);
+$quiz_manager = new smartspe_quiz_manager($USER->id, $cm->course, $context, $instanceid);
 
 // --- 5. Determine user role ---
 $is_teacher = has_capability('mod/smartspe:manage', $context);
