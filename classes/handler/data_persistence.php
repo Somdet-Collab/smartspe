@@ -82,7 +82,7 @@ class data_persistence
                     break;
 
                 default:
-                    $useranswer = json_encode($currentdata); // fallback: keep full structure
+                    $currentdata = json_encode($currentdata); // fallback: keep full structure
                     break;
             }
 
@@ -141,24 +141,39 @@ class data_persistence
         foreach ($quba->get_slots() as $index => $slot)
         {
             $qa = $quba->get_question_attempt($slot);
+            $question = $qa->get_question(); //get question of this slot
+            $qtype = $question->qtype->name(); //get question type
 
-            //if new data is not null
-            if (isset($answers[$index]))
+            //Check question slot type
+            if ($qtype === 'multichoice')
             {
-                // Wrap the answer as an array expected by process_autosave
-                $formatteddata = ['answer' => strval($answers[$index])];
-                //Update new data
-                $this->update_attempt_answers($slot, $formatteddata);
+                //if new data is not null
+                if (isset($answers[$index]))
+                {
+                    // Wrap the answer as an array expected by process_autosave
+                    $formatteddata = ['answer' => strval($answers[$index])];
+                    //Update new data
+                    $this->update_attempt_answers($slot, $formatteddata);
+                }
+                else //If no new data added
+                {
+                    $currentdata = $qa->get_last_qt_data();
+
+                    //if the question has a saved data
+                    if($currentdata)
+                        $quba->process_action($slot, $currentdata, time());
+                    else //if no saved data, leave it blank
+                        $quba->process_action($slot, [], time());
+
+                    // Update time modified
+                    $DB->set_field('smartspe_attempts', 'timemodified', 
+                                    time(), ['id' => $this->attemptid]);
+                }
             }
-            else //If no new data added
+            else
             {
-                $currentdata = $qa->get_last_qt_data();
-
-                //if the question has a saved data
-                if($currentdata)
-                    $quba->process_action($slot, $currentdata, time());
-                else //if no saved data, leave it blank
-                    $quba->process_action($slot, [], time());
+                //No update for comment
+                //As it already stores in smartspe_attempt
 
                 // Update time modified
                 $DB->set_field('smartspe_attempts', 'timemodified', 
