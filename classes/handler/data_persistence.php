@@ -70,7 +70,7 @@ class data_persistence
             $last_saved = $qa->get_last_qt_data(); //get saved answer, array($string)
             $currentdata = null;
 
-            switch($qtype)
+            switch ($qtype) 
             {
                 case 'multichoice':
                 case 'truefalse':
@@ -79,6 +79,10 @@ class data_persistence
 
                 case 'essay':
                     $currentdata = $comments; //comments['comment', 'self_comment']
+                    break;
+
+                default:
+                    $useranswer = json_encode($currentdata); // fallback: keep full structure
                     break;
             }
 
