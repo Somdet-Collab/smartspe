@@ -152,7 +152,7 @@ class data_persistence
                 if (isset($answers[$answer_index]))
                 {
                     // Wrap the answer as an array expected by process_autosave
-                    $formatteddata = ['answer' => strval($answers[$answer_index])];
+                    $formatteddata = ['answer' => $answers[$answer_index]];
                     //Update new data
                     $this->update_attempt_answers($slot, $formatteddata);
                     $answer_index++;
