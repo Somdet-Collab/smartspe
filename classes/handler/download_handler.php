@@ -2,6 +2,7 @@
 
 namespace mod_smartspe\handler;
 use core\exception\moodle_exception;
+use core\output\notification;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -21,7 +22,7 @@ class download_handler
         //Check the extension
         if ($extension == "csv")
             return $this->create_file_csv($filename);
-        else if($extension == "pdf")
+        else if ($extension == "pdf")
             return $this->create_file_pdf(($filename));
         else
             throw new moodle_exception(("The file extension is not supported: {$extension}"));
@@ -39,35 +40,31 @@ class download_handler
     {
         global $DB;
 
-        // Set headers BEFORE any output
-        header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
-        header('Pragma: no-cache');
-        header('Expires: 0');
-
-        // Open output stream
-        $fp = fopen('php://output', 'w');
+        // Create CSV in memory
+        $fp = fopen('php://memory', 'w');
         if (!$fp) {
-            throw new moodle_exception("Cannot open file stream");
+            throw new moodle_exception("Cannot open memory stream for CSV");
         }
 
-        // Write header row
-        $header = ["StudentID", "Name", "Memberid", "Member_Name", "Group", "Polarity", "Sentiment_Scores",
-                "Q1", "Q2", "Q3", "Q4", "Q5", "comment", "self_comment"];
+        $header = ["StudentID","Name","Memberid","Member_Name","Group","Polarity",
+                    "Sentiment_Scores","Q1","Q2","Q3","Q4","Q5","comment","self_comment"];
+
         fputcsv($fp, $header);
 
-        // Get records
         $records = $DB->get_records('smartspe_evaluation');
         foreach ($records as $record) {
-            $line = $this->get_line_record($record);
-            fputcsv($fp, $line);
+            fputcsv($fp, $this->get_line_record($record));
         }
 
-        // Close output
+        rewind($fp);
+        $csvcontent = stream_get_contents($fp);
         fclose($fp);
 
-        // Stop Moodle from sending any more output
-        exit();
+        // Use Moodle file sending function
+        send_file($csvcontent, $filename.'.csv', 0, 0, true, 'text/csv');
+
+        // Stop Moodle rendering page
+        exit;
     }
 
 
@@ -103,8 +100,9 @@ class download_handler
         $comment = $record->comment;
         $self_comment = $record->self_comment;
 
-        $line = array($userid, $name, $memberid, $member_name, $group, $polarity, $sentiment_score,
-                        $q1, $q2, $q3, $q4, $q5, $comment, $self_comment);
+        $line = [$userid,$name,$memberid,$member_name,$group,$polarity,
+                $sentiment_score,$q1,$q2,$q3,$q4,$q5,$comment,$self_comment];
+
 
         return $line;
     }
