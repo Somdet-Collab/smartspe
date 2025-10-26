@@ -133,6 +133,7 @@ class data_persistence
             );
         }
 
+        $answer_index = 0; //track on number of answer
         $answers = $newdata['answers'];
         if (!$answers)
             throw new moodle_exception('In data_persistence: $answers empty');
@@ -148,12 +149,13 @@ class data_persistence
             if ($qtype === 'multichoice')
             {
                 //if new data is not null
-                if (isset($answers[$index]))
+                if (isset($answers[$answer_index]))
                 {
                     // Wrap the answer as an array expected by process_autosave
-                    $formatteddata = ['answer' => strval($answers[$index])];
+                    $formatteddata = ['answer' => strval($answers[$answer_index])];
                     //Update new data
                     $this->update_attempt_answers($slot, $formatteddata);
+                    $answer_index++;
                 }
                 else //If no new data added
                 {
@@ -168,6 +170,8 @@ class data_persistence
                     // Update time modified
                     $DB->set_field('smartspe_attempts', 'timemodified', 
                                     time(), ['id' => $this->attemptid]);
+                                    
+                    $answer_index++;
                 }
             }
             else

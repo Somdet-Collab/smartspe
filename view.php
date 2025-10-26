@@ -93,7 +93,7 @@ foreach ($members as $memberid)
         echo "Question for $member_name: $qtext <br>";
         if ($question['qtype'] === 'multichoice' && $mcq_count < 5) 
         {
-            $answers[$mcq_count] = rand(1, 3); // simulate MCQ answer
+            $answers[$mcq_count] = rand(1, 5); // simulate MCQ answer
             $current_answer = $answers[$mcq_count];
             echo "Answer: $current_answer <br>";
             $mcq_count++;
