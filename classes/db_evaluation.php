@@ -126,7 +126,7 @@ class db_evaluation
 
         //Call check function from team_manager
         //To confirm that this evaluationid exist
-        if ($manager->record_exist('smartspe_evaluation', ['evaluationid' => $evaluationid]))
+        if ($manager->record_exist('smartspe_evaluation', ['id' => $evaluationid]))
         {
             //Save record
             $record = new \stdClass();
