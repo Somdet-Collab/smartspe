@@ -8,7 +8,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @package    mod_smartspe
  */
-class download extends \core\event\base 
+class file_download extends \core\event\base 
 {
 
     protected function init() 

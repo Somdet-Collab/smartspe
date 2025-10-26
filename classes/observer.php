@@ -35,9 +35,9 @@ class observer {
     /**
      * Handle download event.
      *
-     * @param \mod_smartspe\event\download $event
+     * @param \mod_smartspe\event\file_download $event
      */
-    public static function download(\mod_smartspe\event\download $event) 
+    public static function file_download(\mod_smartspe\event\file_download $event) 
     {
         debugging("Download triggered by user {$event->userid} for cmid {$event->contextinstanceid}", DEBUG_DEVELOPER);
 

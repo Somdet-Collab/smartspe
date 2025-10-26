@@ -5,7 +5,7 @@
 namespace mod_smartspe;
 
 use mod_smartspe\event\attempt_finish;
-use mod_smartspe\event\download;
+use mod_smartspe\event\file_download;
 use mod_smartspe\event\attempt_start;
 
 use core\exception\moodle_exception;
@@ -271,7 +271,7 @@ class smartspe_quiz_manager
         if (strcasecmp($extension, "csv") && strcasecmp($extension, "pdf"))
             throw new moodle_exception("quiz_manager: error file extension");
 
-        $event = download::create([
+        $event = file_download::create([
             'objectid' => $this->smartspeid,
             'context' => $this->context,
             'userid' => $this->userid,
