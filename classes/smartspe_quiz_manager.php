@@ -213,6 +213,7 @@ class smartspe_quiz_manager
 
             //Load autosaved questions with answers and comments
             $questions = $data_persistence->load_attempt_questions();
+            $comments = null;
 
             foreach ($questions as $question) {
                 $qtype = $question['qtype'];
