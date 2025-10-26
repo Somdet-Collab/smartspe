@@ -57,7 +57,6 @@ class smartspe_quiz_manager
         $this->questions_handler = new questions_handler();
         $this->notification_handler = new notification_handler();
         $this->download_handler = new download_handler();
-        $this->duration_handler = new duration_controller($smartspeid);
 
         //Get members of this $userid
         $team_manager = new db_team_manager();
