@@ -53,8 +53,11 @@ class db_evaluation
                 $record->self_comment = $self_comment;
             }
 
-            //Insert record into database
-            $evaluationid = $DB->insert_record('smartspe_evaluation', $record);
+            //Check if records alr exist, if yes then update
+            if (!$manager->record_exist('smartspe_evaluation', ['attemptid' => $attemptid]))
+                $evaluationid = $DB->insert_record('smartspe_evaluation', $record);
+            else
+                $evaluationid = $DB->update_record('smartspe_evaluation', $record);
 
         }
         else
