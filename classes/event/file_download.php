@@ -13,7 +13,7 @@ class file_download extends \core\event\base
 
     protected function init() 
     {
-        $this->data['objecttable'] = 'smartspe_evaluation';
+        $this->data['objecttable'] = 'smartspe';
         $this->data['crud'] = 'r'; // read
         $this->data['edulevel'] = self::LEVEL_OTHER;
     }
