@@ -131,12 +131,9 @@ foreach ($members as $memberid)
         echo "Failed autosave for member $memberid: " . $e->getMessage() . "<br>";
     }
 
-    //Reassign new values 
-    $count = 1;
-    while(!$count <= $mcq_count)
-    {
-        $answers[$count] = rand(1, 5);
-        $count++;
+    // Reassign new random answers for MCQs
+    foreach ($answers as $index => $ansvalue) {
+        $answers[$index] = rand(1, 5);
     }
 
     echo '<pre>Review answers before submitting: ';
