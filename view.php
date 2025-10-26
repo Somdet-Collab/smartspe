@@ -133,7 +133,7 @@ foreach ($members as $memberid)
 
     //Reassign new values 
     $count = 1;
-    while(!$count == $mcq_count)
+    while(!$count <= $mcq_count)
     {
         $answers[$count] = rand(1, 5);
         $count++;

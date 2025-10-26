@@ -57,7 +57,7 @@ function smartspe_update_instance($data, $mform)
     global $DB, $COURSE;
 
     $instance = new stdClass();
-    $data->id -> $data->instance;
+    $data->id = $data->instance;
     $instance->id = $data->id;
     $instance->course = $COURSE->id;
     $instance->name = $data->name;
