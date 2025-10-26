@@ -39,34 +39,37 @@ class download_handler
     {
         global $DB;
 
-        // Set headers
+        // Set headers BEFORE any output
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
         header('Pragma: no-cache');
         header('Expires: 0');
 
-        //Open file 
+        // Open output stream
         $fp = fopen('php://output', 'w');
-        if (!$fp)
+        if (!$fp) {
             throw new moodle_exception("Cannot open file stream");
-
-        $header = array("StudentID", "Name", "Memberid", "Member_Name", "Group", "Polarity", "Sentiment_Scores", 
-                        "Q1", "Q2", "Q3", "Q4","Q5", "comment", "self_comment"); //header line
-        fputcsv($fp, $header); //Write header
-
-        //Get records of evaluation
-        $records = $DB->get_records('smartspe_evaluation');
-
-        foreach ($records as $key => $record)
-        {
-            $line = $this->get_line_record($record);
-            fputcsv($fp, $line); //Insert record row
         }
 
+        // Write header row
+        $header = ["StudentID", "Name", "Memberid", "Member_Name", "Group", "Polarity", "Sentiment_Scores",
+                "Q1", "Q2", "Q3", "Q4", "Q5", "comment", "self_comment"];
+        fputcsv($fp, $header);
+
+        // Get records
+        $records = $DB->get_records('smartspe_evaluation');
+        foreach ($records as $record) {
+            $line = $this->get_line_record($record);
+            fputcsv($fp, $line);
+        }
+
+        // Close output
         fclose($fp);
 
-        return true;
+        // Stop Moodle from sending any more output
+        exit();
     }
+
 
     private function create_file_pdf($filename)
     {
