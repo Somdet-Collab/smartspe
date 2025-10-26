@@ -46,7 +46,7 @@ class observer {
 
         //Trigger download
         $downloader = new \mod_smartspe\handler\download_handler();
-        $downloader->download_file($filename, 'csv');
+        $downloader->download_file($filename, "csv");
 
     }
 

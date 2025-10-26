@@ -268,7 +268,7 @@ class smartspe_quiz_manager
      */
     public function download_report($extension="csv")
     {
-        if (strcasecmp($extension, "csv") || strcasecmp($extension, "pdf"))
+        if (strcasecmp($extension, "csv") && strcasecmp($extension, "pdf"))
             throw new moodle_exception("quiz_manager: error file extension");
 
         $event = download::create([
