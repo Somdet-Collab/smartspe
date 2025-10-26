@@ -147,3 +147,31 @@ $submitted = $quiz_manager->quiz_is_submitted();
 echo $submitted ? "Submitted evaluation<br>" : "Failed submission";
 
 echo "<hr>Test completed.";
+
+// Define default filename
+$defaultfilename = 'smartspe_report_' . time();
+?>
+
+<hr>
+<h3>Download Test</h3>
+
+<form method="get" action="">
+    <input type="hidden" name="id" value="<?php echo $cm->id; ?>">
+    <input type="hidden" name="filename" value="<?php echo $defaultfilename; ?>">
+    <input type="hidden" name="extension" value="csv">
+    <button type="submit" name="download_csv" class="btn btn-primary">Download CSV</button>
+</form>
+
+<?php
+// Check if download button clicked
+if (optional_param('download_csv', 0, PARAM_INT)) {
+    $filename = required_param('filename', PARAM_TEXT);
+    $extension = required_param('extension', PARAM_ALPHA);
+    
+    try {
+        $quiz_manager->download_report($filename, $extension);
+    } catch (moodle_exception $e) {
+        echo '<div class="alert alert-danger">Download error: ' . $e->getMessage() . '</div>';
+    }
+}
+?>
