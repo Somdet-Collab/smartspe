@@ -2,7 +2,7 @@
 
 namespace mod_smartspe;
 
-use moodle_exception;
+use core\exception\moodle_exception;
 use stdClass;
 use mod_smartspe\handler\data_persistence;
 use mod_smartspe\handler\questions_handler;
@@ -35,6 +35,9 @@ class smartspe_quiz_attempt
     public function __construct($smartspeid, $userid, $memberid, $questionids)
     {
         global $DB;
+
+        if (empty($questionids))
+            throw new moodle_exception("Questions are not properly selected");
 
         $this->smartspeid = $smartspeid;
         $this->userid = $userid;
