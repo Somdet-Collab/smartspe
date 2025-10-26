@@ -11,7 +11,7 @@ defined('MOODLE_INTERNAL') || die();
 class attempt_start extends \core\event\base {
 
     protected function init() {
-        $this->data['objecttable'] = 'smartspe_attempts';
+        $this->data['objecttable'] = 'smartspe';
         $this->data['crud'] = 'c'; // create
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
     }
