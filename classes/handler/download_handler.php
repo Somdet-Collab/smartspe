@@ -2,9 +2,10 @@
 
 namespace mod_smartspe\handler;
 use core\exception\moodle_exception;
-use core\output\notification;
 
 defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once($CFG->libdir . '/filelib.php');
 
 class download_handler
 {
@@ -23,7 +24,7 @@ class download_handler
         if ($extension == "csv")
             return $this->create_file_csv($filename);
         else if ($extension == "pdf")
-            return $this->create_file_pdf(($filename));
+            return $this->create_file_pdf($filename);
         else
             throw new moodle_exception(("The file extension is not supported: {$extension}"));
     }
@@ -60,8 +61,11 @@ class download_handler
         $csvcontent = stream_get_contents($fp);
         fclose($fp);
 
+        $tempfile = tempnam(sys_get_temp_dir(), 'smartspe_');
+        file_put_contents($tempfile, $csvcontent);
+
         // Use Moodle file sending function
-        send_file($csvcontent, $filename.'.csv', 0, 0, true, false, 'text/csv');
+        send_file($tempfile, $filename.'.csv', 0, 0, true, false, 'text/csv');
 
         // Stop Moodle rendering page
         exit;

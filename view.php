@@ -159,7 +159,8 @@ $defaultfilename = 'smartspe_report_' . time();
     <input type="hidden" name="id" value="<?php echo $cm->id; ?>">
     <input type="hidden" name="filename" value="<?php echo $defaultfilename; ?>">
     <input type="hidden" name="extension" value="csv">
-    <button type="submit" name="download_csv" class="btn btn-primary">Download CSV</button>
+    <button type="submit" name="download_csv" value="1" class="btn btn-primary">Download CSV</button>
+
 </form>
 
 <?php
