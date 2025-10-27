@@ -40,6 +40,12 @@ class download_handler
     private function create_file_csv($filename, $course)
     {
         global $DB;
+
+        // Remove any output before sending CSV
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        \core\session\manager::write_close();
         
         // Create temporary file in Moodle temp dir
         $tempdir = make_temp_directory('smartspe');
