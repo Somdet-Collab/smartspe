@@ -13,12 +13,11 @@ $id = required_param('id', PARAM_INT); // Course module ID
 $cm = get_coursemodule_from_id('smartspe', $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
 $context = \context_module::instance($cm->id);
-$instance = $DB->get_record('smartspe', ['course' => $course->id]);
-$instanceid = $instance->id;
+$instanceid = $cm->instance;
 require_login($course, true, $cm);
 
 // --- Get teacher-selected questions from the module instance ---
-$smartspe = $DB->get_record('smartspe', ['id' => $instanceid]);
+$smartspe = $DB->get_record('smartspe', ['id' => $instanceid], '*', MUST_EXIST);
 $questionids = explode(',', $smartspe->questionids);
 
 //Create attempt
