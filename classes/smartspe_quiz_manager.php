@@ -29,6 +29,7 @@ class smartspe_quiz_manager
     protected $smartspeid;
     protected $userid;
     protected $attemptids;
+    protected $cmid;
     protected $members; //it also includes attemptid for specific members
 
     /**
@@ -40,7 +41,7 @@ class smartspe_quiz_manager
      *@param $smartspeid instance id
      * @return void
      */
-    public function __construct($userid, $courseid, $context, $smartspeid)
+    public function __construct($userid, $courseid, $context, $smartspeid, $cmid)
     {
         global $DB;
 
@@ -49,13 +50,13 @@ class smartspe_quiz_manager
         $this->context = $context;
         $this->smartspeid = $smartspeid;
         $this->userid = $userid;
+        $this->cmid = $cmid; // added a course module id
         $this->questions_handler = new questions_handler();
         $this->notification_handler = new notification_handler();
         $this->download_handler = new download_handler();
 
         //Get members of this $userid
         $team_manager = new db_team_manager();
-        $this->members = $team_manager->get_members_id($this->userid, $this->courseid);
 
         if (empty($this->members))
             throw new moodle_exception("The members are empty in section get_members() in quiz_manager");
@@ -138,6 +139,16 @@ class smartspe_quiz_manager
         }
 
         return true;
+    }
+
+    public function get_cmid() 
+    {
+        return $this->cmid;
+    }
+
+    public function get_context()
+    {
+        return $this->context;
     }
 
      /**
@@ -259,5 +270,6 @@ class smartspe_quiz_manager
     {
 
     }
+}
 
 }
