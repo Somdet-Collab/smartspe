@@ -18,13 +18,13 @@ class download_handler
      *@param $extension file extension
      * @return boolean if download is successful
      */
-    public function download_file($filename, $extension)
+    public function download_file($filename, $extension, $course)
     {
         //Check the extension
         if ($extension == "csv")
-            return $this->create_file_csv($filename);
+            return $this->create_file_csv($filename.'.'.$extension, $course);
         else if ($extension == "pdf")
-            return $this->create_file_pdf($filename);
+            return $this->create_file_pdf($filename.'.'.$extension);
         else
             throw new moodle_exception(("The file extension is not supported: {$extension}"));
     }
@@ -37,14 +37,14 @@ class download_handler
      *@param $filename file name
      * @return boolean if download is successful
      */
-    private function create_file_csv($filename)
+    private function create_file_csv($filename, $course)
     {
         global $DB;
 
         // Create CSV in memory
-        $fp = fopen('php://memory', 'w');
+        $fp = fopen('php://output', 'w');
         if (!$fp) {
-            throw new moodle_exception("Cannot open memory stream for CSV");
+            throw new moodle_exception("Cannot open file stream for CSV");
         }
 
         $header = ["StudentID","Name","Memberid","Member_Name","Group","Polarity",
@@ -52,20 +52,15 @@ class download_handler
 
         fputcsv($fp, $header);
 
-        $records = $DB->get_records('smartspe_evaluation');
+        $records = $DB->get_records('smartspe_evaluation', ['course' => $course]);
         foreach ($records as $record) {
             fputcsv($fp, $this->get_line_record($record));
         }
 
-        rewind($fp);
-        $csvcontent = stream_get_contents($fp);
         fclose($fp);
 
-        $tempfile = tempnam(sys_get_temp_dir(), 'smartspe_');
-        file_put_contents($tempfile, $csvcontent);
-
-        // Use Moodle file sending function
-        send_file($tempfile, $filename.'.csv', 0, 0, true, false, 'text/csv');
+        header('Content-type:application/csv');
+        header('Content-disposition::attachment;filename="'.$filename.'"');
 
         // Stop Moodle rendering page
         exit;

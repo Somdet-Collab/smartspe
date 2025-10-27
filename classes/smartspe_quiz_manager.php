@@ -276,7 +276,8 @@ class smartspe_quiz_manager
             'context' => $this->context,
             'userid' => $this->userid,
             'other' => [
-                'extension' => $extension
+                'extension' => $extension,
+                'course' => $this->courseid
             ]
         ]);
         $event->trigger();
