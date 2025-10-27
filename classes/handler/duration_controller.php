@@ -19,15 +19,16 @@ class duration_controller
 
     private $timezone;
 
-    public function __construct($startdate, $enddate, $timezone=null)
+    public function __construct($startdate, $enddate, $timezone = null)
     {
-        global $USER;
-        
-        if ($startdate >= $enddate) 
-            throw new moodle_exception('Start date must be before end date.');
+        global $DB, $USER;
 
         $this->startdate = $startdate;
         $this->enddate = $enddate;
+
+        if ($this->startdate >= $this->enddate)
+            throw new moodle_exception('Start date must be before end date.');
+
         $this->timezone = $timezone ?? $USER->timezone;
     }
     
