@@ -58,8 +58,21 @@ class smartspe_quiz_manager
         //Get members of this $userid
         $team_manager = new db_team_manager();
 
-        if (empty($this->members))
-            throw new moodle_exception("The members are empty in section get_members() in quiz_manager");
+        // only try to get members if this is a student
+        if (has_capability('mod/smartspe:submit', $context)) 
+        {
+            $this->members = $team_manager->get_members_id($this->userid, $this->courseid);
+
+            if (empty($this->members)) 
+            {
+                throw new moodle_exception("The members are empty in section get_members() in quiz_manager");
+            }
+        } 
+        else 
+        {
+            // teacher or non-student: no group needed
+            $this->members = [];
+        }
 
         //Retrive existing attempt
         foreach ($this->members as $memberid) 
@@ -272,4 +285,3 @@ class smartspe_quiz_manager
     }
 }
 
-}
