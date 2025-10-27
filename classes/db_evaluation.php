@@ -62,6 +62,8 @@ class db_evaluation
                 $record->id = $existing->id;
                 if(!$DB->update_record('smartspe_evaluation', $record))
                     throw new moodle_exception("Error updating existing records");
+                else
+                    $evaluationid = $existing->id;
             }
 
         }
