@@ -15,8 +15,8 @@ $observers = [
         'priority'    => 9999,
     ],
     [
-        'eventname'   => '\mod_smartspe\event\download',
-        'callback'    => 'mod_smartspe\observer::download',
+        'eventname'   => '\mod_smartspe\event\file_download',
+        'callback'    => 'mod_smartspe\observer::file_download',
         'internal'    => false,
         'priority'    => 9999,
     ],
