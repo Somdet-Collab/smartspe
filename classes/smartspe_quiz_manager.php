@@ -238,7 +238,8 @@ class smartspe_quiz_manager
             $questions = $data_persistence->load_attempt_questions();
             $comments = null;
 
-            foreach ($questions as $question) {
+            foreach ($questions as $question) 
+            {
                 $qtype = $question['qtype'];
 
                 if ($qtype === 'multichoice') {
