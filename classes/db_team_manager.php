@@ -13,7 +13,8 @@ class db_team_manager
 
         if (!$this->record_exist('groups_members', ['userid' => $userid])) 
         {
-            throw new moodle_exception("User {$userid} is not in any group.");
+            // returning empty array if user is not in any gorup insstead of throwing an exception
+            return [];
         }
 
         // Get the group record of this user.
