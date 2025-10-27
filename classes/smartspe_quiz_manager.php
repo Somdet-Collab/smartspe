@@ -4,10 +4,6 @@
 //Mainly interact with UI
 namespace mod_smartspe;
 
-use mod_smartspe\event\attempt_finish;
-use mod_smartspe\event\file_download;
-use mod_smartspe\event\attempt_start;
-
 use core\exception\moodle_exception;
 use mod_smartspe\handler\notification_handler;
 use mod_smartspe\handler\questions_handler;
@@ -27,7 +23,6 @@ class smartspe_quiz_manager
     protected $notification_handler; //To handle notification after submission
     protected $download_handler; //To handle report download
     protected $data_handler; //handle data format
-    protected $duration_handler; //handle duration
 
     protected $courseid;
     protected $context;
@@ -46,7 +41,7 @@ class smartspe_quiz_manager
      *@param $smartspeid instance id
      * @return void
      */
-    public function __construct($userid, $courseid, $context, $smartspeid)
+    public function __construct($userid, $courseid, $context, $smartspeid, $cmid)
     {
         global $DB;
 
@@ -55,6 +50,7 @@ class smartspe_quiz_manager
         $this->context = $context;
         $this->smartspeid = $smartspeid;
         $this->userid = $userid;
+        $this->cmid = $cmid; // added a course module id
         $this->questions_handler = new questions_handler();
         $this->notification_handler = new notification_handler();
         $this->download_handler = new download_handler();
@@ -122,13 +118,6 @@ class smartspe_quiz_manager
         if (!$this->data_persistence)
             throw new moodle_exception("Failed to create data persistence");
 
-        $event = attempt_start::create([
-            'objectid' => $this->smartspeid,
-            'context' => $this->context,
-            'userid' => $this->userid,
-        ]);
-        $event->trigger();
-
         //return attemptid
         return $this->attemptids[$memberid];
     }
@@ -165,9 +154,9 @@ class smartspe_quiz_manager
         return true;
     }
 
-    public function get_course_module_id() 
+    public function get_cmid() 
     {
-        return $this->courseid;
+        return $this->cmid;
     }
 
     public function get_context()
@@ -195,7 +184,7 @@ class smartspe_quiz_manager
      */
     public function get_saved_questions_answers()
     {
-        $questions = $this->data_persistence->load_attempt_questions();
+        [$questions, $comments] = $this->data_persistence->load_attempt_questions();
         return $questions;
     }
 
@@ -235,21 +224,15 @@ class smartspe_quiz_manager
             $data_persistence = new data_persistence($this->attemptids[$memberid], $memberid);
 
             //Load autosaved questions with answers and comments
-            $questions = $data_persistence->load_attempt_questions();
-            $comments = null;
+            [$questions, $comments] = $data_persistence->load_attempt_questions();
 
-            foreach ($questions as $question) {
-                $qtype = $question['qtype'];
+            //For debug purpose
+            echo  "Questions structure in quiz_manager";
+            echo '<pre>'; print_r($questions); echo '</pre>';
 
-                if ($qtype === 'multichoice') {
-                    //Get all saved answers
-                    $answers[] = (int) $question['current_answer'];
-                } elseif ($qtype === 'essay') {
-                    $comments = $question['current_answer'];
-                } else {
-                    throw new moodle_exception("Currently question type ($qtype)");
-                }
-            }
+            //Get all saved answers
+            foreach ($questions as $question) 
+                $answers[] = (int)$question['current_answer'];
 
             //Get comment
             if($comments)
@@ -273,9 +256,8 @@ class smartspe_quiz_manager
                 throw new moodle_exception('In quiz_manager: Failed in submitting the evaluation');
         }
 
-        $event = attempt_finish::create([ 'objectid' => $this->smartspeid, 'context' => $this->context, 
-                        'userid' => $this->userid]); 
-        $event->trigger();
+        //if success in submitting all data, send notification to email
+        $this->notification_handler->noti_eval_submitted($this->userid);
 
         return true;
     }
@@ -289,15 +271,17 @@ class smartspe_quiz_manager
      *@param $extension file extension
      * @return boolean if download is successful
      */
-    public function download_report($extension="csv")
+    public function download_report($filename, $extension="csv")
     {
-        if (strcasecmp($extension, "csv") && strcasecmp($extension, "pdf"))
+        if (!strcasecmp($extension, "csv") || !strcasecmp($extension, "pdf"))
             throw new moodle_exception("quiz_manager: error file extension");
 
-        $filename = 'smartspe_report_' . time();
-        $this->download_handler->download_file($filename, 'csv', $this->courseid);
+        return $this->download_handler->download_file($filename, $extension);
+    }
 
-        return true;
+    public function write_file_data($filename, $content, $extension= "csv")
+    {
+
     }
 }
 

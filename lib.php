@@ -62,7 +62,6 @@ function smartspe_update_instance($data, $mform)
     global $DB, $COURSE;
 
     $instance = new stdClass();
-    $data->id = $data->instance;
     $instance->id = $data->id;
     $instance->course = $COURSE->id;
     $instance->name = $data->name;
@@ -88,19 +87,19 @@ function smartspe_update_instance($data, $mform)
  * @param int $id ID of the module instance
  * @return bool true on success, false otherwise
  */
-function smartspe_delete_instance($id)
+function smartspe_delete_instance($id) 
 {
     global $DB;
 
-    // Check record exists
-    if (!$DB->record_exists('smartspe', ['id' => $id])) {
+    if (!$record = $DB->get_record('smartspe', ['id' => $id])) 
+    {
         return false;
     }
 
-    // Delete related attempts
-    $DB->delete_records('smartspe_attempts', ['smartspeid' => $id]);
+    //delete attempts
+    $DB->delete_records('smartspe_attempt', ['smartspeid' => $id]);
 
-    // Delete main record
+    // Delete main instance.
     $DB->delete_records('smartspe', ['id' => $id]);
 
     return true;

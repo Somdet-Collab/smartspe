@@ -4,8 +4,6 @@ namespace mod_smartspe\handler;
 use core\exception\moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once($CFG->libdir . '/filelib.php');
 
 class download_handler
 {
@@ -18,13 +16,13 @@ class download_handler
      *@param $extension file extension
      * @return boolean if download is successful
      */
-    public function download_file($filename, $extension, $course)
+    public function download_file($filename, $extension)
     {
         //Check the extension
         if ($extension == "csv")
-            return $this->create_file_csv($filename.'.'.$extension, $course);
-        else if ($extension == "pdf")
-            return $this->create_file_pdf($filename.'.'.$extension);
+            return $this->create_file_csv($filename);
+        else if($extension == "pdf")
+            return $this->create_file_pdf(($filename));
         else
             throw new moodle_exception(("The file extension is not supported: {$extension}"));
     }
@@ -37,45 +35,34 @@ class download_handler
      *@param $filename file name
      * @return boolean if download is successful
      */
-    private function create_file_csv($filename, $course)
+    private function create_file_csv($filename)
     {
         global $DB;
 
-        // Remove any output before sending CSV
-        while (ob_get_level()) {
-            ob_end_clean();
-        }
-        \core\session\manager::write_close();
-        
-        // Create temporary file in Moodle temp dir
-        $tempdir = make_temp_directory('smartspe');
-        $tempfile = $tempdir . '/' . $filename;
+        //Open file 
+        $fp = fopen('php://output', 'w');
+        if (!$fp)
+            throw new moodle_exception("Cannot open file stream");
 
-        // Create CSV in memory
-        $fp = fopen($tempfile, 'w');
-        if (!$fp) {
-            throw new moodle_exception("Cannot open file stream for CSV");
-        }
+        $header = array("StudentID", "Name", "Memberid", "Member_Name", "Group", "Polarity", "Sentiment_Scores", 
+                        "Q1", "Q2", "Q3", "Q4","Q5", "comment", "self_comment"); //header line
+        fputcsv($fp, $header); //Write header
 
-        $header = ["StudentID","Name","Memberid","Member_Name","Group","Polarity",
-                    "Sentiment_Scores","Q1","Q2","Q3","Q4","Q5","comment","self_comment"];
+        //Get records of evaluation
+        $records = $DB->get_records('smartspe_evaluation');
 
-        fputcsv($fp, $header);
-
-        $records = $DB->get_records('smartspe_evaluation', ['course' => $course]);
-        foreach ($records as $record) {
-            fputcsv($fp, $this->get_line_record($record));
+        foreach ($records as $key => $record)
+        {
+            $line = $this->get_line_record($record);
+            fputcsv($fp, $line); //Insert record row
         }
 
         fclose($fp);
+        header('Content-type:application/csv');
+        header('Content-disposition:attachment;filename="'.$filename.'"');
 
-        // Use Moodle’s send_file() to serve download safely
-        send_file($tempfile, $filename, 0, 0, false, true, 'text/csv');
-
-        // Stop Moodle rendering page
-        exit;
+        return true;
     }
-
 
     private function create_file_pdf($filename)
     {
@@ -94,35 +81,23 @@ class download_handler
     {
         global $DB;
 
-        //User
         $userid = $record->evaluator; //Get evalutor id
-        $user = $DB->get_record('user', ['id' => $userid], 'firstname'); //Get member name
-        $name = $user->firstname ?? '';
-
-        //Member
+        $name = $DB->get_record('user', ['id' => $userid], 'firstname'); //Get member name
         $memberid = $record->evaluatee; //Get evalutee id
-        $member = $DB->get_record('user', ['id' => $memberid], 'firstname'); //Get member name
-        $member_name = $member->firstname ?? '';
+        $member_name = $DB->get_record('user', ['id' => $memberid], 'firstname'); //Get member name
+        $group = $DB->get_record('groups_members', ['userid' => $userid], 'groupid'); //get teamid
+        $polarity = $DB->get_record('smartspe_sentiment_analysis', ['evaluationid' => $record->id], 'polarity');
+        $sentiment_score = $DB->get_record('smartspe_sentiment_analysis', ['evaluationid' => $record->id], 'sentimentscore');
+        $q1 = $record->q1;
+        $q2 = $record->q2;
+        $q3 = $record->q3;
+        $q4 = $record->q4;
+        $q5 = $record->q5;
+        $comment = $record->comment;
+        $self_comment = $record->self_comment;
 
-        //Groups
-        $group_member = $DB->get_record('groups_members', ['userid' => $userid]); //get teamid
-        $group = $DB->get_record('groups', ['id' => $group_member->groupid]);
-        $group_name = $group->name ?? '';
-
-        //Get analysis result
-        $result = $DB->get_record('smartspe_sentiment_analysis', ['evaluationid' => $record->id]);
-        $polarity = $result->polarity ?? null;
-        $sentiment_score = $result->sentimentscore ?? null;
-        $q1 = $record->q1 ?? null;
-        $q2 = $record->q2 ?? null;
-        $q3 = $record->q3 ?? null;
-        $q4 = $record->q4 ?? null;
-        $q5 = $record->q5 ?? null;
-        $comment = $record->comment ?? null;
-        $self_comment = $record->self_comment ?? null;
-
-        $line = [$userid,$name,$memberid,$member_name,$group_name,$polarity,
-                $sentiment_score,$q1,$q2,$q3,$q4,$q5,$comment,$self_comment];
+        $line = array($userid, $name, $memberid, $member_name, $group, $polarity, $sentiment_score,
+                        $q1, $q2, $q3, $q4, $q5, $comment, $self_comment);
 
         return $line;
     }

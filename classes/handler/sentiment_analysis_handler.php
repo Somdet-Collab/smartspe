@@ -1,6 +1,6 @@
 <?php
 
-namespace mod_smartspe\AI;
+namespace mod_smartspe\handler;
 
 use mod_smartspe\db_evaluation;
 use core\exception\moodle_exception;
@@ -11,13 +11,6 @@ defined('MOODLE_INTERNAL') || die();
 
 class sentiment_analysis_handler
 {
-    private $script_dir;
-
-    public function __construct($script_dir) 
-    {
-        $this->script_dir = $script_dir;
-    }
-
     /**
      * Feed data into AI model and get polarity and score
      * 
@@ -45,22 +38,5 @@ class sentiment_analysis_handler
         $sentimentid = $db_manager->save_sentiment_analysis($evaluationid, $polarity, $score);
 
         return $sentimentid;
-    }
-
-    public function predict($input) 
-    {
-        $python = 'python3'; // adjust path if necessary
-        $predict_script = escapeshellarg($this->script_dir . '/predict.py');
-        $input_arg = escapeshellarg($input);
-
-        $command = "$python $predict_script $input_arg";
-        exec($command, $output, $status);
-
-        if ($status !== 0) {
-            throw new \Exception('AI prediction failed');
-        }
-
-        $result = json_decode(implode("\n", $output), true);
-        return $result['prediction'] ?? null;
     }
 }

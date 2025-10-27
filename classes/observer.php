@@ -13,8 +13,7 @@ class observer {
      *
      * @param \mod_smartspe\event\attempt_start $event
      */
-    public static function attempt_start(\mod_smartspe\event\attempt_start $event) 
-    {
+    public static function attempt_start(\mod_smartspe\event\attempt_start $event) {
         // Example: log to Moodle debug
         debugging("Attempt started by user {$event->userid}, attempt id {$event->objectid}", DEBUG_DEVELOPER);
     }
@@ -24,30 +23,25 @@ class observer {
      *
      * @param \mod_smartspe\event\attempt_finish $event
      */
-    public static function attempt_finish(\mod_smartspe\event\attempt_finish $event)
-    {
+    public static function attempt_finish(\mod_smartspe\event\attempt_finish $event) {
         debugging("Attempt finished by user {$event->userid}, attempt id {$event->objectid}", DEBUG_DEVELOPER);
-
-        $notifier = new \mod_smartspe\handler\notification_handler();
-        $notifier->noti_eval_submitted($event->userid);
     }
 
     /**
      * Handle download event.
      *
-     * @param \mod_smartspe\event\file_download $event
+     * @param \mod_smartspe\event\download $event
      */
-    public static function file_download(\mod_smartspe\event\file_download $event) 
-    {
+    public static function download(\mod_smartspe\event\download $event) {
         debugging("Download triggered by user {$event->userid} for cmid {$event->contextinstanceid}", DEBUG_DEVELOPER);
-
-        // Define default filename
-        $filename = 'smartspe_report_' . time();
-
-        //Trigger download
-        $downloader = new \mod_smartspe\handler\download_handler();
-        $downloader->download_file($filename, "csv", $event->other['course']);
-
     }
 
+    /**
+     * Handle evaluation_after_duedate event.
+     *
+     * @param \mod_smartspe\event\after_duedate $event
+     */
+    public static function after_duedate(\mod_smartspe\event\after_duedate $event) {
+        debugging("Evaluation submitted after due date by user {$event->userid}, evaluation id {$event->objectid}", DEBUG_DEVELOPER);
+    }
 }

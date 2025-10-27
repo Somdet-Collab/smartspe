@@ -8,12 +8,12 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @package    mod_smartspe
  */
-class file_download extends \core\event\base 
+class download extends \core\event\base 
 {
 
     protected function init() 
     {
-        $this->data['objecttable'] = 'smartspe';
+        $this->data['objecttable'] = 'smartspe_downloads'; // or null if not stored
         $this->data['crud'] = 'r'; // read
         $this->data['edulevel'] = self::LEVEL_OTHER;
     }

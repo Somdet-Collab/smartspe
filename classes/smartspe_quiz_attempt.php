@@ -2,7 +2,7 @@
 
 namespace mod_smartspe;
 
-use core\exception\moodle_exception;
+use moodle_exception;
 use stdClass;
 use mod_smartspe\handler\data_persistence;
 use mod_smartspe\handler\questions_handler;
@@ -35,9 +35,6 @@ class smartspe_quiz_attempt
     public function __construct($smartspeid, $userid, $memberid, $questionids)
     {
         global $DB;
-
-        if (empty($questionids))
-            throw new moodle_exception("Questions are not properly selected");
 
         $this->smartspeid = $smartspeid;
         $this->userid = $userid;
@@ -103,14 +100,14 @@ class smartspe_quiz_attempt
         {
             //Load questions 
             $this->data_persistence = new data_persistence($this->attemptid, $memberid);
-            $this->questions = $this->data_persistence->load_attempt_questions();
+            [$this->questions, $comments] = $this->data_persistence->load_attempt_questions();
         } 
         else 
         {
             //Cretae questions usage and link to each attempt
             $this->quba = $question_handler->add_all_questions($context, $this->questionids, $this->attemptid);
             $this->data_persistence = new data_persistence($this->attemptid, $memberid);
-            $this->questions = $this->data_persistence->load_attempt_questions();
+            [$this->questions, $comments] = $this->data_persistence->load_attempt_questions();
         }
 
 
