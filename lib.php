@@ -29,9 +29,14 @@ function smartspe_add_instance($data, $mform)
     $instance->enddate = $data->enddate;
     $instance->timecreated = time();
     $instance->timemodified = time();
-    if (is_array($data->questionids)) {
-    $instance->questionids = implode(',', $data->questionids);
-    } else {
+
+    $questionids = (array)$data->questionids; // ensures it's always an array
+    if (is_array($data->questionids)) 
+    {
+        $instance->questionids = implode(',', $data->questionids);
+    } 
+    else 
+    {
         $instance->questionids = $data->questionids; // already a string
     }
 
@@ -63,12 +68,14 @@ function smartspe_update_instance($data, $mform)
     $instance->startdate = $data->startdate;
     $instance->enddate = $data->enddate;
     $instance->timemodified = time();
+
+    $data->questionids = (array)$data->questionids; // ensures it's always an array
     if (is_array($data->questionids)) {
     $instance->questionids = implode(',', $data->questionids);
     } else {
         $instance->questionids = $data->questionids; // already a string
     }
-    
+
     return $DB->update_record('smartspe', $instance);
 }
 
