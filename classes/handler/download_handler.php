@@ -41,17 +41,12 @@ class download_handler
     {
         global $DB;
         
-        // Clean Moodle output buffers to avoid messing up headers
-        \core\session\manager::write_close(); // close session to avoid lock
-        while (ob_get_level()) {
-            ob_end_clean();
-        }
-
-        header('Content-Type:text/csv');
-        header('Content-Disposition:attachment;filename="'.$filename.'"');
+        // Create temporary file in Moodle temp dir
+        $tempdir = make_temp_directory('smartspe');
+        $tempfile = $tempdir . '/' . $filename;
 
         // Create CSV in memory
-        $fp = fopen('php://output', 'w');
+        $fp = fopen($tempfile, 'w');
         if (!$fp) {
             throw new moodle_exception("Cannot open file stream for CSV");
         }
@@ -67,6 +62,9 @@ class download_handler
         }
 
         fclose($fp);
+
+        // Use Moodle’s send_file() to serve download safely
+        send_file($tempfile, $filename, 0, 0, false, true, 'text/csv');
 
         // Stop Moodle rendering page
         exit;
@@ -93,17 +91,17 @@ class download_handler
         //User
         $userid = $record->evaluator; //Get evalutor id
         $user = $DB->get_record('user', ['id' => $userid], 'firstname'); //Get member name
-        $name = $user->firstname;
+        $name = $user->firstname ?? '';
 
         //Member
         $memberid = $record->evaluatee; //Get evalutee id
         $member = $DB->get_record('user', ['id' => $memberid], 'firstname'); //Get member name
-        $member_name = $member->firstname;
+        $member_name = $member->firstname ?? '';
 
         //Groups
         $group_member = $DB->get_record('groups_members', ['userid' => $userid]); //get teamid
         $group = $DB->get_record('groups', ['id' => $group_member->groupid]);
-        $group_name = $group->name;
+        $group_name = $group->name ?? '';
 
         //Get analysis result
         $result = $DB->get_record('smartspe_sentiment_analysis', ['evaluationid' => $record->id]);
@@ -119,7 +117,6 @@ class download_handler
 
         $line = [$userid,$name,$memberid,$member_name,$group_name,$polarity,
                 $sentiment_score,$q1,$q2,$q3,$q4,$q5,$comment,$self_comment];
-
 
         return $line;
     }
