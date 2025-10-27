@@ -46,7 +46,7 @@ class smartspe_quiz_manager
      *@param $smartspeid instance id
      * @return void
      */
-    public function __construct($userid, $courseid, $context, $smartspeid, $cmid)
+    public function __construct($userid, $courseid, $context, $smartspeid)
     {
         global $DB;
 
@@ -55,7 +55,6 @@ class smartspe_quiz_manager
         $this->context = $context;
         $this->smartspeid = $smartspeid;
         $this->userid = $userid;
-        $this->cmid = $cmid; // added a course module id
         $this->questions_handler = new questions_handler();
         $this->notification_handler = new notification_handler();
         $this->download_handler = new download_handler();
@@ -166,9 +165,9 @@ class smartspe_quiz_manager
         return true;
     }
 
-    public function get_cmid() 
+    public function get_course_module_id() 
     {
-        return $this->cmid;
+        return $this->courseid;
     }
 
     public function get_context()
