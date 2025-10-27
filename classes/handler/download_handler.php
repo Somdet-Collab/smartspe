@@ -40,6 +40,15 @@ class download_handler
     private function create_file_csv($filename, $course)
     {
         global $DB;
+        
+        // Clean Moodle output buffers to avoid messing up headers
+        \core\session\manager::write_close(); // close session to avoid lock
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+
+        header('Content-Type:text/csv');
+        header('Content-Disposition:attachment;filename="'.$filename.'"');
 
         // Create CSV in memory
         $fp = fopen('php://output', 'w');
@@ -58,9 +67,6 @@ class download_handler
         }
 
         fclose($fp);
-
-        header('Content-type:application/csv');
-        header('Content-disposition::attachment;filename="'.$filename.'"');
 
         // Stop Moodle rendering page
         exit;
