@@ -26,29 +26,32 @@ $PAGE->set_pagelayout('incourse');
 $smartspe = $DB->get_record('smartspe', ['id' => $cm->instance], '*', MUST_EXIST);
 $instanceid = $smartspe->id;
 
-// --- 4. Create the quiz manager ---
-$quiz_manager = new smartspe_quiz_manager($USER->id, $course->id, $context, $instanceid);
-
-// --- 5. Determine user role ---
+// --- 4. Determine user role ---
 $is_teacher = has_capability('mod/smartspe:manage', $context);
-$is_student = has_capability('mod/smartspe:submit', $context);
+$is_student = !$is_teacher && has_capability('mod/smartspe:submit', $context);
 
 // --- 6. Get renderer ---
 $output = $PAGE->get_renderer('mod_smartspe');
 
-// --- 7️. Handle UI rendering ---
+// output starts here
 echo $OUTPUT->header();
 
-if ($is_teacher) {
-    echo $output->render(new \mod_smartspe\output\teacher_view($quiz_manager));
-} else if ($is_student) {
+$quiz_manager = null;
+if ($is_student) 
+{
+    $quiz_manager = new \mod_smartspe\smartspe_quiz_manager($USER->id, $course->id, $context, $instanceid, $cm->id);
     echo $output->render(new \mod_smartspe\output\student_view($quiz_manager));
 } else {
     echo $OUTPUT->notification(get_string('nopermissiontospe', 'mod_smartspe'), 'notifyproblem');
 }
 
+else 
+{
+    echo $OUTPUT->notification('You do not have permission to view this activity.', 'notifyproblem');
+}
 
 echo $OUTPUT->footer();
+
 /*
 // --- Get teacher-selected questions from the module instance ---
 $smartspe = $DB->get_record('smartspe', ['id' => $instanceid], '*', MUST_EXIST);
