@@ -90,22 +90,34 @@ class download_handler
     {
         global $DB;
 
+        //User
         $userid = $record->evaluator; //Get evalutor id
-        $name = $DB->get_record('user', ['id' => $userid], 'firstname'); //Get member name
-        $memberid = $record->evaluatee; //Get evalutee id
-        $member_name = $DB->get_record('user', ['id' => $memberid], 'firstname'); //Get member name
-        $group = $DB->get_record('groups_members', ['userid' => $userid], 'groupid'); //get teamid
-        $polarity = $DB->get_record('smartspe_sentiment_analysis', ['evaluationid' => $record->id], 'polarity');
-        $sentiment_score = $DB->get_record('smartspe_sentiment_analysis', ['evaluationid' => $record->id], 'sentimentscore');
-        $q1 = $record->q1;
-        $q2 = $record->q2;
-        $q3 = $record->q3;
-        $q4 = $record->q4;
-        $q5 = $record->q5;
-        $comment = $record->comment;
-        $self_comment = $record->self_comment;
+        $user = $DB->get_record('user', ['id' => $userid], 'firstname'); //Get member name
+        $name = $user->firstname;
 
-        $line = [$userid,$name,$memberid,$member_name,$group,$polarity,
+        //Member
+        $memberid = $record->evaluatee; //Get evalutee id
+        $member = $DB->get_record('user', ['id' => $memberid], 'firstname'); //Get member name
+        $member_name = $member->firstname;
+
+        //Groups
+        $group_member = $DB->get_record('groups_members', ['userid' => $userid]); //get teamid
+        $group = $DB->get_record('groups', ['id' => $group_member->groupid]);
+        $group_name = $group->name;
+
+        //Get analysis result
+        $result = $DB->get_record('smartspe_sentiment_analysis', ['evaluationid' => $record->id]);
+        $polarity = $result->polarity ?? null;
+        $sentiment_score = $result->sentimentscore ?? null;
+        $q1 = $record->q1 ?? null;
+        $q2 = $record->q2 ?? null;
+        $q3 = $record->q3 ?? null;
+        $q4 = $record->q4 ?? null;
+        $q5 = $record->q5 ?? null;
+        $comment = $record->comment ?? null;
+        $self_comment = $record->self_comment ?? null;
+
+        $line = [$userid,$name,$memberid,$member_name,$group_name,$polarity,
                 $sentiment_score,$q1,$q2,$q3,$q4,$q5,$comment,$self_comment];
 
 
