@@ -29,6 +29,8 @@ $quiz_manager = new smartspe_quiz_manager($USER->id, $cm->course, $context, $ins
 $is_teacher = has_capability('mod/smartspe:manage', $context);
 $is_student = !$is_teacher && has_capability('mod/smartspe:submit', $context);
 
+    foreach($questions as $question)
+    {
         $qtext = $question['text'];
         $qtype = $question['qtype'];
         echo "Question for $member_name: $qtext <br>";
