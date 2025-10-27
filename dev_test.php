@@ -1,39 +1,25 @@
 <?php
 require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/lib.php');
-//require_once($CFG->dirroot . '/mod/smartspe/mod_smartspe_mod_form.php');
-// commented the above line out, doesn't seem to be required
 
 use mod_smartspe\smartspe_quiz_manager;
 use core\exception\moodle_exception;
 
-global $DB, $USER;
+global $DB, $USER, $PAGE;
 
+// --- 1. Get basic parameters ---
 $id = required_param('id', PARAM_INT); // Course module ID
+
 $cm = get_coursemodule_from_id('smartspe', $id, 0, false, MUST_EXIST);
-$sectionid = $cm->section;
-$courseid = $cm->course;
 $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
 $context = \context_module::instance($cm->id);
+require_login($course, true, $cm);
 $instance = $DB->get_record('smartspe', ['course' => $course->id], '*', MUST_EXIST);
 $instanceid = $instance->id;
-// fixed the two lines above -- 16 & 17, because there seemed to be a bug
-
-// Security and access check
-require_login($course, true, $cm);
-
-if (!$instanceid) {
-    die("smartspeid is required. Example: view.php?smartspeid=1");
-}
 
 // --- Get teacher-selected questions from the module instance ---
 $smartspe = $DB->get_record('smartspe', ['id' => $instanceid], '*', MUST_EXIST);
-
-// `questionids` field stores selected question IDs (assuming serialized or comma-separated)
-$teacher_selected_questionids = explode(',', $smartspe->questionids);
-if (empty($teacher_selected_questionids)) {
-    die("No questions selected for this SmartSpe activity.");
-}
+$questionids = explode(',', $smartspe->questionids);
 
 //Create attempt
 //$attemptid = $quiz_manager->start_attempt_evaluation($data, $teacher_selected_questionids); // changed this function to align with the one from quiz_manager.php -- commenting this out because i don't think we have to create it here
@@ -52,7 +38,7 @@ foreach ($members as $memberid)
 {
     // --- Step 2a: Start attempt with teacher-selected question IDs ---
     try {
-        $attemptid = $quiz_manager->start_attempt_evaluation($memberid, $teacher_selected_questionids);
+        $attemptid = $quiz_manager->start_attempt_evaluation($memberid, $questionids);
         echo "Attempt created for member $memberid: Attempt ID $attemptid<br>";
     } catch (moodle_exception $e) {
         echo "Failed to start attempt for member $memberid: " . $e->getMessage() . "<br>";
@@ -64,36 +50,100 @@ foreach ($members as $memberid)
     $mcq_count = 0;
     $comment_count = 0;
 
-    foreach ($teacher_selected_questionids as $qid) {
-        // Check question type from DB
-        $question = $DB->get_record('question', ['id' => $qid], 'id, qtype', MUST_EXIST);
-        if ($question->qtype === 'multichoice' && $mcq_count < 5) {
-            $answers[$qid] = rand(1, 4); // simulate MCQ answer
-            $mcq_count++;
-        } elseif ($question->qtype === 'comment' && $comment_count < 1) {
-            $answers[$qid] = "This is a comment for member $memberid";
-            $comment_count++;
-        }
+    echo '<pre>Questionids: ';
+    print_r($questionids);
+    echo '</pre>';
+
+    $questions = $quiz_manager->get_questions($questionids);
+    $member = $DB->get_record('user', ['id' => $memberid]);
+    $member_name = $member->firstname;
+
+    //Check
+    if (!$questions || !$questions[0]['qtype'])
+    {
+        echo "Question is empty (view.php) <br>";
+        break;
     }
 
-    $comment = "Peer comment for member $memberid";
-    $self_comment = "My self comment";
+    $comment = null;
+
+    foreach ($questions as $question) 
+    {
+        echo 'QUESTION STRUCTURE: ';
+        echo '<h4>' . format_string($question['name']) . '</h4>';
+        echo format_text($question['text'], FORMAT_HTML);
+
+        // Access qtype safely
+        echo '<p><strong>Type:</strong> ' . $question['qtype'] . '</p>';
+
+        // If it has answers (for MCQ type)
+        if (!empty($question['answers'])) {
+            echo '<ul>';
+            foreach ($question['answers'] as $answer) {
+                // $answer is an object (from question_bank)
+                echo '<li>' . format_text($answer->answer, FORMAT_HTML) . '</li>';
+            }
+            echo '</ul>';
+        }
+
+        echo 'End of question structure<br>';
+
+        $qtext = $question['text'];
+        $qtype = $question['qtype'];
+        echo "Question for $member_name: $qtext <br>";
+        if ($question['qtype'] === 'multichoice' && $mcq_count < 5) 
+        {
+            $answers[$mcq_count] = rand(1, 3); // simulate MCQ answer
+            $current_answer = $answers[$mcq_count];
+            echo "Answer: $current_answer <br>";
+            $mcq_count++;
+        } 
+        elseif ($question['qtype'] === 'essay' && $comment_count < 1) 
+        {
+            $comment = "Peer comment for member $memberid";
+            echo "Comment: $comment <br>";
+            $comment_count++;
+        }
+        else
+        {
+            echo "There is no match type ($qtype) <br>";
+            break;
+        }
+    }
+    
+    if ($USER->id == $memberid)
+    {
+        $self_comment = "My self comment";
+        echo "Self Comment: $self_comment <br>";
+    }
+    else
+        $self_comment = null;
+
+    echo '<pre>Review answers before autosave: ';
+    print_r($answers);
+    echo '</pre>';
 
     // --- Step 2c: Autosave ---
     try {
-        $quiz_manager->process_attempt_evaluation($answers, false);
+        $quiz_manager->process_attempt_evaluation($answers, $comment, $self_comment, false);
         echo "Autosaved answers for member $memberid<br>";
     } catch (moodle_exception $e) {
         echo "Failed autosave for member $memberid: " . $e->getMessage() . "<br>";
     }
 
+    echo '<pre>Review answers before submitting: ';
+    print_r($answers);
+    echo '</pre>';
     // --- Step 2d: Submit ---
     try {
-        $submitted = $quiz_manager->quiz_is_submitted($answers, $comment, $self_comment, $memberid);
-        echo $submitted ? "Submitted evaluation for member $memberid<br>" : "Failed submission for member $memberid<br>";
+        $quiz_manager->process_attempt_evaluation($answers, $comment, $self_comment, true);
     } catch (moodle_exception $e) {
         echo "Submission error for member $memberid: " . $e->getMessage() . "<br>";
     }
 }
+
+//Final Submit
+$submitted = $quiz_manager->quiz_is_submitted();
+echo $submitted ? "Submitted evaluation<br>" : "Failed submission";
 
 echo "<hr>Test completed.";

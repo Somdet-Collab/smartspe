@@ -75,7 +75,7 @@ class data_persistence
                 'name' => $question->name,
                 'text' => $question->questiontext,
                 'state' => $qa->get_state(),
-                'current_answer' => (int)$currentdata['answer'] //convert string to int
+                'current_answer' => $currentdata
             ];
         }
 
