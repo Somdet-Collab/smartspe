@@ -159,7 +159,6 @@ echo "<hr>Test completed.";
 
 <form method="get" action="">
     <input type="hidden" name="id" value="<?php echo $cm->id; ?>">
-    <input type="hidden" name="filename" value="<?php echo $defaultfilename; ?>">
     <input type="hidden" name="extension" value="csv">
     <button type="submit" name="download_csv" value="1" class="btn btn-primary">Download CSV</button>
 
@@ -168,7 +167,6 @@ echo "<hr>Test completed.";
 <?php
 // Check if download button clicked
 if (optional_param('download_csv', 0, PARAM_INT)) {
-    $filename = required_param('filename', PARAM_TEXT);
     $extension = required_param('extension', PARAM_ALPHA);
     
     try {
