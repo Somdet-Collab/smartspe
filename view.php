@@ -1,4 +1,3 @@
-@ -1,178 +0,0 @@
 <?php
 require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/lib.php');
@@ -97,10 +96,16 @@ foreach ($members as $memberid)
             echo "Answer: $current_answer <br>";
             $mcq_count++;
         } 
-        elseif ($question['qtype'] === 'essay' && $comment_count < 1) 
+        elseif ($question['qtype'] === 'essay' && $comment_count < 2) 
         {
             $comment = "Peer comment for member $memberid";
             echo "Comment: $comment <br>";
+            if ($USER->id == $memberid)
+            {
+                $self_comment = "My self comment";
+                echo "Self Comment: $self_comment <br>";
+            }
+            $self_comment = null;
             $comment_count++;
         }
         else
@@ -109,14 +114,6 @@ foreach ($members as $memberid)
             break;
         }
     }
-    
-    if ($USER->id == $memberid)
-    {
-        $self_comment = "My self comment";
-        echo "Self Comment: $self_comment <br>";
-    }
-    else
-        $self_comment = null;
 
     echo '<pre>Review answers before autosave: ';
     print_r($answers);
