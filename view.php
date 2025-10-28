@@ -22,7 +22,6 @@ $smartspe = $DB->get_record('smartspe', ['id' => $instanceid], '*', MUST_EXIST);
 $questionids = explode(',', $smartspe->questionids);
 
 //Create attempt
-//$attemptid = $quiz_manager->start_attempt_evaluation($data, $teacher_selected_questionids); // changed this function to align with the one from quiz_manager.php -- commenting this out because i don't think we have to create it here
 $quiz_manager = new smartspe_quiz_manager($USER->id, $cm->course, $context, $instanceid);
 
 echo '<pre>Questionids: ';
