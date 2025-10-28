@@ -14,16 +14,4 @@ $observers = [
         'internal'    => false,
         'priority'    => 9999,
     ],
-    [
-        'eventname'   => '\mod_smartspe\event\file_download',
-        'callback'    => 'mod_smartspe\observer::file_download',
-        'internal'    => false,
-        'priority'    => 9999,
-    ],
-    [
-        'eventname'   => '\mod_smartspe\event\evaluation_after_duedate',
-        'callback'    => 'mod_smartspe\observer::after_duedate',
-        'internal'    => false,
-        'priority'    => 9999,
-    ],
 ];
