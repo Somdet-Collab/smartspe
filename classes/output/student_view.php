@@ -17,10 +17,22 @@ class student_view implements renderable, templatable {
     }
 
     public function export_for_template(renderer_base $output) {
+        global $DB;
+
         $data = new stdClass();
+        $smartspeid = $this->quiz_manager->get_smartspeid();
 
         // Get evaluation questions from backend
-        $data->questions = $this->quiz_manager->get_questions(['context' => 'student']);
+        // 1. Fetch the questionids string from the smartspe record
+        $smartspe_record = $DB->get_record('smartspe', ['id' => $smartspeid], 'questionids');
+        $questionids_string = $smartspe_record ? $smartspe_record->questionids : '';
+        
+        // 2. Convert the string to an array of integers (mandatory for SQL IN clause)
+        $questionids_array = array_map('intval', array_filter(explode(',', $questionids_string)));
+        
+        // 3. Get evaluation questions from backend
+        $data->questions = $this->quiz_manager->get_questions($questionids_array);        
+        
         $data->activityname = "Smart Self & Peer Evaluation";
         $data->description = "Evaluate your groupmates based on contribution and teamwork.";
 
@@ -32,7 +44,7 @@ class student_view implements renderable, templatable {
         }
 
         // Form URL (to submit evaluation)
-        $data->formaction = new \moodle_url('/mod/smartspe/view.php', ['id' => $this->quiz_manager->get_smartspeid()]);
+        $data->formaction = new \moodle_url('/mod/smartspe/view.php', ['id' => $this->quiz_manager->get_cmid()]);
 
         return $data;
     }

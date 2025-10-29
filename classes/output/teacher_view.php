@@ -23,45 +23,44 @@ class teacher_view implements renderable, templatable
         $data->activityname = "Smart Self & Peer Evaluation Page for Lecturers";
         $data->description = "Manage questions and monitor self and peer evaluations";
         
-        // detect if questions already exist for smartSPE
-        $contextid = $this->quiz_manager->get_context()->id;
-        
-        require_once($CFG->libdir . '/questionlib.php');
-        require_once($CFG->dirroot . '/question/editlib.php');
-
-        // Load question categories in this context
-        $categories = \question_categorylist($contextid);
-
-        // Get all questions in those categories
-        if (!empty($categories)) {
-            list($catidsql, $params) = $DB->get_in_or_equal($categories);
-            $questions = $DB->get_records_select('question', "categoryid $catidsql", $params, '', 'id, name, questiontext');
-        } else {
-            $questions = [];
-        }
-
-        //  check if any question IDs are already linked to this SmartSPE activity
-        // since we store them as a comma-separated list in the 'questionids' field
-        $smartspeid = $this->quiz_manager->get_smartspeid();
-        $record = $DB->get_record('smartspe', ['id' => $smartspeid], 'questionids');
-        $hasquestions = !empty($record->questionids);
+        // Get course ID directly from the course module
+        $cmid = $this->quiz_manager->get_cmid();
+        $cm = get_coursemodule_from_id('smartspe', $cmid, 0, false, MUST_EXIST);
+        $courseid = $cm->course;
                 
-        // generate button dynamically based on existance of questions
-        if ($hasquestions) {
-            $data->actionbutton = [
-                'name' => 'Preview Quiz',
-                'url' => new \moodle_url('/mod/smartspe/preview.php', ['id' => $this->quiz_manager->get_cmid()]),
-                'icon' => 'fa-eye'
-            ];
-        } else {
-            $data->actionbutton = [
-                'name' => 'Create First Question',
-                'url' => new \moodle_url('/mod/smartspe/question/edit.php', ['cmid' => $this->quiz_manager->get_cmid(), 'courseid' => $this->quiz_manager->get_courseid()]),
-                'icon' => 'fa-plus-circle'
-            ];
-        }
+        // 1. Button to access question bank (always visible)
+        $data->buttons[] = [
+            'name' => 'Manage Questions',
+            'url' => (new \moodle_url('/mod/smartspe/question_selection.php', [
+                'cmid' => $cmid, 
+                'courseid' => $courseid            
+            ]))->out(false),
+            'icon' => 'fa-list'
+        ];
 
-        //$data->questions = array_values($questions);  // printing questions for debugging.
+        // 2. Preview Quiz button
+        $data->buttons[] = [
+            'name' => 'Preview Evaluation',
+            'url' => (new \moodle_url('/mod/smartspe/preview.php', ['id' => $this->quiz_manager->get_cmid()]))->out(false),
+            'icon' => 'fa-eye'
+        ];
+
+        // 3. Reports button
+        $data->buttons[] = [
+            'name' => 'View Reports',
+            'url' => (new \moodle_url('/mod/smartspe/reports.php', ['id' => $this->quiz_manager->get_cmid()]))->out(false),
+            'icon' => 'fa-bar-chart'
+        ];
+
+        // 4. Link to question bank (for creating new questions)
+        $data->buttons[] = [
+            'name' => 'Question Bank',
+            'url' => (new \moodle_url('/question/edit.php', [
+                'cmid' => $this->quiz_manager->get_cmid(), 
+                'courseid' => $this->quiz_manager->get_context()->get_course_context()->instanceid            
+            ]))->out(false),
+            'icon' => 'fa-database'
+        ];
 
         return $data;
     }

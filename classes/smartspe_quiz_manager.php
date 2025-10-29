@@ -175,6 +175,11 @@ class smartspe_quiz_manager
         return $this->context;
     }
 
+    public function get_courseid() 
+    {
+        return $this->courseid; // Adjust based on how you store it
+    }
+
      /**
      *Get list of questions from question bank with no saved answers 
      *

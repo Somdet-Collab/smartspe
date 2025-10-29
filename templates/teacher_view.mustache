@@ -4,9 +4,11 @@
   <p>{{description}}</p>
 
   <div class="smartspe-actions">
-    <a href="{{actionbutton.url}}" class="btn btn-primary">
-      <i class="fa {{actionbutton.icon}}"></i> {{actionbutton.name}}
+    {{#buttons}}
+    <a href="{{{url}}}" class="btn btn-primary m-2">
+      <i class="fa {{icon}}"></i> {{name}}
     </a>
+    {{/buttons}}
   </div>
 
   <div class="smartspe-footer">

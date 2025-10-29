@@ -86,7 +86,7 @@ class data_persistence
                     break;
             }
 
-            $questions[] =
+            $questions[] = //questions[index][attribute]
             [
                 'id' => $question->id,
                 'name' => $question->name,
