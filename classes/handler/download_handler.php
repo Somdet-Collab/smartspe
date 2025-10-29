@@ -57,7 +57,7 @@ class download_handler
             throw new moodle_exception("Cannot open file stream for CSV");
         }
 
-        $header = ["StudentID","Name","Memberid","Member_Name","Group","Polarity",
+        $header = ["StudentID","Name", "Lastname","Memberid","Member_Name","Member_Lastname","Group","Polarity",
                     "Sentiment_Scores","Q1","Q2","Q3","Q4","Q5","comment","self_comment"];
 
         fputcsv($fp, $header);
@@ -96,13 +96,15 @@ class download_handler
 
         //User
         $userid = $record->evaluator; //Get evalutor id
-        $user = $DB->get_record('user', ['id' => $userid], 'firstname'); //Get member name
+        $user = $DB->get_record('user', ['id' => $userid]); //Get member name
         $name = $user->firstname ?? '';
+        $lastname = $user->lastname ?? '';
 
         //Member
         $memberid = $record->evaluatee; //Get evalutee id
-        $member = $DB->get_record('user', ['id' => $memberid], 'firstname'); //Get member name
+        $member = $DB->get_record('user', ['id' => $memberid]); //Get member name
         $member_name = $member->firstname ?? '';
+        $member_lastname = $member->lastname ?? '';
 
         //Groups
         $group_member = $DB->get_record('groups_members', ['userid' => $userid]); //get teamid
@@ -121,7 +123,7 @@ class download_handler
         $comment = $record->comment ?? null;
         $self_comment = $record->self_comment ?? null;
 
-        $line = [$userid,$name,$memberid,$member_name,$group_name,$polarity,
+        $line = [$userid,$name, $lastname,$memberid,$member_name, $member_lastname,$group_name,$polarity,
                 $sentiment_score,$q1,$q2,$q3,$q4,$q5,$comment,$self_comment];
 
         return $line;
