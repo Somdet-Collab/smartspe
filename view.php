@@ -40,13 +40,13 @@ echo $OUTPUT->header();
 $quiz_manager = null;
 if ($is_student) 
 {
-    $quiz_manager = new mod_smartspe\smartspe_quiz_manager($USER->id, $course->id, $context, $instanceid);
+    $quiz_manager = new mod_smartspe\smartspe_quiz_manager($USER->id, $course->id, $context, $instanceid, $cm->id);
     echo $output->render(new \mod_smartspe\output\student_view($quiz_manager));
 } 
 else if ($is_teacher)
 {
     try {
-        $quiz_manager = new mod_smartspe\smartspe_quiz_manager($USER->id, $course->id, $context, $instanceid);
+        $quiz_manager = new mod_smartspe\smartspe_quiz_manager($USER->id, $course->id, $context, $instanceid, $cm->id);
     } catch (Exception $e) {
         echo "Quiz manager creation failed: " . $e->getMessage();
         die();
