@@ -69,7 +69,7 @@ class data_persistence
             $question = $qa->get_question(); //get question of this slot
             $currentdata = $qa->get_last_qt_data(); //get saved answer, array($string)
 
-            $questions[] =
+            $questions[] = //questions[index][attribute]
             [
                 'id' => $question->id,
                 'name' => $question->name,
