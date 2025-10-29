@@ -63,8 +63,10 @@ class smartspe_quiz_manager
         //Get members of this $userid
         $team_manager = new db_team_manager();
 
+        $is_teacher = has_capability('mod/smartspe:manage', $context);
+        $is_student = has_capability('mod/smartspe:submit', $context);
         // only try to get members if this is a student
-        if (has_capability('mod/smartspe:submit', $context)) 
+        if ($is_student && !$is_teacher) 
         {
             $this->members = $team_manager->get_members_id($this->userid, $this->courseid);
 
