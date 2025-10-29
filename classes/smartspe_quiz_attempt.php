@@ -46,7 +46,8 @@ class smartspe_quiz_attempt
         // Check if evaluator has already processed on this member
         $memberusage = $DB->get_record('smartspe_attempts', [
             'userid' => $userid,
-            'memberid' => $memberid
+            'memberid' => $memberid,
+            'smartspe' => $smartspeid
         ]);
         
         //If exist, get the attempt

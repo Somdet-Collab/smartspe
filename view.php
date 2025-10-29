@@ -23,6 +23,7 @@ $questionids = explode(',', $smartspe->questionids);
 //Create attempt
 $quiz_manager = new smartspe_quiz_manager($USER->id, $cm->course, $context, $instanceid);
 
+ob_start();
 echo '<pre>Questionids: ';
 print_r($questionids);
 echo '</pre>';
@@ -105,7 +106,9 @@ foreach ($members as $memberid)
                 $self_comment = "My self comment";
                 echo "Self Comment: $self_comment <br>";
             }
-            $self_comment = null;
+            else
+                $self_comment = null;
+            
             $comment_count++;
         }
         else
@@ -148,6 +151,8 @@ $submitted = $quiz_manager->quiz_is_submitted();
 echo $submitted ? "Submitted evaluation<br>" : "Failed submission";
 
 echo "<hr>Test completed.";
+
+ob_end_clean();
 
 ?>
 
