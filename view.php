@@ -23,7 +23,11 @@ $PAGE->set_heading($course->fullname);
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('incourse');
 
-// determine user role
+// --- 3. Load activity instance ---
+$smartspe = $DB->get_record('smartspe', ['id' => $instanceid], '*', MUST_EXIST);
+$questionids = explode(',', $smartspe->questionids);
+
+// --- 4. Determine user role ---
 $is_teacher = has_capability('mod/smartspe:manage', $context);
 $is_student = !$is_teacher && has_capability('mod/smartspe:submit', $context);
 
@@ -36,13 +40,13 @@ echo $OUTPUT->header();
 $quiz_manager = null;
 if ($is_student) 
 {
-    $quiz_manager = new mod_smartspe\smartspe_quiz_manager($USER->id, $course->id, $context, $instanceid, $cm->id);
+    $quiz_manager = new mod_smartspe\smartspe_quiz_manager($USER->id, $course->id, $context, $instanceid);
     echo $output->render(new \mod_smartspe\output\student_view($quiz_manager));
 } 
 else if ($is_teacher)
 {
     try {
-        $quiz_manager = new mod_smartspe\smartspe_quiz_manager($USER->id, $course->id, $context, $instanceid, $cm->id);
+        $quiz_manager = new mod_smartspe\smartspe_quiz_manager($USER->id, $course->id, $context, $instanceid);
     } catch (Exception $e) {
         echo "Quiz manager creation failed: " . $e->getMessage();
         die();

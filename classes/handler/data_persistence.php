@@ -41,8 +41,7 @@ class data_persistence
      *
      * Called when student attempting the quiz.
      *
-     * @return $questions
-     * @return $comments
+     * @return array $questions
      */
     public function load_attempt_questions() 
     {
@@ -67,19 +66,38 @@ class data_persistence
         {
             $qa = $quba->get_question_attempt($slot); //get qa
             $question = $qa->get_question(); //get question of this slot
-            $currentdata = $qa->get_last_qt_data(); //get saved answer, array($string)
+            $qtype = $question->qtype->name();
+            $last_saved = $qa->get_last_qt_data(); //get saved answer, array($string)
+            $currentdata = null;
+
+            switch ($qtype) 
+            {
+                case 'multichoice':
+                case 'truefalse':
+                    $currentdata = $last_saved['answer'] ?? null;
+                    break;
+
+                case 'essay':
+                    $currentdata = $comments; //comments['comment', 'self_comment']
+                    break;
+
+                default:
+                    $currentdata = json_encode($currentdata); // fallback: keep full structure
+                    break;
+            }
 
             $questions[] = //questions[index][attribute]
             [
                 'id' => $question->id,
                 'name' => $question->name,
                 'text' => $question->questiontext,
-                'state' => $qa->get_state(),
+                'qtype' => $qtype,
+                'state' => $qa->get_state()->__toString(),
                 'current_answer' => $currentdata
             ];
         }
 
-        return [$questions, $comments];
+        return $questions;
     }
 
     /**
@@ -115,6 +133,7 @@ class data_persistence
             );
         }
 
+        $answer_index = 0; //track on number of answer
         $answers = $newdata['answers'];
         if (!$answers)
             throw new moodle_exception('In data_persistence: $answers empty');
@@ -123,28 +142,51 @@ class data_persistence
         foreach ($quba->get_slots() as $index => $slot)
         {
             $qa = $quba->get_question_attempt($slot);
+            $question = $qa->get_question(); //get question of this slot
+            $qtype = $question->qtype->name(); //get question type
 
-            //if new data is not null
-            if (isset($answers[$index]))
+            //Check question slot type
+            if ($qtype === 'multichoice')
             {
-                // Wrap the answer as an array expected by process_autosave
-                $formatteddata = ['answer' => strval($answers[$index])];
-                //Update new data
-                $this->update_attempt_answers($slot, $formatteddata);
+                //if new data is not null
+                if (isset($answers[$answer_index]))
+                {
+                    // Wrap the answer as an array expected by process_autosave
+                    $formatteddata = ['answer' => $answers[$answer_index]];
+                    //Update new data
+                    $this->update_attempt_answers($slot, $formatteddata);
+                    $answer_index++;
+                }
+                else //If no new data added
+                {
+                    $currentdata = $qa->get_last_qt_data();
+
+                    //if the question has a saved data
+                    if($currentdata)
+                        $quba->process_action($slot, $currentdata, time());
+                    else //if no saved data, leave it blank
+                        $quba->process_action($slot, [], time());
+
+                    // Update time modified
+                    $DB->set_field('smartspe_attempts', 'timemodified', 
+                                    time(), ['id' => $this->attemptid]);
+
+                    $answer_index++;
+                }
             }
-            else //If no new data added
+            else if ($qtype === 'essay')
             {
-                $currentdata = $qa->get_last_qt_data();
-
-                //if the question has a saved data
-                if($currentdata)
-                    $quba->process_action($slot, $currentdata, time());
-                else //if no saved data, leave it blank
-                    $quba->process_action($slot, [], time());
+                //No update for comment
+                //As it already stores in smartspe_attempt
+                $quba->process_action($slot, [], time()); // Update blank
 
                 // Update time modified
                 $DB->set_field('smartspe_attempts', 'timemodified', 
                                 time(), ['id' => $this->attemptid]);
+            }
+            else
+            {
+                throw new moodle_exception("$qtype is not currently supported in this plugin");
             }
         }
 

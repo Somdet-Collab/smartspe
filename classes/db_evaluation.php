@@ -53,8 +53,18 @@ class db_evaluation
                 $record->self_comment = $self_comment;
             }
 
-            //Insert record into database
-            $evaluationid = $DB->insert_record('smartspe_evaluation', $record);
+            $existing = $DB->get_record('smartspe_evaluation', ['attemptid' => $attemptid]);
+
+            if (!$existing) {
+                $evaluationid = $DB->insert_record('smartspe_evaluation', $record);
+            } else {
+                // Set the ID for update
+                $record->id = $existing->id;
+                if(!$DB->update_record('smartspe_evaluation', $record))
+                    throw new moodle_exception("Error updating existing records");
+                else
+                    $evaluationid = $existing->id;
+            }
 
         }
         else
@@ -119,7 +129,7 @@ class db_evaluation
 
         //Call check function from team_manager
         //To confirm that this evaluationid exist
-        if ($manager->record_exist('smartspe_evaluation', ['evaluationid' => $evaluationid]))
+        if ($manager->record_exist('smartspe_evaluation', ['id' => $evaluationid]))
         {
             //Save record
             $record = new \stdClass();
