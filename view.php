@@ -12,8 +12,8 @@ $id = required_param('id', PARAM_INT);
 $cm = get_coursemodule_from_id('smartspe', $id, 0, false, MUST_EXIST); 
 $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
 $context = \context_module::instance($cm->id);
-$instance = $DB->get_record('smartspe', ['course' => $course->id], '*', MUST_EXIST);
-$instanceid = $instance->id;
+$smartspe = $DB->get_record('smartspe', array('id' => $cm->instance), '*', MUST_EXIST);
+$instanceid = $smartspe->id;
 require_login($course, true, $cm);
 
 // set up the page
