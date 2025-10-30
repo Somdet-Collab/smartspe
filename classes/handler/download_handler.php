@@ -107,59 +107,68 @@ class download_handler
             $criteria = ["1", "2", "3", "4", "5", "Average", ""];
 
             $members = $DB->get_records('groups_members', ['groupid' => $team->id]);
+            $group_userids = array_map(fn($m) => $m->userid, $members);
             $criteria_header = [];
             $evaluatee_header = [];
 
-            //Print header regarding to number of member
-            foreach($members as $member)
+            if ($members)
             {
-                //User
-                $userid = $member->id; //Get evalutor id
-                $member = $DB->get_record('user', ['id' => $userid]); //Get member name
-                $criteria_header = array_merge($criteria_header, $criteria);
-                $members_header = [$member->lastname." ".$member->firstname, '','','','','',''];
-                $evaluatee_header = array_merge($evaluatee_header, $members_header);
-            }
+                //Print header regarding to number of member
+                foreach($members as $group_member)
+                {
+                    //User
+                    $userid = $group_member->id; //Get evalutor id
+                    $member = $DB->get_record('user', ['id' => $userid]); //Get member name
+                    $criteria_header = array_merge($criteria_header, $criteria);
+                    $members_header = [$member->lastname." ".$member->firstname, '','','','','',''];
+                    $evaluatee_header = array_merge($evaluatee_header, $members_header);
+                }
 
-            $final_header = array_merge($header, $criteria_header);
-            $final_eval_header = array_merge($eval_header, $evaluatee_header);
+                $final_header = array_merge($header, $criteria_header);
+                $final_eval_header = array_merge($eval_header, $evaluatee_header);
 
-            fputcsv($fp, $final_eval_header);
-            fputcsv($fp, $final_header);
-            fputcsv($fp, [""]);// Blank line
-            fputcsv($fp, ["Team", "StudentID", "Surname", "Given Name"]);
-
-            $result_line = [];
-
-            foreach($members as $member)
-            {
-                $records = $DB->get_records('smartspe_evaluation', ['evaluator' => $member->id]);
-                //User
-                $userid = $member->id; //Get evalutor id
-                $user = $DB->get_record('user', ['id' => $userid]); //Get member name
-                $name = $user->firstname ?? '';
-                $lastname = $user->lastname ?? '';
-
-                //Groups
-                $group_member = $DB->get_record('groups_members', ['userid' => $userid]); //get teamid
-                $group = $DB->get_record('groups', ['id' => $group_member->groupid]);
-                $group_name = $group->name ?? '';
-
-                $details = [$group_name, $userid, $lastname, $name];
+                fputcsv($fp, $final_eval_header);
+                fputcsv($fp, $final_header);
+                fputcsv($fp, [""]);// Blank line
+                fputcsv($fp, ["Team", "StudentID", "Surname", "Given Name"]);
 
                 $result_line = [];
 
-                foreach($records as $record)
+                foreach($members as $member)
                 {
-                    $result = $this->get_line_summary($record);
-                    $result_line = array_merge($result_line, $result);
+                    $records = $DB->get_records('smartspe_evaluation', ['evaluator' => $member->id]);
+
+                    if ($records)
+                    {
+                        //User
+                        $userid = $member->id; //Get evalutor id
+                        $user = $DB->get_record('user', ['id' => $userid]); //Get member name
+                        $name = $user->firstname ?? '';
+                        $lastname = $user->lastname ?? '';
+
+                        //Groups
+                        $group = $DB->get_record('groups', ['id' => $team->id]);
+                        $group_name = $group->name ?? '';
+
+                        $details = [$group_name, $userid, $lastname, $name];
+
+                        $result_line = [];
+
+                        foreach($records as $record)
+                        {
+                            $result = $this->get_line_summary($record);
+                            $result_line = array_merge($result_line, $result);
+                        }
+
+                        $result_line = array_merge($details, $result_line);
+
+                        fputcsv($fp, $result_line);
+                    }
                 }
-
-                $result_line = array_merge($details, $result_line);
-
-                fputcsv($fp, $result_line);
             }
 
+            fputcsv($fp, [""]);
+            fputcsv($fp, [""]);
         }
 
         fclose($fp);
@@ -214,7 +223,7 @@ class download_handler
         $q3 = $record->q3 ?? null;
         $q4 = $record->q4 ?? null;
         $q5 = $record->q5 ?? null;
-        $average = $record->average ?? null;
+        $average = isset($record->average) ? (float)$record->average : null;
         $comment = $record->comment ?? null;
         $self_comment = $record->self_comment ?? null;
 
@@ -231,7 +240,7 @@ class download_handler
         $q3 = $record->q3 ?? null;
         $q4 = $record->q4 ?? null;
         $q5 = $record->q5 ?? null;
-        $average = $record->average ?? null;
+        $average = isset($record->average) ? (float)$record->average : null;
 
         $line = [$q1,$q2,$q3,$q4,$q5,$average, ""];
 
