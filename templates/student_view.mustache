@@ -1,41 +1,48 @@
 <div class="smartspe-student-container">
+
   <h2>{{activityname}}</h2>
   <p>{{description}}</p>
 
-  {{#members}}
-  <div class="smartspe-member-block">
-    <h4>Evaluate Member {{.}}</h4>
+  <form method="post" action="{{formaction}}">
+    <input type="hidden" name="sesskey" value="{{sesskey}}">
 
-    <form method="post" action="{{{formaction}}}">
-      <input type="hidden" name="memberid" value="{{.}}">
+    {{#evaluations}}
+      <h3>{{title}}</h3>
+      {{#membername}}
+        <p><strong>{{membername}}</strong></p>
+      {{/membername}}
 
-      <ol>
-        {{#questions}}
-        <li>
-          <label>{{text}}</label><br>
-          <select name="q{{id}}" required>
-            <option value="1">1 - Strongly Disagree</option>
-            <option value="2">2 - Disagree</option>
-            <option value="3">3 - Neutral</option>
-            <option value="4">4 - Agree</option>
-            <option value="5">5 - Strongly Agree</option>
-          </select>
-        </li>
-        {{/questions}}
-      </ol>
+      {{#questions}}
+        <div class="question mb-3 p-3 border rounded">
+            <strong>{{name}}</strong>
+            <p>{{{text}}}</p>
 
-      <label>Comments:</label><br>
-      <textarea name="comment" rows="3"></textarea><br>
+            {{#options}}
+              <div class="form-check ml-3">
+                {{#is_self}}
+                  <input class="form-check-input" type="radio" name="self_{{../id}}" value="{{id}}">
+                {{/is_self}}
+                {{#is_peer}}
+                  <input class="form-check-input" type="radio" name="peer_{{../memberid}}_{{../id}}" value="{{id}}">
+                {{/is_peer}}
+                <label class="form-check-label">{{{answer}}}</label>
+              </div>
+            {{/options}}
 
-      <label>Self-comment (optional):</label><br>
-      <textarea name="self_comment" rows="3"></textarea><br>
+            {{^options}}
+              {{#is_self}}
+                <textarea class="form-control" name="self_{{../id}}" rows="2" placeholder="Your response"></textarea>
+              {{/is_self}}
+              {{#is_peer}}
+                <textarea class="form-control" name="peer_{{../memberid}}_{{../id}}" rows="2" placeholder="Your response"></textarea>
+              {{/is_peer}}
+            {{/options}}
+        </div>
+      {{/questions}}
+    {{/evaluations}}
 
-      <button type="submit" class="btn btn-primary">Submit Evaluation</button>
-    </form>
-  </div>
-  {{/members}}
-
-  {{^members}}
-  <p><em>No group members found.</em></p>
-  {{/members}}
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Submit Evaluation</button>
+    </div>
+  </form>
 </div>

@@ -41,7 +41,7 @@ class teacher_view implements renderable, templatable
         // 2. Preview Quiz button
         $data->buttons[] = [
             'name' => 'Preview Evaluation',
-            'url' => (new \moodle_url('/mod/smartspe/preview.php', ['id' => $this->quiz_manager->get_cmid()]))->out(false),
+            'url' => (new \moodle_url('/mod/smartspe/teacher_preview.php', ['id' => $this->quiz_manager->get_cmid()]))->out(false),
             'icon' => 'fa-eye'
         ];
 

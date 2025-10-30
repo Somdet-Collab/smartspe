@@ -23,9 +23,9 @@ $PAGE->set_heading($course->fullname);
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('incourse');
 
-// --- 3. Load activity instance ---
-$smartspe = $DB->get_record('smartspe', ['id' => $instanceid], '*', MUST_EXIST);
-$questionids = explode(',', $smartspe->questionids);
+// --- 3. Load activity instance --- REMOVING THIS BECAUSE IT'S A DUPLICATE
+//$smartspe = $DB->get_record('smartspe', ['id' => $instanceid], '*', MUST_EXIST);
+//$questionids = explode(',', $smartspe->questionids);
 
 // --- 4. Determine user role ---
 $is_teacher = has_capability('mod/smartspe:manage', $context);
