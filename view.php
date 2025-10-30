@@ -162,19 +162,34 @@ ob_end_clean();
 <form method="get" action="">
     <input type="hidden" name="id" value="<?php echo $cm->id; ?>">
     <input type="hidden" name="extension" value="csv">
-    <button type="submit" name="download_csv" value="1" class="btn btn-primary">Download CSV</button>
+    
+    <!-- Button for detailed report -->
+    <button type="submit" name="download_csv" value="details" class="btn btn-primary">
+        Download CSV (Details)
+    </button>
 
+    <!-- Button for summary report -->
+    <button type="submit" name="download_csv" value="summary" class="btn btn-secondary">
+        Download CSV (Summary)
+    </button>
 </form>
 
 <?php
 // Check if download button clicked
-if (optional_param('download_csv', 0, PARAM_INT)) {
+$download_type = optional_param('download_csv', '', PARAM_ALPHANUM);
+
+if ($download_type) {
     $extension = required_param('extension', PARAM_ALPHA);
-    
+
     try {
-        $quiz_manager->download_report($extension);
+        if ($download_type === 'details') {
+            $quiz_manager->download_report_details($extension);
+        } else if ($download_type === 'summary') {
+            $quiz_manager->download_report_summary($extension);
+        }
     } catch (moodle_exception $e) {
         echo '<div class="alert alert-danger">Download error: ' . $e->getMessage() . '</div>';
     }
 }
+
 ?>
