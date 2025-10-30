@@ -106,7 +106,6 @@ class download_handler
             $header = ["", "Assesment Criteria", "", ""];
             $criteria = ["1", "2", "3", "4", "5", "Average", ""];
 
-            $member_count = 0;
             $members = $DB->get_records('groups_members', ['groupid' => $team->id]);
             $criteria_header = [];
             $evaluatee_header = [];
@@ -114,6 +113,9 @@ class download_handler
             //Print header regarding to number of member
             foreach($members as $member)
             {
+                //User
+                $userid = $member->id; //Get evalutor id
+                $member = $DB->get_record('user', ['id' => $userid]); //Get member name
                 $criteria_header = array_merge($criteria_header, $criteria);
                 $members_header = [$member->lastname." ".$member->firstname, '','','','','',''];
                 $evaluatee_header = array_merge($evaluatee_header, $members_header);
@@ -131,7 +133,7 @@ class download_handler
 
             foreach($members as $member)
             {
-                $records = $DB->get_records('smartspe_evaluation', ['evaluatorid' => $member->id]);
+                $records = $DB->get_records('smartspe_evaluation', ['evaluator' => $member->id]);
                 //User
                 $userid = $member->id; //Get evalutor id
                 $user = $DB->get_record('user', ['id' => $userid]); //Get member name
