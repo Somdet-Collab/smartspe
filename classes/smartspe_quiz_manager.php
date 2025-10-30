@@ -193,11 +193,6 @@ class smartspe_quiz_manager
         return $this->courseid; // Adjust based on how you store it
     }
 
-    public function get_cmid()
-    {
-        return $this->cmid;
-    }
-
      /**
      *Get list of questions from question bank with no saved answers 
      *
