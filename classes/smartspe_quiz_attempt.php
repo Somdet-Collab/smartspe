@@ -47,7 +47,7 @@ class smartspe_quiz_attempt
         $memberusage = $DB->get_record('smartspe_attempts', [
             'userid' => $userid,
             'memberid' => $memberid,
-            'smartspe' => $smartspeid
+            'smartspeid' => $smartspeid
         ]);
         
         //If exist, get the attempt
