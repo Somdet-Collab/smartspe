@@ -25,13 +25,23 @@ class student_view implements renderable, templatable {
 
         // Fetch questions from quiz manager
         $questionsraw = $this->quiz_manager->get_questions($this->questionids);
+        $questions_usage = $this->quiz_manager->get_saved_questions_answers();
+
+        // Convert usage to associative
+        $usage_by_id = [];
+        foreach ($questions_usage as $u) {
+            $usage_by_id[$u['id']] = $u;
+        }
 
         $questionsdata = [];
         $displayNumber = 1;
 
         foreach ($questionsraw as $q) {
+            $qid = $q['id'];
+            $u = $usage_by_id[$qid] ?? [];
+
             $qtype = $q['qtype'] ?? 'essay';
-            $currentAnswer = $q['current_answer'] ?? null;
+            $currentAnswer = $u['current_answer'] ?? null;
 
             // Prepare MCQ options
             $options = [];
@@ -46,7 +56,7 @@ class student_view implements renderable, templatable {
             }
 
             $questionsdata[] = [
-                'id'             => $q['id'],
+                'id'             => $qid,
                 'display_number' => $displayNumber++,
                 'text'           => $q['text'],
                 'qtype'          => $qtype,

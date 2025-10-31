@@ -60,6 +60,9 @@ if ($is_student)
     // Fetch question IDs from DB
     //$questionids = explode(',', $smartspe->questionids);
 
+    //Create or retrive attempt of this user
+    $quiz_manager->start_attempt_evaluation($peerid, $questionids);
+
     // Render the unified student evaluation view
     echo $output->render(new \mod_smartspe\output\student_view($quiz_manager, $evaluationid, $type, $questionids));
 } 
