@@ -21,9 +21,9 @@ $smartspe = $DB->get_record('smartspe', ['id' => $instanceid], '*', MUST_EXIST);
 $questionids = explode(',', $smartspe->questionids);
 
 //Create attempt
-//$attemptid = $quiz_manager->start_attempt_evaluation($data, $teacher_selected_questionids); // changed this function to align with the one from quiz_manager.php -- commenting this out because i don't think we have to create it here
 $quiz_manager = new smartspe_quiz_manager($USER->id, $cm->course, $context, $instanceid);
 
+ob_start();
 echo '<pre>Questionids: ';
 print_r($questionids);
 echo '</pre>';
@@ -97,10 +97,18 @@ foreach ($members as $memberid)
             echo "Answer: $current_answer <br>";
             $mcq_count++;
         } 
-        elseif ($question['qtype'] === 'essay' && $comment_count < 1) 
+        elseif ($question['qtype'] === 'essay' && $comment_count < 2) 
         {
             $comment = "Peer comment for member $memberid";
             echo "Comment: $comment <br>";
+            if ($USER->id == $memberid)
+            {
+                $self_comment = "My self comment";
+                echo "Self Comment: $self_comment <br>";
+            }
+            else
+                $self_comment = null;
+            
             $comment_count++;
         }
         else
@@ -109,14 +117,6 @@ foreach ($members as $memberid)
             break;
         }
     }
-    
-    if ($USER->id == $memberid)
-    {
-        $self_comment = "My self comment";
-        echo "Self Comment: $self_comment <br>";
-    }
-    else
-        $self_comment = null;
 
     echo '<pre>Review answers before autosave: ';
     print_r($answers);
@@ -152,6 +152,8 @@ echo $submitted ? "Submitted evaluation<br>" : "Failed submission";
 
 echo "<hr>Test completed.";
 
+ob_end_clean();
+
 ?>
 
 <hr>
@@ -160,19 +162,34 @@ echo "<hr>Test completed.";
 <form method="get" action="">
     <input type="hidden" name="id" value="<?php echo $cm->id; ?>">
     <input type="hidden" name="extension" value="csv">
-    <button type="submit" name="download_csv" value="1" class="btn btn-primary">Download CSV</button>
+    
+    <!-- Button for detailed report -->
+    <button type="submit" name="download_csv" value="details" class="btn btn-primary">
+        Download CSV (Details)
+    </button>
 
+    <!-- Button for summary report -->
+    <button type="submit" name="download_csv" value="summary" class="btn btn-secondary">
+        Download CSV (Summary)
+    </button>
 </form>
 
 <?php
 // Check if download button clicked
-if (optional_param('download_csv', 0, PARAM_INT)) {
+$download_type = optional_param('download_csv', '', PARAM_ALPHANUM);
+
+if ($download_type) {
     $extension = required_param('extension', PARAM_ALPHA);
-    
+
     try {
-        $quiz_manager->download_report($extension);
+        if ($download_type === 'details') {
+            $quiz_manager->download_report_details($extension);
+        } else if ($download_type === 'summary') {
+            $quiz_manager->download_report_summary($extension);
+        }
     } catch (moodle_exception $e) {
         echo '<div class="alert alert-danger">Download error: ' . $e->getMessage() . '</div>';
     }
 }
+
 ?>
