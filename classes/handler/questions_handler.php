@@ -23,24 +23,34 @@ class questions_handler
         if (empty($questionids) || !is_array($questionids))
             return [];
 
-        $qids = $questionids;
-
         // Format results as array
         $questions = [];
-        foreach ($qids as $q) 
+        foreach ($questionids as $q) 
         {
             // Load the full question object
             $questionobj = \question_bank::load_question($q);
 
+            $options = [];
+            if ($questionobj->qtype->name() === 'multichoice') 
+            {
+                foreach ($questionobj->answers as $answer) 
+                {
+                    $options[] = [
+                        'value' => $answer->id,
+                        'text'  => $answer->answer
+                    ];
+                }
+            }
             $questions[] = 
             [
                 'id' => $questionobj->id,
                 'name' => $questionobj->name,
-                'text' => $questionobj->questiontext,
+                'text' => format_text($questionobj->questiontext, $questionobj->questiontextformat),
                 'qtype' => $questionobj->qtype->name(),
                 'defaultmark' => $questionobj->defaultmark,
                 'questiontextformat' => $questionobj->questiontextformat,
-                'answers' => $questionobj->answers ? array_values($questionobj->answers) : []
+                'options' => $options
+                //'answers' => $questionobj->answers ? array_values($questionobj->answers) : []
             ];
         }
 

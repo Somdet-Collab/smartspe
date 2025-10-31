@@ -4,115 +4,74 @@ namespace mod_smartspe\output;
 use renderable;
 use templatable;
 use renderer_base;
-use mod_smartspe\smartspe_quiz_manager;
-use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
-class student_view implements renderable, templatable 
-{
+class student_view implements renderable, templatable {
     protected $quiz_manager;
+    protected $evaluateeid;  // current user (self) or peer
+    protected $type;          // 'self' or 'peer'
+    protected $questionids;
 
-    public function __construct(smartspe_quiz_manager $quiz_manager) 
-    {
+    public function __construct($quiz_manager, $evaluationid, $type, $questionids) {
         $this->quiz_manager = $quiz_manager;
+        $this->evaluateeid = $evaluationid;
+        $this->type = $type;
+        $this->questionids = $questionids;
     }
 
-    public function export_for_template(renderer_base $output) 
-    {
-        global $DB;
+    public function export_for_template(renderer_base $output) {
+        global $USER;
 
-        $data = new stdClass();
-        $smartspeid = $this->quiz_manager->get_smartspeid();
+        // Fetch questions from quiz manager
+        $questionsraw = $this->quiz_manager->get_questions($this->questionids);
 
-        // --- Fetch all question IDs ---
-        $smartspe_record = $DB->get_record('smartspe', ['id' => $smartspeid], 'questionids');
-        $questionids = !empty($smartspe_record->questionids) 
-            ? array_map('intval', explode(',', $smartspe_record->questionids)) 
-            : [];
+        $questionsdata = [];
+        $displayNumber = 1;
 
-        // --- Fetch questions from DB ---
-        $questions = [];
-        if (!empty($questionids)) {
-            list($insql, $params) = $DB->get_in_or_equal($questionids, SQL_PARAMS_NAMED);
-            $sql = "SELECT q.id, q.name, q.questiontext, q.qtype
-                    FROM {question} q
-                    WHERE id $insql
-                    ORDER BY FIELD(id, " . implode(',', $questionids) . ")";
-            $questions = $DB->get_records_sql($sql, $params);
-        }
+        foreach ($questionsraw as $q) {
+            $qtype = $q['qtype'] ?? 'essay';
+            $currentAnswer = $q['current_answer'] ?? null;
 
-        // --- Format questions with options ---
-        $formatted_questions = [];
-        foreach ($questions as $q) {
-            $q = (array)$q;
-
+            // Prepare MCQ options
             $options = [];
-            if (in_array($q['qtype'], ['multichoice', 'truefalse'])) {
-                $answers = $DB->get_records('question_answers', ['question' => $q['id']], 'id ASC');
-                foreach ($answers as $ans) {
+            if ($qtype === 'multichoice' && !empty($q['options'])) {
+                foreach ($q['options'] as $opt) {
                     $options[] = [
-                        'id' => $ans->id,
-                        'answer' => strip_tags($ans->answer)
+                        'value'   => $opt['value'],
+                        'text'    => $opt['text'],
+                        'checked' => ($currentAnswer !== null && $currentAnswer == $opt['value'])
                     ];
                 }
             }
 
-            $formatted_questions[] = [
-                'id' => $q['id'],
-                'name' => $q['name'],
-                'text' => strip_tags($q['questiontext']),
-                'options' => $options
+            $questionsdata[] = [
+                'id'             => $q['id'],
+                'display_number' => $displayNumber++,
+                'text'           => $q['text'],
+                'qtype'          => $qtype,
+                'qtype_essay'    => ($qtype === 'essay'),
+                'options'        => $options,
+                'current_answer' => $currentAnswer ?? ''
             ];
         }
 
-        // --- Get members ---
-        $members = [];
-        try {
-            $rawmembers = $this->quiz_manager->get_members(); // full user objects
-            foreach ($rawmembers as $user) {
-                $members[] = (object)[
-                    'id' => $user->id,
-                    'membername' => fullname($user) // use Moodle fullname()
-                ];
-            }
-        } catch (\moodle_exception $e) {
-            $members = [];
+        // Determine next peer for sequential peer evaluation
+        $nextpeerid = null;
+        if ($this->type === 'peer') {
+            $members = $this->quiz_manager->get_members();
+            $ids = array_column($members, 'id');
+            $currentIndex = array_search($this->evaluateeid, $ids);
+            $nextpeerid = $members[$currentIndex + 1]->id ?? null;
         }
 
-        // --- Build evaluations array ---
-        $evaluations = [];
-
-        // Self evaluation
-        $evaluations[] = [
-            'type' => 'self',
-            'title' => 'Self Evaluation',
-            'questions' => $formatted_questions,
-            'is_self' => true,
-            'is_peer' => false,
-            'membername' => null,
-            'memberid' => null
+        return [
+            'fullname'    => fullname($USER),
+            'questions'   => $questionsdata,
+            'evaluateeid' => $this->evaluateeid,
+            'nextpeerid'  => $nextpeerid,
+            'type'        => $this->type,
+            'is_peer'     => ($this->type === 'peer')
         ];
-
-        // Peer evaluation
-        foreach ($members as $member) {
-            $evaluations[] = [
-                'type' => 'peer',
-                'title' => "Evaluation for {$member->membername}",
-                'questions' => $formatted_questions,
-                'is_self' => false,
-                'is_peer' => true,
-                'membername' => $member->membername,
-                'memberid' => $member->id
-            ];
-        }
-
-        $data->evaluations = $evaluations;
-        $data->activityname = "Smart Self & Peer Evaluation";
-        $data->description = "Evaluate yourself first, then your groupmates based on contribution and teamwork.";
-        $data->formaction = new \moodle_url('/mod/smartspe/submit_eval.php', ['id' => $this->quiz_manager->get_cmid()]);
-        $data->sesskey = sesskey();
-
-        return $data;
     }
 }

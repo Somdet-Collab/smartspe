@@ -27,6 +27,9 @@ $PAGE->set_pagelayout('incourse');
 //$smartspe = $DB->get_record('smartspe', ['id' => $instanceid], '*', MUST_EXIST);
 //$questionids = explode(',', $smartspe->questionids);
 
+$questionids = array_map('trim', explode(',', $smartspe->questionids));
+$questionids = array_map('intval', $questionids);
+
 // --- 4. Determine user role ---
 $is_teacher = has_capability('mod/smartspe:manage', $context);
 $is_student = !$is_teacher && has_capability('mod/smartspe:submit', $context);
@@ -37,20 +40,31 @@ $output = $PAGE->get_renderer('mod_smartspe');
 // output starts here
 echo $OUTPUT->header();
 
-$quiz_manager = null;
+$quiz_manager = new mod_smartspe\smartspe_quiz_manager($USER->id, $course->id, $context, $instanceid, $cm->id);
 if ($is_student) 
 {
-    $quiz_manager = new mod_smartspe\smartspe_quiz_manager($USER->id, $course->id, $context, $instanceid, $cm->id);
-    echo $output->render(new \mod_smartspe\output\student_view($quiz_manager));
+    // Check if a specific peer is selected (via GET)
+    $peerid = optional_param('peerid', 0, PARAM_INT);
+
+    // Determine evaluation type
+    if ($peerid === 0 || $peerid === $USER->id) {
+        // Self-evaluation
+        $evaluationid = $USER->id;
+        $type = 'self';
+    } else {
+        // Peer evaluation
+        $evaluationid = $peerid;
+        $type = 'peer';
+    }
+
+    // Fetch question IDs from DB
+    //$questionids = explode(',', $smartspe->questionids);
+
+    // Render the unified student evaluation view
+    echo $output->render(new \mod_smartspe\output\student_view($quiz_manager, $evaluationid, $type, $questionids));
 } 
 else if ($is_teacher)
 {
-    try {
-        $quiz_manager = new mod_smartspe\smartspe_quiz_manager($USER->id, $course->id, $context, $instanceid, $cm->id);
-    } catch (Exception $e) {
-        echo "Quiz manager creation failed: " . $e->getMessage();
-        die();
-    }
     echo $output->render(new \mod_smartspe\output\teacher_view($quiz_manager));
 }
 
