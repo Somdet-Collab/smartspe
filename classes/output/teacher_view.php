@@ -27,10 +27,21 @@ class teacher_view implements renderable, templatable
         $cmid = $this->quiz_manager->get_cmid();
         $cm = get_coursemodule_from_id('smartspe', $cmid, 0, false, MUST_EXIST);
         $courseid = $cm->course;
-                
-        // 1. Button to access question bank (always visible)
+             
+        
+        // 1. Link to question bank (for creating new questions)
         $data->buttons[] = [
-            'name' => 'Manage Questions',
+            'name' => 'Create Questions (Question Bank)',
+            'url' => (new \moodle_url('/question/edit.php', [
+                'cmid' => $this->quiz_manager->get_cmid(), 
+                'courseid' => $this->quiz_manager->get_context()->get_course_context()->instanceid            
+            ]))->out(false),
+            'icon' => 'fa-database'
+        ];
+
+        // 2. Button to access question bank (always visible)
+        $data->buttons[] = [
+            'name' => 'Select Questions',
             'url' => (new \moodle_url('/mod/smartspe/question_selection.php', [
                 'cmid' => $cmid, 
                 'courseid' => $courseid            
@@ -38,28 +49,18 @@ class teacher_view implements renderable, templatable
             'icon' => 'fa-list'
         ];
 
-        // 2. Preview Quiz button
+        // 3. Preview Quiz button
         $data->buttons[] = [
             'name' => 'Preview Evaluation',
             'url' => (new \moodle_url('/mod/smartspe/teacher_preview.php', ['id' => $this->quiz_manager->get_cmid()]))->out(false),
             'icon' => 'fa-eye'
         ];
 
-        // 3. Reports button
+        // 4. Reports button
         $data->buttons[] = [
             'name' => 'View Reports',
             'url' => (new \moodle_url('/mod/smartspe/reports.php', ['id' => $this->quiz_manager->get_cmid()]))->out(false),
             'icon' => 'fa-bar-chart'
-        ];
-
-        // 4. Link to question bank (for creating new questions)
-        $data->buttons[] = [
-            'name' => 'Question Bank',
-            'url' => (new \moodle_url('/question/edit.php', [
-                'cmid' => $this->quiz_manager->get_cmid(), 
-                'courseid' => $this->quiz_manager->get_context()->get_course_context()->instanceid            
-            ]))->out(false),
-            'icon' => 'fa-database'
         ];
 
         return $data;
