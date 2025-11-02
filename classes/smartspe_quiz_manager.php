@@ -301,11 +301,10 @@ class smartspe_quiz_manager
     }
     
     /**
-     * Download the report
+     * Download the report summary
      *
      * Called when teacher/Unit coordinator request download
      * 
-     *@param $filename file name
      *@param $extension file extension
      * @return boolean if download is successful
      */
