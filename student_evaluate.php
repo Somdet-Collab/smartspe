@@ -135,30 +135,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && confirm_sesskey())
             ]));
         }
     } 
-    
-    elseif ($action === 'save') 
-    {
-        // Autosave - save with finish = false
-        $self_comment = ($type === 'self') ? $comment : null;
-        $peer_comment = ($type === 'peer') ? $comment : null;
-        
-        $quiz_manager->process_attempt_evaluation(
-            $answers, 
-            $peer_comment, 
-            $self_comment, 
-            false
-        );
-        
-        redirect(
-            new moodle_url('/mod/smartspe/student_evaluate.php', [
-                'id' => $cmid,
-                'evaluateeid' => $evaluateeid
-            ]),
-            'Draft saved!',
-            null,
-            \core\output\notification::NOTIFY_SUCCESS
-        );
-    }
 }
 
 // Load saved answers if they exist
