@@ -46,7 +46,7 @@ class smartspe_quiz_manager
      *@param $smartspeid instance id
      * @return void
      */
-    public function __construct($userid, $courseid, $context, $smartspeid, $cmid)
+    public function __construct($userid, $courseid, $context, $smartspeid)
     {
         global $DB;
 
@@ -55,7 +55,6 @@ class smartspe_quiz_manager
         $this->context = $context;
         $this->smartspeid = $smartspeid;
         $this->userid = $userid;
-        $this->cmid = $cmid;
         $this->questions_handler = new questions_handler();
         $this->notification_handler = new notification_handler();
         $this->download_handler = new download_handler();
@@ -63,15 +62,8 @@ class smartspe_quiz_manager
         //Get members of this $userid
         $team_manager = new db_team_manager();
 
-        // Initialize arrays
-        $this->members = [];
-        $this->attemptids = [];
-
-        $is_teacher = has_capability('mod/smartspe:manage', $context);
-        $is_student = has_capability('mod/smartspe:submit', $context);
-
         // only try to get members if this is a student
-        if ($is_student && !$is_teacher) 
+        if (has_capability('mod/smartspe:submit', $context)) 
         {
             $this->members = $team_manager->get_members_id($this->userid, $this->courseid);
 
@@ -79,29 +71,24 @@ class smartspe_quiz_manager
             {
                 throw new moodle_exception("The members are empty in section get_members() in quiz_manager");
             }
-
-            // Initialize attemptids array
-            $this->attemptids = [];
-            
-            // Retrieve existing attempts for each team member
-            foreach ($this->members as $memberid) 
-            {
-                $attempt = $DB->get_record('smartspe_attempts', [
-                    'smartspeid' => $this->smartspeid,
-                    'userid' => $this->userid,
-                    'memberid' => $memberid
-                ]);
-                
-                if ($attempt) {
-                    $this->attemptids[$memberid] = $attempt->id;
-                }
-            }
         } 
         else 
         {
             // teacher or non-student: no group needed
             $this->members = [];
-            $this->attemptids = [];
+        }
+
+        //Retrive existing attempt
+        foreach ($this->members as $memberid) 
+        {
+            $attempt = $DB->get_record('smartspe_attempts', [
+                'smartspeid' => $this->smartspeid,
+                'userid' => $this->userid,
+                'memberid' => $memberid
+            ]);
+            
+            if ($attempt)
+                $this->attemptids[$memberid] = $attempt->id;
         }
     }
 
@@ -178,19 +165,14 @@ class smartspe_quiz_manager
         return true;
     }
 
-    public function get_cmid() 
+    public function get_course_module_id() 
     {
-        return $this->cmid;
+        return $this->courseid;
     }
 
     public function get_context()
     {
         return $this->context;
-    }
-
-    public function get_courseid() 
-    {
-        return $this->courseid; // Adjust based on how you store it
     }
 
      /**
@@ -222,28 +204,9 @@ class smartspe_quiz_manager
      *
      * @return array $member ids
      */
-    public function get_members() // edited this to pass full objects rather than just ID to allow me to retrieve their names for output
+    public function get_members()
     {
-        global $DB;
-
-        $fullmembers = [];
-        foreach ($this->members as $memberid) 
-        {
-            $user = $DB->get_record('user', ['id' => $memberid], 
-                'id, firstname, lastname, firstnamephonetic, lastnamephonetic, middlename, alternatename');
-            if ($user) 
-            {
-                // Ensure optional fields exist
-                if (!isset($user->firstnamephonetic)) $user->firstnamephonetic = '';
-                if (!isset($user->lastnamephonetic)) $user->lastnamephonetic = '';
-                if (!isset($user->middlename)) $user->middlename = '';
-                if (!isset($user->alternatename)) $user->alternatename = '';
-
-                $fullmembers[] = $user;
-            }
-        }
-
-        return $fullmembers; // array of full user objects
+        return $this->members;
     }
 
     public function get_smartspeid() 
@@ -275,8 +238,7 @@ class smartspe_quiz_manager
             $questions = $data_persistence->load_attempt_questions();
             $comments = null;
 
-            foreach ($questions as $question) 
-            {
+            foreach ($questions as $question) {
                 $qtype = $question['qtype'];
 
                 if ($qtype === 'multichoice') {
@@ -315,6 +277,8 @@ class smartspe_quiz_manager
                         'userid' => $this->userid]); 
         $event->trigger();
 
+        debugging("Attempt finish event triggered for user {$this->userid}", DEBUG_DEVELOPER);
+
         return true;
     }
 
@@ -333,7 +297,7 @@ class smartspe_quiz_manager
             throw new moodle_exception("quiz_manager: error file extension");
 
         $filename = 'smartspe_report_' . time();
-        $this->download_handler->download_file($filename, 'csv', $this->courseid, true);
+        $this->download_handler->download_file($filename, $extension, $this->courseid, true);
 
         return true;
     }
@@ -346,13 +310,13 @@ class smartspe_quiz_manager
      *@param $extension file extension
      * @return boolean if download is successful
      */
-    public function download_report_summary($extension="csv")
+    public function download_report_summary($extension="xlsx")
     {
-        if (strcasecmp($extension, "csv") && strcasecmp($extension, "pdf"))
+        if (strcasecmp($extension, "xlsx") && strcasecmp($extension, "pdf"))
             throw new moodle_exception("quiz_manager: error file extension");
 
         $filename = 'smartspe_report_' . time();
-        $this->download_handler->download_file($filename, 'csv', $this->courseid, false);
+        $this->download_handler->download_file($filename, $extension, $this->courseid, false);
 
         return true;
     }
