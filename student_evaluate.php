@@ -38,7 +38,8 @@ $questionids = !empty($smartspe->questionids)
     ? array_map('intval', explode(',', trim($smartspe->questionids))) 
     : [];
 
-if (empty($questionids)) {
+if (empty($questionids)) 
+{
     echo $OUTPUT->header();
     echo $OUTPUT->notification('No questions have been set up for this evaluation.', 'notifyproblem');
     echo $OUTPUT->footer();
@@ -47,7 +48,8 @@ if (empty($questionids)) {
 
 // Get team members
 $members = $quiz_manager->get_members();
-if (empty($members)) {
+if (empty($members)) 
+{
     echo $OUTPUT->header();
     echo $OUTPUT->notification('You must be in a group to complete this evaluation.', 'notifyproblem');
     echo $OUTPUT->footer();
@@ -58,27 +60,33 @@ if (empty($members)) {
 $member_ids = array_column($members, 'id');
 
 // If no evaluateeid, start with self
-if ($evaluateeid == 0) {
+if ($evaluateeid == 0) 
+{
     $evaluateeid = $USER->id;
 }
 
 $type = ($evaluateeid == $USER->id) ? 'self' : 'peer';
 
 // Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && confirm_sesskey()) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && confirm_sesskey()) 
+{
     
     // Collect answers
     $answers = [];
     $comment = '';
     
-    foreach ($questionids as $idx => $qid) {
+    foreach ($questionids as $idx => $qid)
+    {
         $answer_key = 'answer_' . ($idx + 1);
         $answer = optional_param($answer_key, '', PARAM_RAW);
         
         // If it's an essay question (contains more text), treat as comment
-        if (strlen($answer) > 10 && strpos($answer, ' ') !== false) {
+        if (strlen($answer) > 10 && strpos($answer, ' ') !== false) 
+        {
             $comment = $answer;
-        } else {
+        } 
+        else 
+        {
             $answers[] = intval($answer);
         }
     }
@@ -90,7 +98,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && confirm_sesskey()) {
     $current_index = array_search($evaluateeid, $member_ids);
     $is_last = ($current_index === count($member_ids) - 1);
     
-    if ($action === 'next' || $is_last) {
+    if ($action === 'next' || $is_last) 
+    {
         // Save with finish = false (moving to next)
         $self_comment = ($type === 'self') ? $comment : null;
         $peer_comment = ($type === 'peer') ? $comment : null;
@@ -102,7 +111,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && confirm_sesskey()) {
             false  // Not finished yet
         );
         
-        if ($is_last) {
+        if ($is_last) 
+        {
             // This was the last person - now call final submission
             $quiz_manager->quiz_is_submitted();
             
@@ -112,7 +122,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && confirm_sesskey()) {
                 null,
                 \core\output\notification::NOTIFY_SUCCESS
             );
-        } else {
+        } 
+        else 
+        {
             // Move to next person
             $next_index = $current_index + 1;
             $next_evaluateeid = $member_ids[$next_index];
@@ -122,7 +134,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && confirm_sesskey()) {
                 'evaluateeid' => $next_evaluateeid
             ]));
         }
-    } elseif ($action === 'save') {
+    } 
+    
+    elseif ($action === 'save') 
+    {
         // Autosave - save with finish = false
         $self_comment = ($type === 'self') ? $comment : null;
         $peer_comment = ($type === 'peer') ? $comment : null;
@@ -148,17 +163,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && confirm_sesskey()) {
 
 // Load saved answers if they exist
 $saved_questions = [];
-try {
+try 
+{
     // Only try to load if an attempt exists for this evaluatee
     $members = $quiz_manager->get_members();
     $member_ids = array_column($members, 'id');
     
-    if (in_array($evaluateeid, $member_ids)) {
+    if (in_array($evaluateeid, $member_ids)) 
+    {
         // Check if attempt was already started before
         // If not, just use empty array
         $saved_questions = [];
     }
-} catch (Exception $e) {
+} 
+catch (Exception $e) 
+{
     $saved_questions = [];
 }
 
