@@ -188,7 +188,7 @@ class download_handler
 
     private function create_file_xlsx_summary($filename, $course)
     {
-        global $DB;
+        global $DB, $CFG;
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -203,10 +203,10 @@ class download_handler
                 continue;
             }
 
-            // --- Original style header ---
-            $eval_header = [" ", "Student being evaluated", " ", " "];
-            $header = [" ", "Assessment Criteria", " ", " "];
-            $criteria = ["1", "2", "3", "4", "5", "Average", " "];
+            // --- Headers (same as CSV version) ---
+            $eval_header = ["", "Student being evaluated", "", ""];
+            $header = ["", "Assessment Criteria", "", ""];
+            $criteria = ["1", "2", "3", "4", "5", "Average", ""];
 
             $criteria_header = [];
             $evaluatee_header = [];
@@ -214,9 +214,10 @@ class download_handler
             foreach ($members as $group_member) {
                 $userid = $group_member->userid;
                 $member = $DB->get_record('user', ['id' => $userid]);
+
                 $criteria_header = array_merge($criteria_header, $criteria);
-                $members_header = [$member->lastname . " " . $member->firstname, '', '', '', '', '', ''];
-                $evaluatee_header = array_merge($evaluatee_header, $members_header);
+                $member_header = [$member->lastname . " " . $member->firstname, '', '', '', '', '', ''];
+                $evaluatee_header = array_merge($evaluatee_header, $member_header);
             }
 
             $final_header = array_merge($header, $criteria_header);
@@ -226,12 +227,12 @@ class download_handler
             $sheet->fromArray($final_eval_header, null, "A{$row}");
             $sheet->fromArray($final_header, null, "A" . ($row + 1));
 
-            // Highlight header rows exactly like before
+            // Highlight and style header rows
             $headerRange = "A{$row}:" . $sheet->getHighestColumn() . ($row + 1);
             $sheet->getStyle($headerRange)->applyFromArray([
                 'fill' => [
                     'fillType' => Fill::FILL_SOLID,
-                    'color' => ['rgb' => 'D9E1F2'] // light blue
+                    'color' => ['rgb' => 'D9E1F2']
                 ],
                 'font' => ['bold' => true],
                 'alignment' => [
@@ -247,7 +248,7 @@ class download_handler
 
             $row += 3;
 
-            // --- Sub-header for members ---
+            // Sub-header for team member info
             $sheet->fromArray(["Team", "StudentID", "Surname", "Given Name"], null, "A{$row}");
             $sheet->getStyle("A{$row}:D{$row}")->getFont()->setBold(true);
             $row++;
@@ -256,48 +257,43 @@ class download_handler
             foreach ($members as $member) {
                 $userid = $member->userid;
                 $records = $DB->get_records('smartspe_evaluation', ['evaluator' => $userid]);
-
                 if (!$records) {
                     continue;
                 }
 
+                $user = $DB->get_record('user', ['id' => $userid]);
+                $group_name = $team->name ?? '';
+
+                $details = [$group_name, $userid, $user->lastname ?? '', $user->firstname ?? ''];
+                $result_line = [];
+
                 foreach ($records as $record) {
-                    $user = $DB->get_record('user', ['id' => $userid]);
-                    $group = $DB->get_record('groups', ['id' => $team->id]);
-                    $group_name = $group->name ?? '';
-
-                    $details = [$group_name, $userid, $user->lastname ?? '', $user->firstname ?? ''];
-                    $result_line = [];
-                    foreach ($records as $record) {
-                        $result = $this->get_line_summary($record);
-                        $result_line = array_merge($result_line, $result);
-                    }
-
-                    $sheet->fromArray(array_merge($details, $result_line), null, "A{$row}");
-                    $row++;
+                    $result = $this->get_line_summary($record);
+                    $result_line = array_merge($result_line, $result);
                 }
+
+                $sheet->fromArray(array_merge($details, $result_line), null, "A{$row}");
+                $row++;
             }
 
-            $row += 2; // blank lines between teams
+            $row += 2; // Blank lines between teams
         }
 
-        // Auto size columns
+        // Auto-size columns for clean layout
         foreach (range('A', $sheet->getHighestColumn()) as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
-        // Save to temp file
+        // Save to temporary file
         $tempdir = make_temp_directory('smartspe');
         $tempfile = $tempdir . '/' . $filename;
         $writer = new Xlsx($spreadsheet);
         $writer->save($tempfile);
 
-        // Serve file to browser
+        // Send file to browser
         send_file($tempfile, $filename, 0, 0, false, true, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         exit;
     }
-
-
 
     private function create_file_pdf($filename)
     {
