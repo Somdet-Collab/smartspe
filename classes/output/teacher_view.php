@@ -63,6 +63,15 @@ class teacher_view implements renderable, templatable
             'icon' => 'fa-bar-chart'
         ];
 
+        // 5. View All Responses button
+        $data->buttons[] = [
+            'name' => 'View All Responses',
+            'url' => (new \moodle_url('/mod/smartspe/teacher_results.php', [
+                'id' => $cmid
+            ]))->out(false),
+            'icon' => 'fa-table'
+        ];
+
         return $data;
     }
 }
