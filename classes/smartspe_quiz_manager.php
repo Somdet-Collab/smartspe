@@ -297,7 +297,7 @@ class smartspe_quiz_manager
             throw new moodle_exception("quiz_manager: error file extension");
 
         $filename = 'smartspe_report_' . time();
-        $this->download_handler->download_file($filename, 'csv', $this->courseid, true);
+        $this->download_handler->download_file($filename, $extension, $this->courseid, true);
 
         return true;
     }
@@ -310,13 +310,13 @@ class smartspe_quiz_manager
      *@param $extension file extension
      * @return boolean if download is successful
      */
-    public function download_report_summary($extension="csv")
+    public function download_report_summary($extension="xlsx")
     {
-        if (strcasecmp($extension, "csv") && strcasecmp($extension, "pdf"))
+        if (strcasecmp($extension, "xlsx") && strcasecmp($extension, "pdf"))
             throw new moodle_exception("quiz_manager: error file extension");
 
         $filename = 'smartspe_report_' . time();
-        $this->download_handler->download_file($filename, 'csv', $this->courseid, false);
+        $this->download_handler->download_file($filename, $extension, $this->courseid, false);
 
         return true;
     }

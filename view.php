@@ -23,6 +23,23 @@ $questionids = explode(',', $smartspe->questionids);
 //Create attempt
 $quiz_manager = new smartspe_quiz_manager($USER->id, $cm->course, $context, $instanceid);
 
+// Check if download button clicked
+$download_type = optional_param('download_csv', '', PARAM_ALPHANUM);
+
+if ($download_type) {
+    $extension = required_param('extension', PARAM_ALPHA);
+
+    try {
+        if ($download_type === 'details') {
+            $quiz_manager->download_report_details($extension);
+        } else if ($download_type === 'summary') {
+            $quiz_manager->download_report_summary("xlsx");
+        }
+    } catch (moodle_exception $e) {
+        echo '<div class="alert alert-danger">Download error: ' . $e->getMessage() . '</div>';
+    }
+}
+
 ob_start();
 echo '<pre>Questionids: ';
 print_r($questionids);
@@ -178,5 +195,3 @@ ob_end_clean();
         Continue to Course
     </button>
 </form>
-
-?>

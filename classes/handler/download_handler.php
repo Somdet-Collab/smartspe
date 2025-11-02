@@ -6,6 +6,13 @@ use core\exception\moodle_exception;
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->libdir . '/filelib.php');
+require_once($CFG->libdir . '/phpspreadsheet/vendor/autoload.php');
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
 class download_handler
 {
@@ -23,8 +30,8 @@ class download_handler
         //Check the extension
         if ($extension == "csv" && $details)
             return $this->create_file_csv_details($filename.'.'.$extension, $course);
-        else if ($extension == "csv" && !$details)
-            return $this->create_file_csv_summary($filename.'.'.$extension, $course);
+        else if ($extension == "xlsx" && !$details)
+            return $this->create_file_xlsx_summary($filename.'.'.$extension, $course);
         else if ($extension == "pdf")
             return $this->create_file_pdf($filename.'.'.$extension);
         else
@@ -178,6 +185,119 @@ class download_handler
         // Stop Moodle rendering page
         exit;
     }
+
+    private function create_file_xlsx_summary($filename, $course)
+    {
+        global $DB;
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $row = 1;
+
+        // Loop through teams
+        $teams = $DB->get_records('groups', ['courseid' => $course]);
+        foreach ($teams as $team) {
+
+            $members = $DB->get_records('groups_members', ['groupid' => $team->id]);
+            if (!$members) {
+                continue;
+            }
+
+            // --- Original style header ---
+            $eval_header = [" ", "Student being evaluated", " ", " "];
+            $header = [" ", "Assessment Criteria", " ", " "];
+            $criteria = ["1", "2", "3", "4", "5", "Average", " "];
+
+            $criteria_header = [];
+            $evaluatee_header = [];
+
+            foreach ($members as $group_member) {
+                $userid = $group_member->userid;
+                $member = $DB->get_record('user', ['id' => $userid]);
+                $criteria_header = array_merge($criteria_header, $criteria);
+                $members_header = [$member->lastname . " " . $member->firstname, '', '', '', '', '', ''];
+                $evaluatee_header = array_merge($evaluatee_header, $members_header);
+            }
+
+            $final_header = array_merge($header, $criteria_header);
+            $final_eval_header = array_merge($eval_header, $evaluatee_header);
+
+            // Write the two header rows
+            $sheet->fromArray($final_eval_header, null, "A{$row}");
+            $sheet->fromArray($final_header, null, "A" . ($row + 1));
+
+            // Highlight header rows exactly like before
+            $headerRange = "A{$row}:" . $sheet->getHighestColumn() . ($row + 1);
+            $sheet->getStyle($headerRange)->applyFromArray([
+                'fill' => [
+                    'fillType' => Fill::FILL_SOLID,
+                    'color' => ['rgb' => 'D9E1F2'] // light blue
+                ],
+                'font' => ['bold' => true],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical' => Alignment::VERTICAL_CENTER
+                ],
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => Border::BORDER_THIN
+                    ]
+                ]
+            ]);
+
+            $row += 3;
+
+            // --- Sub-header for members ---
+            $sheet->fromArray(["Team", "StudentID", "Surname", "Given Name"], null, "A{$row}");
+            $sheet->getStyle("A{$row}:D{$row}")->getFont()->setBold(true);
+            $row++;
+
+            // --- Data rows ---
+            foreach ($members as $member) {
+                $userid = $member->userid;
+                $records = $DB->get_records('smartspe_evaluation', ['evaluator' => $userid]);
+
+                if (!$records) {
+                    continue;
+                }
+
+                foreach ($records as $record) {
+                    $user = $DB->get_record('user', ['id' => $userid]);
+                    $group = $DB->get_record('groups', ['id' => $team->id]);
+                    $group_name = $group->name ?? '';
+
+                    $details = [$group_name, $userid, $user->lastname ?? '', $user->firstname ?? ''];
+                    $result_line = [];
+                    foreach ($records as $record) {
+                        $result = $this->get_line_summary($record);
+                        $result_line = array_merge($result_line, $result);
+                    }
+
+                    $sheet->fromArray(array_merge($details, $result_line), null, "A{$row}");
+                    $row++;
+                }
+            }
+
+            $row += 2; // blank lines between teams
+        }
+
+        // Auto size columns
+        foreach (range('A', $sheet->getHighestColumn()) as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Save to temp file
+        $tempdir = make_temp_directory('smartspe');
+        $tempfile = $tempdir . '/' . $filename;
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($tempfile);
+
+        // Serve file to browser
+        send_file($tempfile, $filename, 0, 0, false, true, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        exit;
+    }
+
+
 
     private function create_file_pdf($filename)
     {
