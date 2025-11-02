@@ -29,6 +29,11 @@ $string['event_attempt_finish'] = 'Attempt finished';
 $string['event_download'] = 'File downloaded';
 $string['event_evaluation_after_duedate'] = 'Evaluation submitted after due date';
 
+// Message provider strings.
+$string['messageprovider:evaluation_notification'] = 'Evaluation submission notifications';
+$string['messageprovider:evaluation_notification_desc'] = 'Notifications sent to users when evaluation is submitted or pending.';
+$string['receivenotifications'] = 'Receive SmartSpe notifications';
+
 // names for admin view
 //Buttons
 $string['startattempt'] = 'Attempt Evaluation';
