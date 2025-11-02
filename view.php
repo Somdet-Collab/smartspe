@@ -21,6 +21,7 @@ require_login($course, true, $cm);
 $smartspe = $DB->get_record('smartspe', ['id' => $instanceid], '*', MUST_EXIST);
 $questionids = explode(',', $smartspe->questionids);
 
+ob_start();
 // --- Read CSV file (comments and self_comments) ---
 $csvpath = __DIR__ . '/comments.csv';
 $peer_comments = [];
@@ -176,6 +177,8 @@ foreach ($groups as $group) {
 
 // --- Debug: remaining comments after assignment ---
 echo '<pre>Remaining peer_comments=' . count($peer_comments) . ', remaining self_comments=' . count($self_comments) . '</pre>';
+
+ob_end_clean();
 ?>
 
 <hr>

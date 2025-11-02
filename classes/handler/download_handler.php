@@ -135,12 +135,12 @@ class download_handler
 
                 foreach($members as $member)
                 {
-                    $records = $DB->get_records('smartspe_evaluation', ['evaluator' => $member->id]);
+                    $userid = $member->userid; //Get evalutor id
+                    $records = $DB->get_records('smartspe_evaluation', ['evaluator' => $userid]);
 
                     if ($records)
                     {
                         //User
-                        $userid = $member->userid; //Get evalutor id
                         $user = $DB->get_record('user', ['id' => $userid]); //Get member name
                         $name = $user->firstname ?? '';
                         $lastname = $user->lastname ?? '';
