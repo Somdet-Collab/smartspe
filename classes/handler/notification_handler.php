@@ -47,6 +47,8 @@ defined('MOODLE_INTERNAL') || die();
         $eventdata->fullmessagehtml = nl2br($message);
         $eventdata->smallmessage = $subject;
 
+        debugging("Sending notification to user {$userid}", DEBUG_DEVELOPER);
+
         return message_send($eventdata);
     }
 

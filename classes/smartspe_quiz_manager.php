@@ -277,6 +277,8 @@ class smartspe_quiz_manager
                         'userid' => $this->userid]); 
         $event->trigger();
 
+        debugging("Attempt finish event triggered for user {$this->userid}", DEBUG_DEVELOPER);
+
         return true;
     }
 
