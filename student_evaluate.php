@@ -117,8 +117,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && confirm_sesskey())
             $quiz_manager->quiz_is_submitted();
             
             redirect(
-                new moodle_url('/mod/smartspe/view.php', ['id' => $cmid]),
-                'All evaluations submitted successfully!',
+                new moodle_url('/course/view.php', ['id' => $course->id]),
+                get_string('submissionsuccess', 'mod_smartspe'),
                 null,
                 \core\output\notification::NOTIFY_SUCCESS
             );
