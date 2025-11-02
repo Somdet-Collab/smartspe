@@ -34,6 +34,9 @@ $string['messageprovider:evaluation_notification'] = 'Evaluation submission noti
 $string['messageprovider:evaluation_notification_desc'] = 'Notifications sent to users when evaluation is submitted or pending.';
 $string['receivenotifications'] = 'Receive SmartSpe notifications';
 
+$string['sentiment_analysis'] = 'Sentiment Analysis';
+$string['statistical_analysis'] = 'Statistical Analysis';
+
 // names for admin view
 //Buttons
 $string['startattempt'] = 'Attempt Evaluation';
