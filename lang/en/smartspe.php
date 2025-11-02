@@ -36,4 +36,5 @@ $string['startattempt'] = 'Attempt Evaluation';
 $string['pluginadministration'] = 'Self Peer Evaluation administration'; // Admin menu
 $string['privacy:metadata'] = 'The Self Peer Evaluation plugin stores user submissions and peer evaluation data.';
 
+$string['submissionsuccess'] = 'All evaluations submitted successfully.';
 ?>
