@@ -319,7 +319,7 @@ class smartspe_quiz_manager
     }
 
     /**
-     * Download the report
+     * Download the report details
      *
      * Called when teacher/Unit coordinator request download
      * 
@@ -327,13 +327,32 @@ class smartspe_quiz_manager
      *@param $extension file extension
      * @return boolean if download is successful
      */
-    public function download_report($extension="csv")
+    public function download_report_details($extension="csv")
     {
         if (strcasecmp($extension, "csv") && strcasecmp($extension, "pdf"))
             throw new moodle_exception("quiz_manager: error file extension");
 
         $filename = 'smartspe_report_' . time();
-        $this->download_handler->download_file($filename, 'csv', $this->courseid);
+        $this->download_handler->download_file($filename, 'csv', $this->courseid, true);
+
+        return true;
+    }
+    
+    /**
+     * Download the report summary
+     *
+     * Called when teacher/Unit coordinator request download
+     * 
+     *@param $extension file extension
+     * @return boolean if download is successful
+     */
+    public function download_report_summary($extension="csv")
+    {
+        if (strcasecmp($extension, "csv") && strcasecmp($extension, "pdf"))
+            throw new moodle_exception("quiz_manager: error file extension");
+
+        $filename = 'smartspe_report_' . time();
+        $this->download_handler->download_file($filename, 'csv', $this->courseid, false);
 
         return true;
     }
