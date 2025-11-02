@@ -107,7 +107,6 @@ class download_handler
             $criteria = ["1", "2", "3", "4", "5", "Average", ""];
 
             $members = $DB->get_records('groups_members', ['groupid' => $team->id]);
-            $group_userids = array_map(fn($m) => $m->userid, $members);
             $criteria_header = [];
             $evaluatee_header = [];
 
@@ -117,7 +116,7 @@ class download_handler
                 foreach($members as $group_member)
                 {
                     //User
-                    $userid = $group_member->id; //Get evalutor id
+                    $userid = $group_member->userid; //Get evalutor id
                     $member = $DB->get_record('user', ['id' => $userid]); //Get member name
                     $criteria_header = array_merge($criteria_header, $criteria);
                     $members_header = [$member->lastname." ".$member->firstname, '','','','','',''];
@@ -141,7 +140,7 @@ class download_handler
                     if ($records)
                     {
                         //User
-                        $userid = $member->id; //Get evalutor id
+                        $userid = $member->userid; //Get evalutor id
                         $user = $DB->get_record('user', ['id' => $userid]); //Get member name
                         $name = $user->firstname ?? '';
                         $lastname = $user->lastname ?? '';
