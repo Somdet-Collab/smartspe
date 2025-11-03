@@ -119,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && confirm_sesskey())
             $answers, 
             $peer_comment, 
             $self_comment, 
-            true  // Finished
+            true  // finished
             );
             // This was the last person - now call final submission
             $quiz_manager->quiz_is_submitted();

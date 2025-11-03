@@ -307,6 +307,10 @@ class smartspe_quiz_manager
                 throw new moodle_exception('In quiz_manager: Failed in submitting the evaluation');
         }
 
+        $event = attempt_finish::create([ 'objectid' => $this->smartspeid, 'context' => $this->context, 
+                        'userid' => $this->userid]); 
+        $event->trigger();
+
         return true;
     }
 
