@@ -143,7 +143,11 @@ class data_persistence
         {
             $qa = $quba->get_question_attempt($slot);
             $question = $qa->get_question(); //get question of this slot
-            $qtype = $question->qtype->name(); //get question type
+            if ($question) {
+                $qtype = $question->qtype->name();
+            } else {
+                continue; // skip this slot
+            }
 
             //Check question slot type
             if ($qtype === 'multichoice')
