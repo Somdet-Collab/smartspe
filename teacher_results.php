@@ -62,7 +62,8 @@ echo '</tbody></table>';
 
 // Add download button
 echo '<div class="mt-3">';
-echo '<a href="download_results.php?id=' . $cmid . '" class="btn btn-primary">Download as CSV</a>';
+echo '<a href="download_results.php?id=' . $cmid . '&type=csv" class="btn btn-primary">Download result details(CSV)</a>';
+echo '<a href="download_results.php?id=' . $cmid . '&type=xlsx" class="btn btn-success">Download result summary(XLSX)</a>';
 echo '</div>';
 
 echo $OUTPUT->footer();
