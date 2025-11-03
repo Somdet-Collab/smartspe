@@ -16,12 +16,17 @@ $PAGE->set_url('/mod/smartspe/teacher_results.php', ['id' => $cmid]);
 $PAGE->set_title('Evaluation Results');
 $PAGE->set_heading($course->fullname);
 
+
 echo $OUTPUT->header();
 
 // Add download button
-echo '<div class="mt-3">';
-echo '<a href="download_results.php?id=' . $cmid . '&type=csv" class="btn btn-primary">Download result details(CSV)</a>';
-echo '<a href="download_results.php?id=' . $cmid . '&type=xlsx" class="btn btn-success">Download result summary(XLSX)</a>';
+echo '<div class="mb-4 mt-3">';
+echo '<a href="download_results.php?id=' . $cmid . '&type=csv" class="btn btn-primary me-2">
+        <i class="fa fa-download"></i> Download result details (CSV)
+      </a>';
+echo '<a href="download_results.php?id=' . $cmid . '&type=xlsx" class="btn btn-success">
+        <i class="fa fa-file-excel-o"></i> Download result summary (XLSX)
+      </a>';
 echo '</div>';
 
 // Get all evaluations
