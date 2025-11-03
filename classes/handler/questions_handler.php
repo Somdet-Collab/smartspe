@@ -37,7 +37,7 @@ class questions_handler
                 {
                     $options[] = [
                         'value' => $answer->id,
-                        'text'  => $answer->answer
+                        'text'  => $answer->answer ?? ''
                     ];
                 }
             }
