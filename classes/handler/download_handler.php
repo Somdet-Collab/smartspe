@@ -87,13 +87,13 @@ class download_handler
 
     private function create_file_xlsx_summary($filename, $course)
     {
-        global $DB, $CFG;
+        global $DB;
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $row = 1;
 
-        // Loop through teams
+        // Get all teams in this course
         $teams = $DB->get_records('groups', ['courseid' => $course]);
         foreach ($teams as $team) {
 
@@ -102,31 +102,32 @@ class download_handler
                 continue;
             }
 
-            // --- Headers (same as CSV version) ---
+            // --- Header setup ---
             $eval_header = ["", "Student being evaluated", "", ""];
             $header = ["", "Assessment Criteria", "", ""];
             $criteria = ["1", "2", "3", "4", "5", "Average", ""];
 
             $criteria_header = [];
             $evaluatee_header = [];
-
             foreach ($members as $group_member) {
                 $userid = $group_member->userid;
                 $member = $DB->get_record('user', ['id' => $userid]);
 
                 $criteria_header = array_merge($criteria_header, $criteria);
-                $member_header = [$member->lastname . " " . $member->firstname, '', '', '', '', '', ''];
+                $member_header = [
+                    $member->lastname . " " . $member->firstname, '', '', '', '', '', ''
+                ];
                 $evaluatee_header = array_merge($evaluatee_header, $member_header);
             }
 
             $final_header = array_merge($header, $criteria_header);
             $final_eval_header = array_merge($eval_header, $evaluatee_header);
 
-            // Write the two header rows
+            // Write headers
             $sheet->fromArray($final_eval_header, null, "A{$row}");
             $sheet->fromArray($final_header, null, "A" . ($row + 1));
 
-            // Highlight and style header rows
+            // Style header
             $headerRange = "A{$row}:" . $sheet->getHighestColumn() . ($row + 1);
             $sheet->getStyle($headerRange)->applyFromArray([
                 'fill' => [
@@ -139,20 +140,23 @@ class download_handler
                     'vertical' => Alignment::VERTICAL_CENTER
                 ],
                 'borders' => [
-                    'allBorders' => [
-                        'borderStyle' => Border::BORDER_THIN
-                    ]
+                    'allBorders' => ['borderStyle' => Border::BORDER_THIN]
                 ]
             ]);
 
             $row += 3;
 
-            // Sub-header for team member info
+            // Subheader for evaluator info
             $sheet->fromArray(["Team", "StudentID", "Surname", "Given Name"], null, "A{$row}");
             $sheet->getStyle("A{$row}:D{$row}")->getFont()->setBold(true);
             $row++;
 
-            // --- Data rows ---
+            // --- Prepare structure for vertical averaging ---
+            // Store all answers keyed by [evaluateeid][question_index]
+            $vertical_sums = [];
+            $vertical_counts = [];
+
+            // --- Data rows for evaluators ---
             foreach ($members as $member) {
                 $userid = $member->userid;
                 $records = $DB->get_records('smartspe_evaluation', ['evaluator' => $userid]);
@@ -167,18 +171,67 @@ class download_handler
                 $result_line = [];
 
                 foreach ($records as $record) {
-                    $result = $this->get_line_summary($record);
+                    $result = $this->get_line_summary($record); // returns [Q1..Q5, avg]
                     $result_line = array_merge($result_line, $result);
+
+                    // Track vertical sums
+                    $evaluatee = $record->evaluatee;
+                    foreach ($result as $index => $val) {
+                        if (!is_numeric($val)) {
+                            continue;
+                        }
+                        $vertical_sums[$evaluatee][$index] = ($vertical_sums[$evaluatee][$index] ?? 0) + $val;
+                        $vertical_counts[$evaluatee][$index] = ($vertical_counts[$evaluatee][$index] ?? 0) + 1;
+                    }
                 }
 
                 $sheet->fromArray(array_merge($details, $result_line), null, "A{$row}");
                 $row++;
             }
 
-            $row += 2; // Blank lines between teams
+            // --- Add Average Row ---
+            $avg_details = ["", "", "", "Average"];
+            $avg_line = [];
+
+            foreach ($members as $group_member) {
+                $evaluatee = $group_member->userid;
+                $answers = [];
+
+                if (isset($vertical_sums[$evaluatee])) {
+                    foreach ($vertical_sums[$evaluatee] as $index => $sum) {
+                        $count = $vertical_counts[$evaluatee][$index] ?? 0;
+                        $avg = $count ? round($sum / $count, 2) : '';
+                        $answers[] = $avg;
+                    }
+                }
+
+                // Ensure always 6 columns (5Q + avg)
+                $answers = array_pad($answers, 6, '');
+
+                // Add trailing empty to match header layout
+                $answers[] = '';
+
+                $avg_line = array_merge($avg_line, $answers);
+            }
+
+            // Write the averages row
+            $sheet->fromArray(array_merge($avg_details, $avg_line), null, "A{$row}");
+            $sheet->getStyle("A{$row}:" . $sheet->getHighestColumn() . "{$row}")->applyFromArray([
+                'fill' => [
+                    'fillType' => Fill::FILL_SOLID,
+                    'color' => ['rgb' => 'FFF2CC']
+                ],
+                'font' => ['bold' => true],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                'borders' => [
+                    'allBorders' => ['borderStyle' => Border::BORDER_THIN]
+                ]
+            ]);
+
+            $row += 3; // Leave space between teams
         }
 
-        // Auto-size columns for clean layout
+        // Auto-size columns
         foreach (range('A', $sheet->getHighestColumn()) as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
@@ -190,9 +243,18 @@ class download_handler
         $writer->save($tempfile);
 
         // Send file to browser
-        send_file($tempfile, $filename, 0, 0, false, true, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        send_file(
+            $tempfile,
+            $filename,
+            0,
+            0,
+            false,
+            true,
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        );
         exit;
     }
+
 
     private function create_file_pdf($filename)
     {
