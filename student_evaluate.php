@@ -2,6 +2,7 @@
 require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/lib.php');
 
+use core\exception\moodle_exception;
 use mod_smartspe\event\attempt_start;
 
 global $DB, $USER, $PAGE, $OUTPUT;
@@ -95,6 +96,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && confirm_sesskey())
     
     // Start attempt for this evaluatee
     $attemptid = $quiz_manager->start_attempt_evaluation($evaluateeid, $questionids);
+
+    if (!$attemptid)
+        throw new moodle_exception("Attemptid in invalid: {$attemptid}");
     
     // Determine if this is the last evaluation
     $current_index = array_search($evaluateeid, $member_ids);
