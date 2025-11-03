@@ -63,6 +63,7 @@ class smartspe_quiz_attempt
             $record = new stdClass();
             $record->smartspeid = $smartspeid;
             $record->userid = $userid;
+            $record->state = 'inprogress';
             $record->memberid = $memberid;
             $record->timecreated = time();
             $record->timemodified = time();
