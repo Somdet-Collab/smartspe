@@ -256,6 +256,11 @@ class smartspe_quiz_manager
         return $fullmembers; // array of full user objects
     }
 
+    public function get_member_ids()
+    {
+        return $this->members;
+    }
+
     public function get_smartspeid() 
     {
         return $this->smartspeid;
