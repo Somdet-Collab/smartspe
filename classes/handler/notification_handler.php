@@ -23,7 +23,7 @@ defined('MOODLE_INTERNAL') || die();
         global $DB;
 
         // Get user info
-        $user = $DB->get_record('user', ['id' => $userid], 'id, firstname, lastname, email');
+        $user = $DB->get_record('user', ['id' => $userid]);
 
         //If user has no email
         if (!$user->email)
