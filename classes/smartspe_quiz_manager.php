@@ -33,7 +33,7 @@ class smartspe_quiz_manager
     protected $userid;
     protected $attemptids;
     protected $cmid;
-    protected $members; 
+    protected $members; //it also includes attemptid for specific members
 
     /**
      * Initializing context and plugin details
@@ -149,8 +149,6 @@ class smartspe_quiz_manager
      */
     public function process_attempt_evaluation($answers, $comment, $self_comment=null, $finish=false)
     {
-        global $DB;
-
         //Wrap data
         $newdata = [
             'answers' => $answers,
@@ -165,12 +163,7 @@ class smartspe_quiz_manager
         //If the evaluation finish
         if($finish)
         {
-            foreach($this->members as $member)
-            {
-                //Mark as finish to all attempt
-                $data_persistence = new data_persistence($this->attemptids[$member], $member);
-                $data_persistence->finish_attempt();
-            }
+            $this->data_persistence->finish_attempt();
         }
 
         return true;
