@@ -18,6 +18,12 @@ $PAGE->set_heading($course->fullname);
 
 echo $OUTPUT->header();
 
+// Add download button
+echo '<div class="mt-3">';
+echo '<a href="download_results.php?id=' . $cmid . '&type=csv" class="btn btn-primary">Download result details(CSV)</a>';
+echo '<a href="download_results.php?id=' . $cmid . '&type=xlsx" class="btn btn-success">Download result summary(XLSX)</a>';
+echo '</div>';
+
 // Get all evaluations
 $sql = "SELECT e.*, u1.firstname as eval_fname, u1.lastname as eval_lname,
                u2.firstname as evaluatee_fname, u2.lastname as evaluatee_lname
@@ -59,11 +65,5 @@ foreach ($evaluations as $eval) {
 }
 
 echo '</tbody></table>';
-
-// Add download button
-echo '<div class="mt-3">';
-echo '<a href="download_results.php?id=' . $cmid . '&type=csv" class="btn btn-primary">Download result details(CSV)</a>';
-echo '<a href="download_results.php?id=' . $cmid . '&type=xlsx" class="btn btn-success">Download result summary(XLSX)</a>';
-echo '</div>';
 
 echo $OUTPUT->footer();

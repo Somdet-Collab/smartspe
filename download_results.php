@@ -24,7 +24,8 @@ require_capability('mod/smartspe:manage', $context);
 // 4. Initialize quiz manager
 $quizmanager = new smartspe_quiz_manager($USER->id, $course->id, $context, $smartspe->id, $cmid);
 
-try {
+try 
+{
     if($extension == "csv")
         $quizmanager->download_report_details($extension);
     if($extension == "xlsx")

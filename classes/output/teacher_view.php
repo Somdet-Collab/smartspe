@@ -59,7 +59,7 @@ class teacher_view implements renderable, templatable
         // 4. Reports button
         $data->buttons[] = [
             'name' => 'View Reports',
-            'url' => (new \moodle_url('/mod/smartspe/reports.php', ['id' => $this->quiz_manager->get_cmid()]))->out(false),
+            'url' => (new \moodle_url('/mod/smartspe/stat_dashboard.php', ['id' => $this->quiz_manager->get_cmid()]))->out(false),
             'icon' => 'fa-bar-chart'
         ];
 
