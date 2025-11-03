@@ -2,6 +2,8 @@
 require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/lib.php');
 
+use mod_smartspe\event\attempt_start;
+
 global $DB, $USER, $PAGE, $OUTPUT;
 
 // Get parameters
@@ -128,6 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && confirm_sesskey())
                 null,
                 \core\output\notification::NOTIFY_SUCCESS
             );
+
         } 
         else 
         {
@@ -140,6 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && confirm_sesskey())
                 'evaluateeid' => $next_evaluateeid
             ]));
         }
+
     } 
 }
 
