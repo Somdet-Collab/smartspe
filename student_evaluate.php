@@ -115,6 +115,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && confirm_sesskey())
         
         if ($is_last) 
         {
+            $quiz_manager->process_attempt_evaluation(
+            $answers, 
+            $peer_comment, 
+            $self_comment, 
+            true  // finished
+            );
             // This was the last person - now call final submission
             $quiz_manager->quiz_is_submitted();
             
