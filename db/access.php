@@ -42,6 +42,15 @@ $capabilities = array(
         )
     ),
 
+    'mod/smartspe:viewstatsdashboard' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        )
+    ),
+
     'mod/smartspe:manage' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
