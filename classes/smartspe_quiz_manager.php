@@ -5,8 +5,6 @@
 namespace mod_smartspe;
 
 use mod_smartspe\event\attempt_finish;
-use mod_smartspe\event\file_download;
-use mod_smartspe\event\attempt_start;
 
 use core\exception\moodle_exception;
 use mod_smartspe\handler\notification_handler;
@@ -134,13 +132,6 @@ class smartspe_quiz_manager
 
         if (!$this->data_persistence)
             throw new moodle_exception("Failed to create data persistence");
-
-        $event = attempt_start::create([
-            'objectid' => $this->smartspeid,
-            'context' => $this->context,
-            'userid' => $this->userid,
-        ]);
-        $event->trigger();
 
         //return attemptid
         return $this->attemptids[$memberid];
@@ -315,10 +306,6 @@ class smartspe_quiz_manager
             if (!$evaluationid)
                 throw new moodle_exception('In quiz_manager: Failed in submitting the evaluation');
         }
-
-        $event = attempt_finish::create([ 'objectid' => $this->smartspeid, 'context' => $this->context, 
-                        'userid' => $this->userid]); 
-        $event->trigger();
 
         return true;
     }
