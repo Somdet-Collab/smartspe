@@ -165,11 +165,18 @@ class smartspe_quiz_manager
         //If the evaluation finish
         if($finish)
         {
-            foreach($this->members as $member)
+            foreach($this->members as $memberid)
             {
-                //Mark as finish to all attempt
-                $data_persistence = new data_persistence($this->attemptids[$member], $member);
-                $data_persistence->finish_attempt();
+                if ($this->attemptids[$memberid])
+                {
+                    //Mark as finish to all attempt
+                    $data_persistence = new data_persistence($this->attemptids[$memberid], $memberid);
+                    $data_persistence->finish_attempt();
+                }
+                else
+                {
+                    throw new moodle_exception("Attempt for $memberid is not found in smartspe_attempts");
+                }
             }
         }
 
