@@ -54,8 +54,8 @@ class smartspe_quiz_manager
         $this->courseid = $courseid;
         $this->context = $context;
         $this->smartspeid = $smartspeid;
-        $this->cmid = $cmid;
         $this->userid = $userid;
+        $this->cmid = $cmid;
         $this->questions_handler = new questions_handler();
         $this->notification_handler = new notification_handler();
         $this->download_handler = new download_handler();
@@ -63,8 +63,15 @@ class smartspe_quiz_manager
         //Get members of this $userid
         $team_manager = new db_team_manager();
 
+        // Initialize arrays
+        $this->members = [];
+        $this->attemptids = [];
+
+        $is_teacher = has_capability('mod/smartspe:manage', $context);
+        $is_student = has_capability('mod/smartspe:submit', $context);
+
         // only try to get members if this is a student
-        if (has_capability('mod/smartspe:submit', $context)) 
+        if ($is_student && !$is_teacher) 
         {
             $this->members = $team_manager->get_members_id($this->userid, $this->courseid);
 
@@ -72,24 +79,29 @@ class smartspe_quiz_manager
             {
                 throw new moodle_exception("The members are empty in section get_members() in quiz_manager");
             }
+
+            // Initialize attemptids array
+            $this->attemptids = [];
+            
+            // Retrieve existing attempts for each team member
+            foreach ($this->members as $memberid) 
+            {
+                $attempt = $DB->get_record('smartspe_attempts', [
+                    'smartspeid' => $this->smartspeid,
+                    'userid' => $this->userid,
+                    'memberid' => $memberid
+                ]);
+                
+                if ($attempt) {
+                    $this->attemptids[$memberid] = $attempt->id;
+                }
+            }
         } 
         else 
         {
             // teacher or non-student: no group needed
             $this->members = [];
-        }
-
-        //Retrive existing attempt
-        foreach ($this->members as $memberid) 
-        {
-            $attempt = $DB->get_record('smartspe_attempts', [
-                'smartspeid' => $this->smartspeid,
-                'userid' => $this->userid,
-                'memberid' => $memberid
-            ]);
-            
-            if ($attempt)
-                $this->attemptids[$memberid] = $attempt->id;
+            $this->attemptids = [];
         }
     }
 
@@ -166,19 +178,24 @@ class smartspe_quiz_manager
         return true;
     }
 
-    public function get_course_id() 
+    public function get_course_module_id() 
     {
         return $this->courseid;
-    }
-
-    public function get_cmid() 
-    {
-        return $this->cmid;
     }
 
     public function get_context()
     {
         return $this->context;
+    }
+
+    public function get_courseid() 
+    {
+        return $this->courseid; // Adjust based on how you store it
+    }
+
+    public function get_cmid()
+    {
+        return $this->cmid;
     }
 
      /**
@@ -210,9 +227,28 @@ class smartspe_quiz_manager
      *
      * @return array $member ids
      */
-    public function get_members()
+    public function get_members() // edited this to pass full objects rather than just ID to allow me to retrieve their names for output
     {
-        return $this->members;
+        global $DB;
+
+        $fullmembers = [];
+        foreach ($this->members as $memberid) 
+        {
+            $user = $DB->get_record('user', ['id' => $memberid], 
+                'id, firstname, lastname, firstnamephonetic, lastnamephonetic, middlename, alternatename');
+            if ($user) 
+            {
+                // Ensure optional fields exist
+                if (!isset($user->firstnamephonetic)) $user->firstnamephonetic = '';
+                if (!isset($user->lastnamephonetic)) $user->lastnamephonetic = '';
+                if (!isset($user->middlename)) $user->middlename = '';
+                if (!isset($user->alternatename)) $user->alternatename = '';
+
+                $fullmembers[] = $user;
+            }
+        }
+
+        return $fullmembers; // array of full user objects
     }
 
     public function get_smartspeid() 
@@ -244,7 +280,8 @@ class smartspe_quiz_manager
             $questions = $data_persistence->load_attempt_questions();
             $comments = null;
 
-            foreach ($questions as $question) {
+            foreach ($questions as $question) 
+            {
                 $qtype = $question['qtype'];
 
                 if ($qtype === 'multichoice') {
@@ -282,8 +319,6 @@ class smartspe_quiz_manager
         $event = attempt_finish::create([ 'objectid' => $this->smartspeid, 'context' => $this->context, 
                         'userid' => $this->userid]); 
         $event->trigger();
-
-        debugging("Attempt finish event triggered for user {$this->userid}", DEBUG_DEVELOPER);
 
         return true;
     }
