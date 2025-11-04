@@ -28,14 +28,23 @@ class db_evaluation
             //Loop all answers
             foreach ($answers as $index => $answer)
             {
-                if (!$answer)
+                // treat only null/empty-string as missing answers (0 may be a valid numeric answer)
+                if ($answer === null || $answer === '')
                     throw new moodle_exception("In db_evaluation: No answer added with answers[$index]");
 
-                $sum += $answer;
-
-                $field = 'q'.($index+1); //q1, q2, etc. (database column for questions)
-                $record->$field = $answer;
-                $nums++;
+                // ensure numeric answers are stored as integers
+                if (is_numeric($answer)) {
+                    $answer = (int)$answer;
+                } else {
+                    // If you expect only numeric answers for MCQ, throw; otherwise keep as-is
+                    throw new moodle_exception("In db_evaluation: Invalid answer format for answers[$index]");
+                }
+ 
+                 $sum += $answer;
+ 
+                 $field = 'q'.($index+1); //q1, q2, etc. (database column for questions)
+                 $record->$field = $answer;
+                 $nums++;
             }
 
             $record->average = $sum / $nums;

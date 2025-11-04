@@ -30,6 +30,8 @@ class download_handler
         //Check the extension
         if ($extension == "csv" && $details)
             return $this->create_file_csv_details($filename.'.'.$extension, $course);
+        else if ($extension == "csv" && !$details)
+            return $this->create_file_csv_sentiment($filename.'.'.$extension, $course);
         else if ($extension == "xlsx" && !$details)
             return $this->create_file_xlsx_summary($filename.'.'.$extension, $course);
         else if ($extension == "pdf")
@@ -74,6 +76,57 @@ class download_handler
         $records = $DB->get_records('smartspe_evaluation', ['course' => $course]);
         foreach ($records as $record) {
             fputcsv($fp, $this->get_line_record_details($record));
+        }
+
+        fclose($fp);
+
+        // Use Moodle’s send_file() to serve download safely
+        send_file($tempfile, $filename, 0, 0, false, true, 'text/csv');
+
+        // Stop Moodle rendering page
+        exit;
+    }
+
+    /**
+     * Create report for .csv
+     *
+     * Called when teacher/Unit coordinator request download for csv file
+     * 
+     *@param $filename file name
+     * @return boolean if download is successful
+     */
+    private function create_file_csv_sentiment($filename, $course)
+    {
+        global $DB;
+
+        // Remove any output before sending CSV
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        \core\session\manager::write_close();
+        
+        // Create temporary file in Moodle temp dir
+        $tempdir = make_temp_directory('smartspe');
+        $tempfile = $tempdir . '/' . $filename;
+
+        // Create CSV in memory
+        $fp = fopen($tempfile, 'w');
+        if (!$fp) {
+            throw new moodle_exception("Cannot open file stream for CSV");
+        }
+
+        $header = ["Evaluator ID", "Evaluator Name", "Evaluatee ID", "Evaluatee Name", "Group", "Evaluation Type", 
+                    "Feedback_Text", "Toxicity_score", "Toxicity_label", "text_score", "predicted_label"];
+
+        fputcsv($fp, $header);
+
+        $records = $DB->get_records('smartspe_evaluation', ['course' => $course]);
+        foreach ($records as $record) {
+            $line = $this->get_line_record_details($record);
+            if (empty($line))
+                continue;
+            else
+                fputcsv($fp, $line);
         }
 
         fclose($fp);
@@ -305,6 +358,46 @@ class download_handler
 
         $line = [$userid,$name, $lastname,$memberid,$member_name, $member_lastname,$group_name,$polarity,
                 $sentiment_score,$q1,$q2,$q3,$q4,$q5,$average,$comment,$self_comment];
+
+        return $line;
+    }
+
+    private function get_line_record_sentiment($record)
+    {
+        global $DB;
+
+        //User
+        $userid = $record->evaluator; //Get evalutor id
+        $user = $DB->get_record('user', ['id' => $userid]); //Get member name
+        $name = $user->firstname ?? '';
+        $lastname = $user->lastname ?? '';
+
+        //Member
+        $memberid = $record->evaluatee; //Get evalutee id
+        $member = $DB->get_record('user', ['id' => $memberid]); //Get member name
+        $member_name = $member->firstname ?? '';
+        $member_lastname = $member->lastname ?? '';
+
+        //Groups
+        $group_member = $DB->get_record('groups_members', ['userid' => $userid]); //get teamid
+        $group = $DB->get_record('groups', ['id' => $group_member->groupid]);
+        $group_name = $group->name ?? '';
+
+        //Get analysis result
+        $result = $DB->get_record('feedback_ai_results', ['evaluatorID' => $userid, 'evaluateeID' => $memberid]);
+
+        if(!$result)
+            return [];
+
+        $eval_type = $result->evaluation_type;
+        $eval_feedback = $result->feedback_text;
+        $eval_toxicity_score = $result->toxicity_score;
+        $eval_toxicity_label = $result->toxicity_label;
+        $eval_text_score = $result->text_score;
+        $eval_predicted = $result->predicted_label;
+
+        $line = [$userid, $name, $memberid, $member_name, $group_name, $eval_type, $eval_feedback, $eval_toxicity_score
+                    , $eval_toxicity_label, $eval_text_score, $eval_predicted];
 
         return $line;
     }

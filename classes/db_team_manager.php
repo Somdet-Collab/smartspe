@@ -11,30 +11,25 @@ class db_team_manager
     {
         global $DB;
 
-        if (!$this->record_exist('groups_members', ['userid' => $userid])) 
-        {
-            // returning empty array if user is not in any gorup insstead of throwing an exception
+        if (!$this->record_exist('groups_members', ['userid' => $userid])) {
             return [];
         }
 
-        // Get the group record of this user.
-        $user = $DB->get_record('groups_members', ['userid' => $userid], '*', MUST_EXIST);
-        $groupid = $user->groupid;
+        $userrecord = $DB->get_record('groups_members', ['userid' => $userid], '*', MUST_EXIST);
+        $groupid = $userrecord->groupid;
 
-        // Ensure the group belongs to this course.
-        if (!$this->record_exist('groups', ['id' => $groupid, 'courseid' => $courseid])) 
-        {
+        if (!$this->record_exist('groups', ['id' => $groupid, 'courseid' => $courseid])) {
             throw new moodle_exception("User {$userid}’s group does not belong to course {$courseid}.");
         }
 
-        // Get all members in the same group.
-        $members = $DB->get_records('groups_members', ['groupid' => $groupid], '', 'userid');
-
+        // get full records and map to integer ids
+        $members = $DB->get_records('groups_members', ['groupid' => $groupid], '', '*');
         if (empty($members)) {
             throw new moodle_exception("No members found in the group for user {$userid}.");
         }
 
-        $members_id = array_map(fn($m) => $m->userid, $members);
+        $members_id = array_map(fn($m) => (int)$m->userid, $members);
+        $members_id = array_values(array_unique($members_id, SORT_NUMERIC)); // reindex and dedupe
 
         return $members_id;
     }

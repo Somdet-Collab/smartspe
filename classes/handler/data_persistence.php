@@ -135,8 +135,6 @@ class data_persistence
 
         $answer_index = 0; //track on number of answer
         $answers = $newdata['answers'];
-        if (!$answers)
-            throw new moodle_exception('In data_persistence: $answers empty');
 
         // Loop through all slots in this usage
         foreach ($quba->get_slots() as $index => $slot)

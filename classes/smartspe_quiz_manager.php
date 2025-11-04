@@ -72,9 +72,9 @@ class smartspe_quiz_manager
         if ($is_student && !$is_teacher) 
         {
             $this->members = $team_manager->get_members_id($this->userid, $this->courseid);
-
-            if (empty($this->members)) 
-            {
+            $this->members = array_map('intval', $this->members);
+            $this->members = array_values(array_unique($this->members, SORT_NUMERIC));
+            if (empty($this->members)) {
                 throw new moodle_exception("The members are empty in section get_members() in quiz_manager");
             }
 
@@ -160,10 +160,19 @@ class smartspe_quiz_manager
         if(!$this->data_persistence->auto_save($newdata))
             throw new moodle_exception("Failed autosave data");
 
-        //If the evaluation finish
-        if($finish)
+        if ($finish)
         {
-            $this->data_persistence->finish_attempt();
+            //If the evaluation finish
+            foreach ($this->members as $memberid) {
+                //Mark as finish to all attempt
+                if ($this->attemptids[$memberid]) {
+                    //Mark as finish to all attempt
+                    $data_persistence = new data_persistence($this->attemptids[$memberid], $memberid);
+                    $data_persistence->finish_attempt();
+                } else {
+                    throw new moodle_exception("Attempt for $memberid is not found in smartspe_attempts");
+                }
+            }
         }
 
         return true;
@@ -207,10 +216,39 @@ class smartspe_quiz_manager
      * @return array questions
      * @return array comments
      */
-    public function get_saved_questions_answers()
+    public function get_saved_questions_answers($memberid = null)
     {
-        $questions = $this->data_persistence->load_attempt_questions();
-        return $questions;
+        global $DB;
+
+        // If caller didn't provide member id and there's exactly one member, use it.
+        if ($memberid === null) {
+            if (count($this->members) === 1) {
+                $memberid = $this->members[0];
+            } else {
+                throw new moodle_exception('get_saved_questions_answers: member id is required');
+            }
+        }
+
+        // Ensure we have an attempt id for this member; if not try to load from DB.
+        if (empty($this->attemptids[$memberid])) {
+            $attempt = $DB->get_record('smartspe_attempts', [
+                'smartspeid' => $this->smartspeid,
+                'userid' => $this->userid,
+                'memberid' => $memberid
+            ]);
+            if ($attempt) {
+                $this->attemptids[$memberid] = $attempt->id;
+            } else {
+                // No attempt yet for this member
+                throw new moodle_exception("No attempt found for member {$memberid}");
+            }
+        }
+
+        // (Re)create data_persistence for this member so load_attempt_questions() is available.
+        $this->data_persistence = new data_persistence($this->attemptids[$memberid], $memberid);
+
+        // Return questions + comments
+        return $this->data_persistence->load_attempt_questions();
     }
 
     /**
@@ -281,8 +319,12 @@ class smartspe_quiz_manager
                 $qtype = $question['qtype'];
 
                 if ($qtype === 'multichoice') {
-                    //Get all saved answers
-                    $answers[] = (int) $question['current_answer'];
+                    //Get saved answer without forcing cast to int (so we can detect missing)
+                    $raw = $question['current_answer'] ?? null;
+                    if ($raw === null || $raw === '') {
+                        throw new \moodle_exception("Missing answer for member {$memberid} at question id {$question['id']}");
+                    }
+                    $answers[] = (int)$raw;
                 } elseif ($qtype === 'essay') {
                     $comments = $question['current_answer'];
                 } else {
@@ -335,6 +377,17 @@ class smartspe_quiz_manager
 
         $filename = 'smartspe_report_' . time();
         $this->download_handler->download_file($filename, $extension, $this->courseid, true);
+
+        return true;
+    }
+
+    public function download_sentiment_report($extension="csv")
+    {
+        if (strcasecmp($extension, "csv") && strcasecmp($extension, "pdf"))
+            throw new moodle_exception("quiz_manager: error file extension");
+
+        $filename = 'smartspe_report_' . time();
+        $this->download_handler->download_file($filename, $extension, $this->courseid, false);
 
         return true;
     }
