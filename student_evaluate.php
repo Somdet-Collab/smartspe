@@ -116,30 +116,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && confirm_sesskey()) {
             if ($require_full && $ans === null) {
                 throw new moodle_exception("Index {$idx}: no answer");
             }
-            //answer from db
-            $record = $DB->get_record('question_answers', ['id' => $ans]);
-            $answer = $record->answer;
-            $answer_int = 0;
 
-            if (!is_numeric($answer))
-            {
-                // Step 1: remove HTML tags
-                $clean = strip_tags($answer);
-
-                // Step 2: convert to integer
-                $answer_int = (int) $clean;
-            }
-            else
-            {
-                $answer_int = $answer;
-            }
-
-            $answers[] = $answer_int;
+            $answers[] = $ans;
         } elseif ($qtype === 'essay') {
             $ans = optional_param($fieldname, '', PARAM_TEXT);
             $comments[] = trim($ans);
         } else {
             throw new moodle_exception("Unhandled question type: {$qtype}");
+        }
+    }
+
+    $answer_int = [];
+    foreach ($answers as $ans) 
+    {
+        //answer from db
+        $record = $DB->get_record('question_answers', ['id' => $ans]);
+        $answer = $record->answer;
+
+        if (!is_numeric($answer)) {
+            // Step 1: remove HTML tags
+            $clean = strip_tags($answer);
+
+            // Step 2: convert to integer
+            $answer_int = (int) $clean;
+        } else {
+            $answer_int[] = $answer;
         }
     }
 
