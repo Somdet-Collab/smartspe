@@ -126,32 +126,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && confirm_sesskey()) {
         }
     }
 
-    $answer_int = [];
-    foreach ($answers as $ans) 
-    {
-        //answer from db
-        $record = $DB->get_record('question_answers', ['id' => $ans]);
-        $answer = $record->answer;
-
-        if (!is_numeric($answer)) {
-            // Step 1: remove HTML tags
-            $clean = strip_tags($answer);
-
-            // Step 2: convert to integer
-            $answer_int = (int) $clean;
-        } else {
-            $answer_int[] = $answer;
-        }
-    }
-
-    $comment2 = null;
-    $comment = null;
-    if($type === 'peer') {
-        $comment = $comments[0] ?? null;
-    } else {
-        $comment = $comments[0] ?? null;
-        $comment2 = $comments[1] ?? null;
-    }
+    $comment2 = $comments[1] ?? null;
+    $comment = $comments[0] ?? null;
 
     $attemptid = $quiz_manager->start_attempt_evaluation($displayed, $questionids);
     $quiz_manager->process_attempt_evaluation(

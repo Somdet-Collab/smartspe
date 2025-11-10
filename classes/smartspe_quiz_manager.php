@@ -300,6 +300,8 @@ class smartspe_quiz_manager
      */
     public function quiz_is_submitted()
     {
+        global $DB;
+
         foreach($this->members as $memberid)
         {
             //Initialize
@@ -326,29 +328,36 @@ class smartspe_quiz_manager
                     }
                     $answers[] = (int)$raw;
                 } elseif ($qtype === 'essay') {
-                    $comments = $question['current_answer'];
+                    $comments[] = $question['current_answer'];
                 } else {
                     throw new moodle_exception("Currently question type ($qtype)");
                 }
             }
 
-            //Get comment
-            if($comments)
+            $answer_int = [];
+            foreach ($answers as $ans) 
             {
-                $comment = $comments['comment'];
-                //Get self comment
-                if(!$comments['self_comment'])
-                    $self_comment = null;
-                else
-                    $self_comment = $comments['self_comment'];
+                //answer from db
+                $record = $DB->get_record('question_answers', ['id' => $ans]);
+                $answer = $record->answer;
+
+                if (!is_numeric($answer)) {
+                    // Step 1: remove HTML tags
+                    $clean = strip_tags($answer);
+
+                    // Step 2: convert to integer
+                    $answer_int[] = (int) $clean;
+                } else {
+                    $answer_int[] = $answer;
+                }
             }
 
             $this->submission_handler = new submission_handler($this->userid, 
                             $this->courseid, $this->attemptids[$memberid]);
 
             //Return evaluation id
-            $evaluationid = $this->submission_handler->is_submitted($answers, $memberid, 
-                                                        $comment, $self_comment);
+            $evaluationid = $this->submission_handler->is_submitted($answer_int, $memberid, 
+                                                        $comments[0] ?? null, $comments[1] ?? null);
 
             if (!$evaluationid)
                 throw new moodle_exception('In quiz_manager: Failed in submitting the evaluation');

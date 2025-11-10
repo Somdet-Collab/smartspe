@@ -122,7 +122,7 @@ class download_handler
 
         $records = $DB->get_records('smartspe_evaluation', ['course' => $course]);
         foreach ($records as $record) {
-            $line = $this->get_line_record_details($record);
+            $line = $this->get_line_record_sentiment($record);
             if (empty($line))
                 continue;
             else

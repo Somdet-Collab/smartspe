@@ -62,40 +62,57 @@ class data_persistence
 
         //Get all questions
         $questions = [];
-        foreach ($quba->get_slots() as $slot) 
-        {
-            $qa = $quba->get_question_attempt($slot); //get qa
-            $question = $qa->get_question(); //get question of this slot
-            $qtype = $question->qtype->name();
-            $last_saved = $qa->get_last_qt_data(); //get saved answer, array($string)
-            $currentdata = null;
-
-            switch ($qtype) 
-            {
-                case 'multichoice':
-                case 'truefalse':
-                    $currentdata = $last_saved['answer'] ?? null;
-                    break;
-
-                case 'essay':
-                    $currentdata = $comments; //comments['comment', 'self_comment']
-                    break;
-
-                default:
-                    $currentdata = json_encode($currentdata); // fallback: keep full structure
-                    break;
-            }
-
-            $questions[] = //questions[index][attribute]
-            [
-                'id' => $question->id,
-                'name' => $question->name,
-                'text' => $question->questiontext,
-                'qtype' => $qtype,
-                'state' => $qa->get_state()->__toString(),
-                'current_answer' => $currentdata
-            ];
-        }
+        $essayIndex = 0; // track which essay slot we are at so we can map comments correctly
+         foreach ($quba->get_slots() as $slot) 
+         {
+             $qa = $quba->get_question_attempt($slot); //get qa
+             $question = $qa->get_question(); //get question of this slot
+             $qtype = $question->qtype->name();
+             $last_saved = $qa->get_last_qt_data(); //get saved answer, array($string)
+             $currentdata = null;
+ 
+             switch ($qtype) 
+             {
+                 case 'multichoice':
+                 case 'truefalse':
+                     $currentdata = $last_saved['answer'] ?? null;
+                     break;
+ 
+                 case 'essay':
+                    // Map stored comments JSON to individual essay slots:
+                    // - first essay slot -> comments['comment']
+                    // - second essay slot -> comments['self_comment']
+                    // - further essay slots -> empty string
+                    if (is_array($comments)) {
+                        if ($essayIndex === 0) {
+                            $currentdata = $comments['comment'] ?? '';
+                        } elseif ($essayIndex === 1) {
+                            $currentdata = $comments['self_comment'] ?? '';
+                        } else {
+                            $currentdata = '';
+                        }
+                    } else {
+                        $currentdata = '';
+                    }
+                    $essayIndex++;
+ 
+                     break;
+ 
+                 default:
+                     $currentdata = json_encode($currentdata); // fallback: keep full structure
+                     break;
+             }
+ 
+             $questions[] = //questions[index][attribute]
+             [
+                 'id' => $question->id,
+                 'name' => $question->name,
+                 'text' => $question->questiontext,
+                 'qtype' => $qtype,
+                 'state' => $qa->get_state()->__toString(),
+                 'current_answer' => $currentdata
+             ];
+         }
 
         return $questions;
     }
