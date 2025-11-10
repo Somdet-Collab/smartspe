@@ -10,6 +10,7 @@ global $DB, $USER;
 // 1. Get course module ID
 $cmid = required_param('id', PARAM_INT);
 $extension = optional_param('type', 'csv', PARAM_ALPHA);
+$sentiment = optional_param('sentiment', 'false', PARAM_ALPHA);
 
 // 2. Get Moodle context info
 $cm = get_coursemodule_from_id('smartspe', $cmid, 0, false, MUST_EXIST);
@@ -26,8 +27,10 @@ $quizmanager = new smartspe_quiz_manager($USER->id, $course->id, $context, $smar
 
 try 
 {
-    if($extension == "csv")
+    if($extension == "csv" && !$sentiment)
         $quizmanager->download_report_details($extension);
+    if ($extension == "csv" && $sentiment)
+        $quizmanager->download_sentiment_report($extension);
     if($extension == "xlsx")
         $quizmanager->download_report_summary($extension);
 } catch (Exception $e) {
