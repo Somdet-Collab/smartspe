@@ -27,9 +27,9 @@ $quizmanager = new smartspe_quiz_manager($USER->id, $course->id, $context, $smar
 
 try 
 {
-    if($extension == "csv" && !$sentiment)
+    if($extension == "csv" && $sentiment == "false")
         $quizmanager->download_report_details($extension);
-    if ($extension == "csv" && $sentiment)
+    if ($extension == "csv" && $sentiment == "true")
         $quizmanager->download_sentiment_report($extension);
     if($extension == "xlsx")
         $quizmanager->download_report_summary($extension);

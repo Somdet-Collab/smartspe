@@ -339,14 +339,22 @@ class download_handler
         $member_lastname = $member->lastname ?? '';
 
         //Groups
-        $group_member = $DB->get_record('groups_members', ['userid' => $userid]); //get teamid
-        $group = $DB->get_record('groups', ['id' => $group_member->groupid]);
-        $group_name = $group->name ?? '';
+        if ($group_member = $DB->get_record('groups_members', ['userid' => $userid])) //get teamid
+        {
+            if($group = $DB->get_record('groups', ['id' => $group_member->groupid]))
+                $group_name = $group->name;
+            else
+                $group_name = '';
+        }
+        else
+        {
+            $group_name = '';
+        }
 
         //Get analysis result
-        $result = $DB->get_record('smartspe_sentiment_analysis', ['evaluationid' => $record->id]);
-        $polarity = $result->polarity ?? null;
-        $sentiment_score = $result->sentimentscore ?? null;
+        $result = $DB->get_record('feedback_ai_results', ['evaluatorID' => $userid, 'evaluateeID' => $memberid]);
+        $polarity = $result->predicted_label ?? null;
+        $sentiment_score = $result->text_score ?? null;
         $q1 = $record->q1 ?? null;
         $q2 = $record->q2 ?? null;
         $q3 = $record->q3 ?? null;
@@ -379,9 +387,17 @@ class download_handler
         $member_lastname = $member->lastname ?? '';
 
         //Groups
-        $group_member = $DB->get_record('groups_members', ['userid' => $userid]); //get teamid
-        $group = $DB->get_record('groups', ['id' => $group_member->groupid]);
-        $group_name = $group->name ?? '';
+        if ($group_member = $DB->get_record('groups_members', ['userid' => $userid])) //get teamid
+        {
+            if($group = $DB->get_record('groups', ['id' => $group_member->groupid]))
+                $group_name = $group->name;
+            else
+                $group_name = '';
+        }
+        else
+        {
+            $group_name = '';
+        }
 
         //Get analysis result
         $result = $DB->get_record('feedback_ai_results', ['evaluatorID' => $userid, 'evaluateeID' => $memberid]);
