@@ -25,17 +25,17 @@ class download_handler
      *@param $extension file extension
      * @return bool if download is successful
      */
-    public function download_file($filename, $extension, $course, $details=false)
+    public function download_file($filename, $extension, $course, $details = false)
     {
         //Check the extension
         if ($extension == "csv" && $details)
-            return $this->create_file_csv_details($filename.'.'.$extension, $course);
+            return $this->create_file_csv_details($filename . '.' . $extension, $course);
         else if ($extension == "csv" && !$details)
-            return $this->create_file_csv_sentiment($filename.'.'.$extension, $course);
+            return $this->create_file_csv_sentiment($filename . '.' . $extension, $course);
         else if ($extension == "xlsx" && !$details)
-            return $this->create_file_xlsx_summary($filename.'.'.$extension, $course);
+            return $this->create_file_xlsx_summary($filename . '.' . $extension, $course);
         else if ($extension == "pdf")
-            return $this->create_file_pdf($filename.'.'.$extension);
+            return $this->create_file_pdf($filename . '.' . $extension);
         else
             throw new moodle_exception(("The file extension is not supported: {$extension}"));
     }
@@ -57,7 +57,7 @@ class download_handler
             ob_end_clean();
         }
         \core\session\manager::write_close();
-        
+
         // Create temporary file in Moodle temp dir
         $tempdir = make_temp_directory('smartspe');
         $tempfile = $tempdir . '/' . $filename;
@@ -68,8 +68,25 @@ class download_handler
             throw new moodle_exception("Cannot open file stream for CSV");
         }
 
-        $header = ["StudentID","Name", "Lastname","Memberid","Member_Name","Member_Lastname","Group","Polarity",
-                    "Sentiment_Scores","Q1","Q2","Q3","Q4","Q5","Average","comment","self_comment"];
+        $header = [
+            "StudentID",
+            "Name",
+            "Lastname",
+            "Memberid",
+            "Member_Name",
+            "Member_Lastname",
+            "Group",
+            "Polarity",
+            "Sentiment_Scores",
+            "Q1",
+            "Q2",
+            "Q3",
+            "Q4",
+            "Q5",
+            "Average",
+            "comment",
+            "self_comment"
+        ];
 
         fputcsv($fp, $header);
 
@@ -95,49 +112,6 @@ class download_handler
      *@param $filename file name
      * @return boolean if download is successful
      */
-    private function create_file_csv_sentiment($filename, $course)
-    {
-        global $DB;
-
-        // Remove any output before sending CSV
-        while (ob_get_level()) {
-            ob_end_clean();
-        }
-        \core\session\manager::write_close();
-        
-        // Create temporary file in Moodle temp dir
-        $tempdir = make_temp_directory('smartspe');
-        $tempfile = $tempdir . '/' . $filename;
-
-        // Create CSV in memory
-        $fp = fopen($tempfile, 'w');
-        if (!$fp) {
-            throw new moodle_exception("Cannot open file stream for CSV");
-        }
-
-        $header = ["Evaluator ID", "Evaluator Name", "Evaluatee ID", "Evaluatee Name", "Group", "Evaluation Type", 
-                    "Feedback_Text", "Toxicity_score", "Toxicity_label", "text_score", "predicted_label"];
-
-        fputcsv($fp, $header);
-
-        $records = $DB->get_records('smartspe_evaluation', ['course' => $course]);
-        foreach ($records as $record) {
-            $line = $this->get_line_record_sentiment($record);
-            if (empty($line))
-                continue;
-            else
-                fputcsv($fp, $line);
-        }
-
-        fclose($fp);
-
-        // Use Moodle’s send_file() to serve download safely
-        send_file($tempfile, $filename, 0, 0, false, true, 'text/csv');
-
-        // Stop Moodle rendering page
-        exit;
-    }
-
     private function create_file_xlsx_summary($filename, $course)
     {
         global $DB;
@@ -145,6 +119,23 @@ class download_handler
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $row = 1;
+
+        /* --- ADD TITLE (wide merge to be safe) --- */
+        $title = "Self and Peer Assessment: Student Ratings";
+        // Merge a wide range so title span always covers headers that come later
+        $sheet->mergeCells("A{$row}:ZZ{$row}");
+        $sheet->setCellValue("A{$row}", $title);
+        $sheet->getStyle("A{$row}")->applyFromArray([
+            'font' => [
+                'bold' => true,
+                'size' => 16,
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_LEFT,
+                'vertical' => Alignment::VERTICAL_CENTER
+            ]
+        ]);
+        $row += 2; // leave space after title
 
         // Get all teams in this course
         $teams = $DB->get_records('groups', ['courseid' => $course]);
@@ -155,6 +146,18 @@ class download_handler
                 continue;
             }
 
+            // Filter out invalid members (integrity check)
+            $valid_members = [];
+            foreach ($members as $m) {
+                $user = $DB->get_record('user', ['id' => $m->userid]);
+                if ($user) {
+                    $valid_members[$m->userid] = $m;
+                }
+            }
+            if (empty($valid_members)) {
+                continue;
+            }
+
             // --- Header setup ---
             $eval_header = ["", "Student being evaluated", "", ""];
             $header = ["", "Assessment Criteria", "", ""];
@@ -162,15 +165,33 @@ class download_handler
 
             $criteria_header = [];
             $evaluatee_header = [];
-            foreach ($members as $group_member) {
+
+            // Build a deterministic evaluatee order (important for column alignment)
+            $evaluatee_order = [];
+            foreach ($valid_members as $group_member) {
                 $userid = $group_member->userid;
                 $member = $DB->get_record('user', ['id' => $userid]);
+                if (!$member)
+                    continue;
+
+                $evaluatee_order[] = $userid;
 
                 $criteria_header = array_merge($criteria_header, $criteria);
                 $member_header = [
-                    $member->lastname . " " . $member->firstname, '', '', '', '', '', ''
+                    $member->lastname . " " . $member->firstname,
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    ''
                 ];
                 $evaluatee_header = array_merge($evaluatee_header, $member_header);
+            }
+
+            // If no valid evaluatee headers (safety)
+            if (empty($evaluatee_order)) {
+                continue;
             }
 
             $final_header = array_merge($header, $criteria_header);
@@ -180,24 +201,29 @@ class download_handler
             $sheet->fromArray($final_eval_header, null, "A{$row}");
             $sheet->fromArray($final_header, null, "A" . ($row + 1));
 
-            // Style header
-            $headerRange = "A{$row}:" . $sheet->getHighestColumn() . ($row + 1);
-            $sheet->getStyle($headerRange)->applyFromArray([
-                'fill' => [
-                    'fillType' => Fill::FILL_SOLID,
-                    'color' => ['rgb' => 'D9E1F2']
-                ],
-                'font' => ['bold' => true],
-                'alignment' => [
-                    'horizontal' => Alignment::HORIZONTAL_CENTER,
-                    'vertical' => Alignment::VERTICAL_CENTER
-                ],
-                'borders' => [
-                    'allBorders' => ['borderStyle' => Border::BORDER_THIN]
-                ]
-            ]);
+            // Determine last column for this team (details columns = 4, each evaluatee block = 7 columns)
+            $detailsCount = 4;
+            $lastColIndex = $detailsCount + (count($evaluatee_order) * 7);
+            $lastCol = $sheet->getCellByColumnAndRow($lastColIndex, $row)->getColumn();
 
-            $row += 3;
+            // Style header (limit to team columns only)
+            $headerRange = "A{$row}:{$lastCol}" . ($row + 1);
+            $sheet->getStyle($headerRange)->applyFromArray([
+                 'fill' => [
+                     'fillType' => Fill::FILL_SOLID,
+                     'color' => ['rgb' => 'D9E1F2']
+                 ],
+                 'font' => ['bold' => true],
+                 'alignment' => [
+                     'horizontal' => Alignment::HORIZONTAL_CENTER,
+                     'vertical' => Alignment::VERTICAL_CENTER
+                 ],
+                 'borders' => [
+                     'allBorders' => ['borderStyle' => Border::BORDER_THIN]
+                 ]
+             ]);
+
+             $row += 3;
 
             // Subheader for evaluator info
             $sheet->fromArray(["Team", "StudentID", "Surname", "Given Name"], null, "A{$row}");
@@ -205,15 +231,15 @@ class download_handler
             $row++;
 
             // --- Prepare structure for vertical averaging ---
-            // Store all answers keyed by [evaluateeid][question_index]
             $vertical_sums = [];
             $vertical_counts = [];
 
             // --- Data rows for evaluators ---
-            foreach ($members as $member) {
+            foreach ($valid_members as $member) {
                 $userid = $member->userid;
                 $records = $DB->get_records('smartspe_evaluation', ['evaluator' => $userid]);
                 if (!$records) {
+                    // still write the evaluator details row? you previously skipped - keep same behaviour
                     continue;
                 }
 
@@ -223,22 +249,59 @@ class download_handler
                 $details = [$group_name, $userid, $user->lastname ?? '', $user->firstname ?? ''];
                 $result_line = [];
 
-                foreach ($records as $record) {
-                    $result = $this->get_line_summary($record); // returns [Q1..Q5, avg]
-                    $result_line = array_merge($result_line, $result);
+                // Build a map from evaluatee => record so we can output cells in the header order
+                $records_map = [];
+                foreach ($records as $r) {
+                    $records_map[$r->evaluatee] = $r;
+                }
 
-                    // Track vertical sums
-                    $evaluatee = $record->evaluatee;
-                    foreach ($result as $index => $val) {
-                        if (!is_numeric($val)) {
-                            continue;
+                // For each evaluatee in the header order, either place their result or blanks
+                foreach ($evaluatee_order as $eval_index => $evaluatee_userid) {
+                    if (isset($records_map[$evaluatee_userid])) {
+                        $record = $records_map[$evaluatee_userid];
+                        $result = $this->get_line_summary($record); // returns [Q1..Q5, avg]
+                        $result_line = array_merge($result_line, $result);
+
+                        // Track vertical sums (use same index scheme as get_line_summary returns)
+                        foreach ($result as $index => $val) {
+                            if (!is_numeric($val)) {
+                                continue;
+                            }
+                            $vertical_sums[$evaluatee_userid][$index] = ($vertical_sums[$evaluatee_userid][$index] ?? 0) + $val;
+                            $vertical_counts[$evaluatee_userid][$index] = ($vertical_counts[$evaluatee_userid][$index] ?? 0) + 1;
                         }
-                        $vertical_sums[$evaluatee][$index] = ($vertical_sums[$evaluatee][$index] ?? 0) + $val;
-                        $vertical_counts[$evaluatee][$index] = ($vertical_counts[$evaluatee][$index] ?? 0) + 1;
+                    } else {
+                        // No record for this evaluatee from this evaluator -> insert 7 blanks (5Q + avg + trailing)
+                        $result_line = array_merge($result_line, array_fill(0, 7, ''));
                     }
                 }
 
+                // Write the evaluator row
                 $sheet->fromArray(array_merge($details, $result_line), null, "A{$row}");
+
+                /* --- HIGHLIGHT SELF-EVALUATION BLOCK (correctly aligned) --- */
+                // Details columns = 4 (A..D), each evaluatee block = 7 columns
+                $detailsCount = 4;
+                foreach ($evaluatee_order as $blockIndex => $evaluatee_userid) {
+                    // If this block is a self-evaluation (evaluator == evaluatee) and there is actually a record
+                    if ($userid == $evaluatee_userid && isset($records_map[$evaluatee_userid])) {
+                        $startColIndex = $detailsCount + ($blockIndex * 7) + 1; // 1-based column index
+                        $endColIndex = $startColIndex + 6;
+                        $startCol = $sheet->getCellByColumnAndRow($startColIndex, $row)->getColumn();
+                        $endCol = $sheet->getCellByColumnAndRow($endColIndex, $row)->getColumn();
+                        $selfRange = "{$startCol}{$row}:{$endCol}{$row}";
+
+                        $sheet->getStyle($selfRange)->applyFromArray([
+                            'fill' => [
+                                'fillType' => Fill::FILL_SOLID,
+                                'color' => ['rgb' => 'C6E0B4'] // light green
+                            ]
+                        ]);
+                        // only one self-eval block per row, so can break if you want:
+                        break;
+                    }
+                }
+
                 $row++;
             }
 
@@ -246,8 +309,7 @@ class download_handler
             $avg_details = ["", "", "", "Average"];
             $avg_line = [];
 
-            foreach ($members as $group_member) {
-                $evaluatee = $group_member->userid;
+            foreach ($evaluatee_order as $evaluatee) {
                 $answers = [];
 
                 if (isset($vertical_sums[$evaluatee])) {
@@ -260,7 +322,6 @@ class download_handler
 
                 // Ensure always 6 columns (5Q + avg)
                 $answers = array_pad($answers, 6, '');
-
                 // Add trailing empty to match header layout
                 $answers[] = '';
 
@@ -269,17 +330,18 @@ class download_handler
 
             // Write the averages row
             $sheet->fromArray(array_merge($avg_details, $avg_line), null, "A{$row}");
-            $sheet->getStyle("A{$row}:" . $sheet->getHighestColumn() . "{$row}")->applyFromArray([
-                'fill' => [
-                    'fillType' => Fill::FILL_SOLID,
-                    'color' => ['rgb' => 'FFF2CC']
-                ],
-                'font' => ['bold' => true],
-                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-                'borders' => [
-                    'allBorders' => ['borderStyle' => Border::BORDER_THIN]
-                ]
-            ]);
+            // Style averages only across the team columns calculated earlier
+            $sheet->getStyle("A{$row}:{$lastCol}{$row}")->applyFromArray([
+                 'fill' => [
+                     'fillType' => Fill::FILL_SOLID,
+                     'color' => ['rgb' => 'FFF2CC']
+                 ],
+                 'font' => ['bold' => true],
+                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                 'borders' => [
+                     'allBorders' => ['borderStyle' => Border::BORDER_THIN]
+                 ]
+             ]);
 
             $row += 3; // Leave space between teams
         }
@@ -341,13 +403,11 @@ class download_handler
         //Groups
         if ($group_member = $DB->get_record('groups_members', ['userid' => $userid])) //get teamid
         {
-            if($group = $DB->get_record('groups', ['id' => $group_member->groupid]))
+            if ($group = $DB->get_record('groups', ['id' => $group_member->groupid]))
                 $group_name = $group->name;
             else
                 $group_name = '';
-        }
-        else
-        {
+        } else {
             $group_name = '';
         }
 
@@ -360,14 +420,74 @@ class download_handler
         $q3 = $record->q3 ?? null;
         $q4 = $record->q4 ?? null;
         $q5 = $record->q5 ?? null;
-        $average = isset($record->average) ? (float)$record->average : null;
+        $average = isset($record->average) ? (float) $record->average : null;
         $comment = $record->comment ?? null;
         $self_comment = $record->self_comment ?? null;
 
-        $line = [$userid,$name, $lastname,$memberid,$member_name, $member_lastname,$group_name,$polarity,
-                $sentiment_score,$q1,$q2,$q3,$q4,$q5,$average,$comment,$self_comment];
+        $line = [
+            $userid,
+            $name,
+            $lastname,
+            $memberid,
+            $member_name,
+            $member_lastname,
+            $group_name,
+            $polarity,
+            $sentiment_score,
+            $q1,
+            $q2,
+            $q3,
+            $q4,
+            $q5,
+            $average,
+            $comment,
+            $self_comment
+        ];
 
         return $line;
+    }
+
+    private function create_file_csv_sentiment($filename, $course)
+    {
+        global $DB;
+
+        // Remove any output before sending CSV
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        \core\session\manager::write_close();
+        
+        // Create temporary file in Moodle temp dir
+        $tempdir = make_temp_directory('smartspe');
+        $tempfile = $tempdir . '/' . $filename;
+
+        // Create CSV in memory
+        $fp = fopen($tempfile, 'w');
+        if (!$fp) {
+            throw new moodle_exception("Cannot open file stream for CSV");
+        }
+
+        $header = ["Evaluator ID", "Evaluator Name", "Evaluatee ID", "Evaluatee Name", "Group", "Evaluation Type", 
+                    "Feedback_Text", "Toxicity_score", "Toxicity_label", "text_score", "predicted_label"];
+
+        fputcsv($fp, $header);
+
+        $records = $DB->get_records('smartspe_evaluation', ['course' => $course]);
+        foreach ($records as $record) {
+            $line = $this->get_line_record_sentiment($record);
+            if (empty($line))
+                continue;
+            else
+                fputcsv($fp, $line);
+        }
+
+        fclose($fp);
+
+        // Use Moodle’s send_file() to serve download safely
+        send_file($tempfile, $filename, 0, 0, false, true, 'text/csv');
+
+        // Stop Moodle rendering page
+        exit;
     }
 
     private function get_line_record_sentiment($record)
@@ -389,20 +509,18 @@ class download_handler
         //Groups
         if ($group_member = $DB->get_record('groups_members', ['userid' => $userid])) //get teamid
         {
-            if($group = $DB->get_record('groups', ['id' => $group_member->groupid]))
+            if ($group = $DB->get_record('groups', ['id' => $group_member->groupid]))
                 $group_name = $group->name;
             else
                 $group_name = '';
-        }
-        else
-        {
+        } else {
             $group_name = '';
         }
 
         //Get analysis result
         $result = $DB->get_record('feedback_ai_results', ['evaluatorID' => $userid, 'evaluateeID' => $memberid]);
 
-        if(!$result)
+        if (!$result)
             return [];
 
         $eval_type = $result->evaluation_type;
@@ -412,8 +530,20 @@ class download_handler
         $eval_text_score = $result->text_score;
         $eval_predicted = $result->predicted_label;
 
-        $line = [$userid, $name, $memberid, $member_name, $group_name, $eval_type, $eval_feedback, $eval_toxicity_score
-                    , $eval_toxicity_label, $eval_text_score, $eval_predicted];
+        $line = [
+            $userid,
+            $name,
+            $memberid,
+            $member_name,
+            $group_name,
+            $eval_type,
+            $eval_feedback,
+            $eval_toxicity_score
+            ,
+            $eval_toxicity_label,
+            $eval_text_score,
+            $eval_predicted
+        ];
 
         return $line;
     }
@@ -425,9 +555,9 @@ class download_handler
         $q3 = $record->q3 ?? null;
         $q4 = $record->q4 ?? null;
         $q5 = $record->q5 ?? null;
-        $average = isset($record->average) ? (float)$record->average : null;
+        $average = isset($record->average) ? (float) $record->average : null;
 
-        $line = [$q1,$q2,$q3,$q4,$q5,$average, ""];
+        $line = [$q1, $q2, $q3, $q4, $q5, $average, ""];
 
         return $line;
     }
