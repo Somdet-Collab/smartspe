@@ -90,7 +90,7 @@ Student summaries
 Sentiment indicators
 Download reports
 Question management
-## 🧠 Sentiment Analysis
+### 🧠 Sentiment Analysis
 
 The plugin analyses peer comments to determine:
 
@@ -101,7 +101,7 @@ Invalid / null evaluation
 
 The sentiment result is compared against numerical scores to identify inconsistencies or suspicious evaluations.
 
-## 📊 Statistical Analysis
+### 📊 Statistical Analysis
 
 Examples include:
 
