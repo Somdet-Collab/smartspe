@@ -45,55 +45,7 @@ Consistency checking between:
 Numerical ratings
 Written comments
 Statistical analysis across team evaluations
-## 🏗️ Project Structure
-mod/smartspe
-│
-├── classes
-│   ├── handler
-│   │   ├── data_handler.php
-│   │   ├── data_persistence.php
-│   │   ├── download_handler.php
-│   │   ├── duration_controller.php
-│   │   ├── notification_handler.php
-│   │   ├── questions_handler.php
-│   │   └── submission_handler.php
-│   │
-│   ├── output
-│   │   ├── main.php
-│   │   └── renderer.php
-│   │
-│   ├── db_evaluation.php
-│   ├── db_team_manager.php
-│   ├── observer.php
-│   ├── smartspe_quiz_attempt.php
-│   ├── smartspe_quiz_manager.php
-│   ├── smartspe_sentiment_analysis.php
-│   └── user_permission.php
-│
-├── db
-│   ├── access.php
-│   ├── events.php
-│   ├── install.xml
-│   ├── messages.php
-│   └── upgrade.php
-│
-├── lang/en
-│   └── smartspe.php
-│
-├── templates
-│   ├── view.mustache
-│   └── teacher_view.mustache
-│
-├── pix
-│
-├── views
-│   └── secondary.php
-│
-├── lib.php
-├── mod_form.php
-├── view.php
-├── version.php
-└── README.md
+
 ## 🧩 Architecture
 
 SmartSPE follows Moodle’s plugin architecture and separates responsibilities into:
